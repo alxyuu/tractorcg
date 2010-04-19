@@ -5,7 +5,7 @@ import java.net.Socket;
 import java.io.IOException;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.Vector;
-import tractor.lib.IOFactory;
+import tractor.lib.MessageFactory;
 import tractor.server.User;
 
 class Server {
@@ -13,7 +13,9 @@ class Server {
 	private ServerSocket socket;
 	private ConcurrentHashMap<String,User> users;
 	private Vector<User> waiting;
-	final int PORT;
+	private IOHandler io;
+	private final int PORT;
+	private final int MAX_USERS = 500;
 
 	public static void main(String ... bobby) {
 		Server host = new Server();
@@ -31,6 +33,7 @@ class Server {
 			this.socket = new ServerSocket(this.PORT);
 			this.users = new ConcurrentHashMap<String,User>();
 			this.waiting = new Vector<User>();	
+			this.io = new IOHandler();
 		} catch (IOException e) {
 			//e.printStackTrace();
 			System.out.println("FATAL ERROR: failed to initialize socket");
@@ -48,15 +51,24 @@ class Server {
 			public void run() {
 				System.out.println("listening for connections");
 				while(true) {
-					try {
-						Socket sock = socket.accept();
-						System.out.println(sock);
-						sock.setSoTimeout(15000);
-						sock.setKeepAlive(true);
-						User user = new User(sock);
-						waiting.add(user);
-					} catch (IOException e) {
-						e.printStackTrace();
+					if(users.size()+waiting.size() < MAX_USERS) {
+						try {
+							Socket sock = socket.accept();
+							System.out.println(sock);
+							sock.setSoTimeout(15000);
+							sock.setKeepAlive(true);
+							User user = new User(sock);
+							io.add(user);
+							waiting.add(user);
+						} catch (IOException e) {
+							e.printStackTrace();
+						}
+					} else {
+						try {
+							Thread.sleep(1000);
+						} catch (InterruptedException e) {
+							e.printStackTrace();
+						}
 					}
 				}
 			}
@@ -70,27 +82,27 @@ class Server {
 					try {
 						if(!waiting.isEmpty()) {
 							User user = waiting.remove(0);
-							IOFactory io = user.getIO();
-							if(io.getMessageSize(IOFactory.LOGIN) >= 2) {
-								String name = io.getNextMessage(IOFactory.LOGIN);
-								if(io.getNextMessage(IOFactory.LOGIN).equals(user.getMD5())) {
+							MessageFactory io = user.getIO();
+							if(io.getMessageSize(MessageFactory.LOGIN) >= 2) {
+								String name = io.getNextMessage(MessageFactory.LOGIN);
+								if(io.getNextMessage(MessageFactory.LOGIN).equals(user.getMD5())) {
 									if(!users.containsKey(name)) {
 										user.setName(name);
-										io.write("1",IOFactory.LOGIN);
+										io.write("1",MessageFactory.LOGIN);
 										users.put(name,user);
 									} else {
-										io.write("2+",IOFactory.LOGIN);
-										io.clearMessageQueue(IOFactory.LOGIN);
+										io.write("2",MessageFactory.LOGIN);
+										io.clearMessageQueue(MessageFactory.LOGIN);
 										waiting.add(user);
 									}
 								} else {
-									io.write("3",IOFactory.LOGIN);
+									io.write("3",MessageFactory.LOGIN);
 									System.out.println("Auth Failure: MD5 mismatch from "+user.toString()+", booting");
-									io.kill();
+									//delay kill? user may not have received message yet
+									user.kill();
 									user = null;
 								}
 							} else {
-								//System.out.println("where did they go");
 								if(!waiting.isEmpty()) {
 									waiting.add(1,user);
 								} else {
@@ -117,16 +129,16 @@ class Server {
 					try {
 						for(String name : users.keySet()) {
 							User user = users.get(name);
-							if(user.getIO().checkError()) {
-								user.getIO().kill();
+							if(user.checkError()) {
+								user.kill();
 								users.remove(name);
 								System.out.println(user.toString()+" - connection closed");
 							}
 						}
 						for(int i = 0; i < waiting.size(); i++) {
 							User user = waiting.get(i);
-							if(user.getIO().checkError()) {
-								user.getIO().kill();
+							if(user.checkError()) {
+								user.kill();
 								waiting.remove(i);
 								System.out.println(user.toString()+" - connection closed");
 								i--;

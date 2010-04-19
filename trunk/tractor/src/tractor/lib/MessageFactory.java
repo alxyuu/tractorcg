@@ -1,7 +1,5 @@
 package tractor.lib;
 
-import java.io.IOException;
-import java.net.Socket;
 import java.util.concurrent.LinkedBlockingQueue;
 
 public class MessageFactory {
@@ -13,28 +11,25 @@ public class MessageFactory {
 
 	private LinkedBlockingQueue<String>[] in;
 	private LinkedBlockingQueue<String> out;
+	private long lastUpdate;
+	private long timeout;
 
 	@SuppressWarnings("unchecked")
-	public MessageFactory() {
-		this.socket = s;
+	public MessageFactory(long timeout) {
 		this.in = (LinkedBlockingQueue<String>[]) new LinkedBlockingQueue[4];
 		for(int i=0; i<4; i++) {
 			this.in[i] = new LinkedBlockingQueue<String>();
 		}
 		this.out = new LinkedBlockingQueue<String>();
-
+		
+		this.timeout = timeout;
+		this.lastUpdate = System.currentTimeMillis();
 	}
-
-	public boolean checkError() {
-		if( this.socket == null || !this.socket.isConnected() || this.out == null || this.out.checkError() || this.in == null )
-			return true;
-		return false;
-	}
-
+	
 	public void clearMessageQueue(int type) {
 		this.in[type].clear();
 	}
-
+	
 	public int getMessageSize(int type) {
 		return this.in[type].size();
 	}
@@ -54,15 +49,24 @@ public class MessageFactory {
 	public boolean hasNextWrite() {
 		return !this.out.isEmpty();
 	}
+
+	public boolean isAlive() {
+		return System.currentTimeMillis()-lastUpdate < timeout;
+	}
 	public void read(String message) throws ErroneousMessageException {
 		try {
 			int type = Integer.parseInt(message.substring(0,1));
 			this.in[type].add(message.substring(1,message.length()));
+			this.renew();
 		} catch (NumberFormatException e) {
 			throw new ErroneousMessageException("Message type not supplied");
 		} catch (ArrayIndexOutOfBoundsException e) {
 			throw new ErroneousMessageException("Message type invalid");
 		}
+	}
+	
+	public void renew() {
+		this.lastUpdate = System.currentTimeMillis();
 	}
 	public void write(String message, int type) {
 		this.out.offer(type+message);

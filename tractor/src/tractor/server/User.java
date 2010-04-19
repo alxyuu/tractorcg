@@ -1,10 +1,14 @@
 package tractor.server;
 
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStreamReader;
+import java.io.PrintWriter;
 import java.net.Socket;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.util.Queue;
-import tractor.lib.IOFactory;
+import tractor.lib.MessageFactory;
 
 class User {
 	
@@ -23,11 +27,11 @@ class User {
 	
 	//TODO: timeouts and shits
 	private long connectTime;
-	private IOFactory io;
+	private MessageFactory io;
 	private String md5;
 	public Queue<String> messages;
 	private String name;
-	private boolean ready;
+	private boolean error;
 	private Socket socket; 
 	
 	User(Socket socket) {
@@ -44,24 +48,30 @@ class User {
 			//this.md5 = new String(md.digest((md5salt+this.socket.toString()).getBytes()));
 			
 			this.name = "addr=" + this.socket.getInetAddress().toString() + ":" + this.socket.getPort();
-			this.ready = false;
+			this.error = false;
 			
-			this.io = new IOFactory(this.socket);
+			this.io = new MessageFactory(15000);
 
-			this.io.write(this.md5,IOFactory.LOGIN);
+			this.io.write(this.md5,MessageFactory.LOGIN);
 			
 		} catch (Exception e) {
 			e.printStackTrace();
-			this.io.kill();
+			this.kill();
 		}
+	}
+
+	public boolean checkError() {
+		if( this.error || this.socket == null || !this.socket.isConnected() || !this.io.isAlive())
+			return true;
+		return false;
+	}
+	
+	public MessageFactory getIO() {
+		return this.io;
 	}
 
 	public String getMD5() {
 		return this.md5;
-	}
-	
-	public IOFactory getIO() {
-		return this.io;
 	}
 
 	public String getName() {
@@ -72,21 +82,30 @@ class User {
 		return this.socket;
 	}
 
+	public void kill() {	
+		try {
+			if(this.socket != null) {
+				this.socket.close();
+				this.socket = null;
+			}
+
+		}
+		catch (IOException e) { this.socket = null; }
+	}
+
 	public void setName(String name) {
 		this.name = name;
 	}
-
-	public void setReadyState(boolean ready) {
-		this.ready = ready;
-	}
-
-	public String toString() {
-		return this.name;
+	
+	public void setError() {
+		this.error = true;
 	}
 	
-	public boolean checkError() {
-		if( this.socket == null || !this.socket.isConnected() || this.out == null || this.out.checkError() || this.in == null )
-			return true;
-		return false;
+	public void clearError() {
+		this.error = false;
+	}
+	
+	public String toString() {
+		return this.name;
 	}
 }

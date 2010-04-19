@@ -51,6 +51,7 @@ class Server {
 			public void run() {
 				System.out.println("listening for connections");
 				while(true) {
+					//TODO: proper overflow response
 					if(users.size()+waiting.size() < MAX_USERS) {
 						try {
 							Socket sock = socket.accept();

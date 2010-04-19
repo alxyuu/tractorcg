@@ -12,7 +12,8 @@ import tractor.lib.MessageFactory;
 class Client {
 
 	public static void main(String ... boobie) {
-		new Client("192.168.0.2",443,"bobby");
+		//new Client("192.168.0.2",443,"bobby");
+		new Client("10.4.6.197",443,"bobby");
 	}
 
 	private MessageFactory io;
@@ -111,7 +112,11 @@ class Client {
 		keepalive.start();
 
 		if(this.login()) {
-
+			 java.awt.EventQueue.invokeLater(new Runnable() {
+		            public void run() {
+		                new ClientView().setVisible(true);
+		            }
+		        });
 		} else {
 			System.out.println("login failed");
 			System.exit(0);

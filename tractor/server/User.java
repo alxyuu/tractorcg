@@ -84,4 +84,9 @@ class User {
 		return this.name;
 	}
 	
+	public boolean checkError() {
+		if( this.socket == null || !this.socket.isConnected() || this.out == null || this.out.checkError() || this.in == null )
+			return true;
+		return false;
+	}
 }

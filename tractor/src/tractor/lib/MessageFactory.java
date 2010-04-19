@@ -7,7 +7,8 @@ public class MessageFactory {
 	static public final int GAMECMD = 2;
 	static public final int KEEPALIVE = 0;
 	static public final int LOGIN = 1;
-	static public final int MESSAGE = 3;
+	static public final int CHAT = 3;
+	static public final int CHATCMD = 4;
 
 	private LinkedBlockingQueue<String>[] in;
 	private LinkedBlockingQueue<String> out;
@@ -16,7 +17,7 @@ public class MessageFactory {
 
 	@SuppressWarnings("unchecked")
 	public MessageFactory(long timeout) {
-		this.in = (LinkedBlockingQueue<String>[]) new LinkedBlockingQueue[4];
+		this.in = (LinkedBlockingQueue<String>[]) new LinkedBlockingQueue[5];
 		for(int i=0; i<4; i++) {
 			this.in[i] = new LinkedBlockingQueue<String>();
 		}

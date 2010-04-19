@@ -25,8 +25,6 @@ class User {
 		}
 	}
 	
-	//TODO: timeouts and shits
-	private long connectTime;
 	private MessageFactory io;
 	private String md5;
 	public Queue<String> messages;

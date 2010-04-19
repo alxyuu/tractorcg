@@ -10,7 +10,7 @@ class Client {
 		new Client("192.168.0.2",443,"bobby");
 	}
 	
-	private IOFactory io;
+	private MessageFactory io;
 	private final int MAX_TRIES = 5;
 	private String md5;
 	private boolean ready;
@@ -23,7 +23,7 @@ class Client {
 			this.socket.setSoTimeout(15000);
 			this.socket.setKeepAlive(true);
 
-			this.io = new IOFactory(this.socket);
+			this.io = new MessageFactory();
 			this.ready = false;
 			this.username = username;
 
@@ -41,24 +41,24 @@ class Client {
 
 	private boolean login() {
 		//get md5 from server
-		while(!this.io.hasNextMessage(IOFactory.LOGIN)) {
+		while(!this.io.hasNextMessage(MessageFactory.LOGIN)) {
 			try {
 				Thread.sleep(250);
 			} catch (InterruptedException e) {
 				e.printStackTrace();
 			}
 		}
-		this.md5 = this.io.getNextMessage(IOFactory.LOGIN);
+		this.md5 = this.io.getNextMessage(MessageFactory.LOGIN);
 
-		this.io.write(this.username,IOFactory.LOGIN);
-		this.io.write(this.md5,IOFactory.LOGIN);
+		this.io.write(this.username,MessageFactory.LOGIN);
+		this.io.write(this.md5,MessageFactory.LOGIN);
 
 
 		int tries = 1;
 
 		login: while(!ready && this.socket.isConnected() && tries <= MAX_TRIES) {
-			if(this.io.hasNextMessage(IOFactory.LOGIN)) {
-				char s = this.io.getNextMessage(IOFactory.LOGIN).charAt(0);
+			if(this.io.hasNextMessage(MessageFactory.LOGIN)) {
+				char s = this.io.getNextMessage(MessageFactory.LOGIN).charAt(0);
 				switch(s) {
 				case '1': 
 					this.ready = true;
@@ -67,8 +67,8 @@ class Client {
 					for(int i=0; i<tries; i++) {
 						this.username += "_";
 					}
-					this.io.write(this.username,IOFactory.LOGIN);
-					this.io.write(this.md5,IOFactory.LOGIN);
+					this.io.write(this.username,MessageFactory.LOGIN);
+					this.io.write(this.md5,MessageFactory.LOGIN);
 
 					tries++;
 					continue login;

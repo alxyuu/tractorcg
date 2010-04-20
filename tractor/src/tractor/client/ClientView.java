@@ -18,10 +18,14 @@ import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JTextArea;
 import javax.swing.JTextField;
+import javax.swing.SwingUtilities;
+
+import tractor.client.ClientConnection;
 
 public class ClientView extends JFrame {
 
 	private static final long serialVersionUID = -8991821814527274354L;
+	private static ClientView instance;
 	private JLabel statusField;
 	private JTextField statusColor;
 	private JPanel statusBar;
@@ -29,22 +33,48 @@ public class ClientView extends JFrame {
 	private JTextField chatLine;
 	private JTextField nameField;
 	private JButton connectButton;
+	private String username;
+	private ClientConnection connection;
 	public final static int NULL = 0;
 	public final static int DISCONNECTED = 1;
 	public final static int DISCONNECTING = 2;
 	public final static int BEGIN_CONNECT = 3;
 	public final static int CONNECTED = 4;
-	public final static String statusMessages[] = {
+	private final static String statusMessages[] = {
 		" Error! Could not connect!", " Disconnected",
 		" Disconnecting...", " Connecting...", " Connected"
 	};
 
 	public static void main(String ...bobby) {
-		new ClientView();
+		java.awt.EventQueue.invokeLater(new Runnable() {
+			public void run() {
+				new ClientView().setVisible(true);
+			}
+		});
 	}
 
 	public ClientView() {
+		ClientView.instance = this;
 		initComponents();
+	}
+	public static ClientView getInstance() {
+		return ClientView.instance;
+	}
+	private void connectTS() {
+	       // Call the run() routine (Runnable interface) on the
+	       // error-handling and GUI-update thread
+	       SwingUtilities.invokeLater(new Runnable() {
+	    	   public void run() {
+	    		   ClientView.getInstance().connect();
+	    	   }
+	       });
+	}
+	public void connect() {
+		this.statusField.setText(statusMessages[BEGIN_CONNECT]);
+		this.repaint();
+		//doesn't repaint until connection completed?
+		this.connection = new ClientConnection("10.4.6.197",443,this.username);
+		
 	}
 	private void initComponents() {
 
@@ -96,21 +126,15 @@ public class ClientView extends JFrame {
 		loginPane.setPreferredSize(new Dimension(640,480));
 
 		loginPane.add(new JLabel("TRACTORLOL"), new GridBagConstraints(0, 1, 1, 1, 0.0, 0.0, GridBagConstraints.CENTER, GridBagConstraints.NONE, new Insets(0, 0, 0, 0), 0, 0));
-		
+
 		JPanel userPane = new JPanel();
 		userPane.add(new JLabel("Username: "));
 		nameField = new JTextField(10);
 		nameField.setEnabled(true);
 		nameField.addFocusListener(new FocusAdapter() {
 			public void focusLost(FocusEvent e) {
-				/*nameField.selectAll();
-	               // Should be editable only when disconnected
-	               if (connectionStatus != DISCONNECTED) {
-	                  changeStatusNTS(NULL, true);
-	               }
-	               else {
-	                  screenname = nameField.getText();
-	               }*/
+				nameField.selectAll();
+				username = nameField.getText();
 			}
 		});
 		userPane.add(nameField);
@@ -118,14 +142,7 @@ public class ClientView extends JFrame {
 
 		ActionListener buttonListener = new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
-				/*// Request a connection initiation
-               if (e.getActionCommand().equals("connect")) {
-                  changeStatusNTS(BEGIN_CONNECT, true);
-               }
-               // Disconnect
-               else {
-                  changeStatusNTS(DISCONNECTING, true);
-               }*/
+				connectTS();
 			}
 		};
 		connectButton = new JButton("Connect");
@@ -143,7 +160,6 @@ public class ClientView extends JFrame {
 		this.setSize(this.getPreferredSize());
 		this.setLocation(200, 200);
 		this.pack();
-		this.setVisible(true);
 	}
 
 }

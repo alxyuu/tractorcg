@@ -9,12 +9,12 @@ import java.net.Socket;
 import tractor.lib.ErroneousMessageException;
 import tractor.lib.MessageFactory;
 
-class Client {
+class ClientConnection {
 
-	public static void main(String ... boobie) {
+	/*public static void main(String ... boobie) {
 		//new Client("192.168.0.2",443,"bobby");
 		new Client("10.4.6.197",443,"bobby");
-	}
+	}*/
 
 	private MessageFactory io;
 	private final int MAX_TRIES = 5;
@@ -24,8 +24,9 @@ class Client {
 	private String username;
 	private BufferedReader in;
 	private PrintWriter out;
+	private ThreadGroup iogroup;
 
-	Client(String ip, int port, String username) {
+	ClientConnection(String ip, int port, String username) {
 
 		try {
 			this.socket = new Socket(ip,port);
@@ -43,8 +44,8 @@ class Client {
 		this.username = username;
 
 
-
-		Thread listener = new Thread("listener") {
+		iogroup = new ThreadGroup("IOHandler");
+		Thread listener = new Thread(iogroup,"listener") {
 			public void run() {
 				System.out.println("waiting for incoming messages");
 				while(socket.isConnected()) {
@@ -70,7 +71,7 @@ class Client {
 		};
 		listener.start();
 
-		Thread output = new Thread("output") {
+		Thread output = new Thread(iogroup,"output") {
 			public void run() {
 				System.out.println("output stream open");
 				while(!out.checkError()) {
@@ -96,7 +97,7 @@ class Client {
 		output.start();
 
 		//TODO: merge with input
-		Thread keepalive = new Thread("keepalive") {
+		Thread keepalive = new Thread(iogroup,"keepalive") {
 			public void run() {
 				while(true) {
 					io.write("0", MessageFactory.KEEPALIVE);
@@ -112,16 +113,37 @@ class Client {
 		keepalive.start();
 
 		if(this.login()) {
-			 java.awt.EventQueue.invokeLater(new Runnable() {
-		            public void run() {
-		                new ClientView().setVisible(true);
-		            }
-		        });
+
 		} else {
 			System.out.println("login failed");
 			System.exit(0);
 		}
 
+	}
+
+	public void kill() {
+		this.iogroup.interrupt();
+		
+		try {
+			if(this.socket != null) {
+				this.socket.close();
+				this.socket = null;
+			}
+		}
+		catch (IOException e) { this.socket = null; }
+		try {
+			if(this.in != null) {
+				this.in.close();
+				this.in = null;
+			}
+		}
+		catch (IOException e) { this.in = null; }
+		if(this.out != null) {
+			this.out.close();
+			this.out = null;
+		}
+		
+		//clean up messagefactory
 	}
 
 	private boolean login() {

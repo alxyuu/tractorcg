@@ -3,6 +3,7 @@ package tractor.client;
 import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Dimension;
+import java.awt.EventQueue;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.Insets;
@@ -16,11 +17,10 @@ import javax.swing.JButton;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
+import javax.swing.JScrollPane;
 import javax.swing.JTextArea;
 import javax.swing.JTextField;
 import javax.swing.SwingUtilities;
-
-import tractor.client.ClientConnection;
 
 public class ClientView extends JFrame {
 
@@ -33,25 +33,13 @@ public class ClientView extends JFrame {
 	private JTextField chatLine;
 	private JTextField nameField;
 	private JButton connectButton;
-	private String username;
-	private ClientConnection connection;
-	public final static int NULL = 0;
-	public final static int DISCONNECTED = 1;
-	public final static int DISCONNECTING = 2;
-	public final static int BEGIN_CONNECT = 3;
-	public final static int CONNECTED = 4;
+	private JPanel loginPane;
+	private JPanel mainPane;
+	private JPanel chatPane;
 	private final static String statusMessages[] = {
 		" Error! Could not connect!", " Disconnected",
 		" Disconnecting...", " Connecting...", " Connected"
 	};
-
-	public static void main(String ...bobby) {
-		java.awt.EventQueue.invokeLater(new Runnable() {
-			public void run() {
-				new ClientView().setVisible(true);
-			}
-		});
-	}
 
 	public ClientView() {
 		ClientView.instance = this;
@@ -60,26 +48,58 @@ public class ClientView extends JFrame {
 	public static ClientView getInstance() {
 		return ClientView.instance;
 	}
-	private void connectTS() {
-	       // Call the run() routine (Runnable interface) on the
-	       // error-handling and GUI-update thread
-	       SwingUtilities.invokeLater(new Runnable() {
-	    	   public void run() {
-	    		   ClientView.getInstance().connect();
-	    	   }
-	       });
+	public void updateStatusTS() {
+		SwingUtilities.invokeLater(new Runnable() {
+			public void run() {
+				ClientView.getInstance().updateStatus();
+			}
+		});
 	}
-	public void connect() {
-		this.statusField.setText(statusMessages[BEGIN_CONNECT]);
+	public void updateStatus() {
+		mainPane.removeAll();
+		switch(Client.getInstance().getConnectionStatus()) {
+
+		//check errors
+		case Client.DISCONNECTED:
+			connectButton.setEnabled(true);
+			nameField.setEnabled(true);
+			chatLine.setText(""); chatLine.setEnabled(false);
+			statusColor.setBackground(Color.red);
+			mainPane.add(loginPane, BorderLayout.CENTER);
+			mainPane.add(statusBar, BorderLayout.SOUTH);
+			break;
+		case Client.CONNECTED:
+			connectButton.setEnabled(false);
+			nameField.setEnabled(false);
+			chatLine.setEnabled(true);
+			statusColor.setBackground(Color.green);
+			mainPane.add(chatPane, BorderLayout.CENTER);
+			mainPane.add(statusBar, BorderLayout.SOUTH);
+			break;
+
+		case Client.BEGIN_CONNECT:
+			connectButton.setEnabled(false);
+			nameField.setEnabled(false);
+			chatLine.setEnabled(false);
+			chatLine.grabFocus();
+			statusColor.setBackground(Color.orange);
+			mainPane.add(loginPane, BorderLayout.CENTER);
+			mainPane.add(statusBar, BorderLayout.SOUTH);
+			break;
+
+		}
+		statusField.setText(statusMessages[Client.getInstance().getConnectionStatus()]);
 		this.repaint();
-		//doesn't repaint until connection completed?
-		this.connection = new ClientConnection("10.4.6.197",443,this.username);
-		
+	}
+
+	public String getUsername() {
+		//this.nameField.selectAll();
+		return this.nameField.getText();
 	}
 	private void initComponents() {
 
 		statusField = new JLabel();
-		statusField.setText(statusMessages[DISCONNECTED]);
+		statusField.setText(statusMessages[Client.DISCONNECTED]);
 		statusColor = new JTextField(1);
 		statusColor.setBackground(Color.red);
 		statusColor.setEditable(false);
@@ -87,8 +107,8 @@ public class ClientView extends JFrame {
 		statusBar.add(statusColor, BorderLayout.WEST);
 		statusBar.add(statusField, BorderLayout.CENTER);
 
-		/*// Set up the chat pane
-		JPanel chatPane = new JPanel(new BorderLayout());
+		// Set up the chat pane
+		chatPane = new JPanel(new BorderLayout());
 		chatText = new JTextArea(10, 20);
 		chatText.setLineWrap(true);
 		chatText.setEditable(false);
@@ -108,14 +128,14 @@ public class ClientView extends JFrame {
 		});
 		chatPane.add(chatLine, BorderLayout.SOUTH);
 		chatPane.add(chatTextPane, BorderLayout.CENTER);
-		chatPane.setPreferredSize(new Dimension(600, 200));*/
+		chatPane.setPreferredSize(new Dimension(600, 200));
 
 		// Create an options pane
 
 
 
 
-		JPanel loginPane = new JPanel();
+		loginPane = new JPanel();
 
 		GridBagLayout loginPaneLayout = new GridBagLayout();
 		loginPaneLayout.rowWeights = new double[] {0.4, 0.1, 0.0, 0.0, 0.5};
@@ -131,18 +151,23 @@ public class ClientView extends JFrame {
 		userPane.add(new JLabel("Username: "));
 		nameField = new JTextField(10);
 		nameField.setEnabled(true);
-		nameField.addFocusListener(new FocusAdapter() {
+		/*nameField.addFocusListener(new FocusAdapter() {
 			public void focusLost(FocusEvent e) {
 				nameField.selectAll();
 				username = nameField.getText();
 			}
-		});
+		});*/
 		userPane.add(nameField);
 		loginPane.add(userPane, new GridBagConstraints(0, 2, 1, 1, 0.0, 0.0, GridBagConstraints.CENTER, GridBagConstraints.NONE, new Insets(0, 0, 0, 0), 0, 0));
 
 		ActionListener buttonListener = new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
-				connectTS();
+				if(Client.getInstance().isConnected()) {
+					Client.getInstance().login(true);
+				} else {
+					Client.getInstance().connect(true);
+				}
+				updateStatusTS();
 			}
 		};
 		connectButton = new JButton("Connect");
@@ -152,7 +177,7 @@ public class ClientView extends JFrame {
 		connectButton.setEnabled(true);
 		loginPane.add(connectButton, new GridBagConstraints(0, 3, 1, 1, 0.0, 0.0, GridBagConstraints.CENTER, GridBagConstraints.NONE, new Insets(0, 0, 0, 0), 0, 0));
 
-		JPanel mainPane = new JPanel(new BorderLayout());
+		mainPane = new JPanel(new BorderLayout());
 		mainPane.add(loginPane, BorderLayout.CENTER);
 		mainPane.add(statusBar, BorderLayout.SOUTH);
 		this.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);

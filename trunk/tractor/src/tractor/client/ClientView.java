@@ -26,6 +26,7 @@ public class ClientView extends JFrame {
 
 	private static final long serialVersionUID = -8991821814527274354L;
 	private static ClientView instance;
+	private Client client;
 	private JLabel statusField;
 	private JTextField statusColor;
 	private JPanel statusBar;
@@ -36,6 +37,7 @@ public class ClientView extends JFrame {
 	private JPanel loginPane;
 	private JPanel mainPane;
 	private JPanel chatPane;
+	private JLabel errorLabel;
 	private final static String statusMessages[] = {
 		" Error! Could not connect!", " Disconnected",
 		" Disconnecting...", " Connecting...", " Connected"
@@ -43,6 +45,7 @@ public class ClientView extends JFrame {
 
 	public ClientView() {
 		ClientView.instance = this;
+		this.client = Client.getInstance();
 		initComponents();
 	}
 	public static ClientView getInstance() {
@@ -57,7 +60,7 @@ public class ClientView extends JFrame {
 	}
 	public void updateStatus() {
 		mainPane.removeAll();
-		switch(Client.getInstance().getConnectionStatus()) {
+		switch(this.client.getConnectionStatus()) {
 
 		//check errors
 		case Client.DISCONNECTED:
@@ -65,6 +68,11 @@ public class ClientView extends JFrame {
 			nameField.setEnabled(true);
 			chatLine.setText(""); chatLine.setEnabled(false);
 			statusColor.setBackground(Color.red);
+			loginPane.remove(errorLabel);
+			if(this.client.getErrorCode() != ClientError.NO_ERROR) {
+				errorLabel.setText(this.client.getErrorMessage());
+				loginPane.add(errorLabel, new GridBagConstraints(0, 2, 1, 1, 0.0, 0.0, GridBagConstraints.CENTER, GridBagConstraints.NONE, new Insets(0, 0, 0, 0), 0, 0));
+			}
 			mainPane.add(loginPane, BorderLayout.CENTER);
 			mainPane.add(statusBar, BorderLayout.SOUTH);
 			break;
@@ -88,7 +96,7 @@ public class ClientView extends JFrame {
 			break;
 
 		}
-		statusField.setText(statusMessages[Client.getInstance().getConnectionStatus()]);
+		statusField.setText(statusMessages[this.client.getConnectionStatus()]);
 		this.repaint();
 	}
 
@@ -138,8 +146,8 @@ public class ClientView extends JFrame {
 		loginPane = new JPanel();
 
 		GridBagLayout loginPaneLayout = new GridBagLayout();
-		loginPaneLayout.rowWeights = new double[] {0.4, 0.1, 0.0, 0.0, 0.5};
-		loginPaneLayout.rowHeights = new int[] {7, 7, 7, 7, 7};
+		loginPaneLayout.rowWeights = new double[] {0.4, 0.1, 0.0, 0.0, 0.0, 0.5};
+		loginPaneLayout.rowHeights = new int[] {7, 7, 7, 7, 7, 7};
 		loginPaneLayout.columnWeights = new double[] {1.0};
 		loginPaneLayout.columnWidths = new int[] {7};
 		loginPane.setLayout(loginPaneLayout);
@@ -147,20 +155,11 @@ public class ClientView extends JFrame {
 
 		loginPane.add(new JLabel("TRACTORLOL"), new GridBagConstraints(0, 1, 1, 1, 0.0, 0.0, GridBagConstraints.CENTER, GridBagConstraints.NONE, new Insets(0, 0, 0, 0), 0, 0));
 
-		JPanel userPane = new JPanel();
-		userPane.add(new JLabel("Username: "));
-		nameField = new JTextField(10);
-		nameField.setEnabled(true);
-		/*nameField.addFocusListener(new FocusAdapter() {
-			public void focusLost(FocusEvent e) {
-				nameField.selectAll();
-				username = nameField.getText();
-			}
-		});*/
-		userPane.add(nameField);
-		loginPane.add(userPane, new GridBagConstraints(0, 2, 1, 1, 0.0, 0.0, GridBagConstraints.CENTER, GridBagConstraints.NONE, new Insets(0, 0, 0, 0), 0, 0));
-
-		ActionListener buttonListener = new ActionListener() {
+		errorLabel = new JLabel();
+		errorLabel.setForeground(Color.red);
+		//loginPane.add(errorLabel, new GridBagConstraints(0, 2, 1, 1, 0.0, 0.0, GridBagConstraints.CENTER, GridBagConstraints.NONE, new Insets(0, 0, 0, 0), 0, 0));
+		
+		ActionListener loginListener = new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
 				if(Client.getInstance().isConnected()) {
 					Client.getInstance().login(true);
@@ -170,12 +169,22 @@ public class ClientView extends JFrame {
 				updateStatusTS();
 			}
 		};
+		
+		JPanel userPane = new JPanel();
+		userPane.add(new JLabel("Username: "));
+		nameField = new JTextField(10);
+		nameField.setEnabled(true);
+		nameField.addActionListener(loginListener);
+		userPane.add(nameField);
+		loginPane.add(userPane, new GridBagConstraints(0, 3, 1, 1, 0.0, 0.0, GridBagConstraints.CENTER, GridBagConstraints.NONE, new Insets(0, 0, 0, 0), 0, 0));
+
+		
 		connectButton = new JButton("Connect");
 		connectButton.setMnemonic(KeyEvent.VK_C);
 		connectButton.setActionCommand("connect");
-		connectButton.addActionListener(buttonListener);
+		connectButton.addActionListener(loginListener);
 		connectButton.setEnabled(true);
-		loginPane.add(connectButton, new GridBagConstraints(0, 3, 1, 1, 0.0, 0.0, GridBagConstraints.CENTER, GridBagConstraints.NONE, new Insets(0, 0, 0, 0), 0, 0));
+		loginPane.add(connectButton, new GridBagConstraints(0, 4, 1, 1, 0.0, 0.0, GridBagConstraints.CENTER, GridBagConstraints.NONE, new Insets(0, 0, 0, 0), 0, 0));
 
 		mainPane = new JPanel(new BorderLayout());
 		mainPane.add(loginPane, BorderLayout.CENTER);

@@ -1,6 +1,7 @@
 package tractor.client;
 
 import java.io.IOException;
+import java.net.InetSocketAddress;
 import java.net.Socket;
 
 import tractor.lib.IOFactory;
@@ -16,7 +17,7 @@ public class Client {
 	private static Client instance;
 	//do something with this...
 	//support hostnames?
-	public final static String ip = "192.168.0.2";
+	public final static String ip = "10.4.6.197";
 	public final static int NULL = 0;
 	public final static int port = 443;
 	public static Client getInstance() {
@@ -36,10 +37,10 @@ public class Client {
 	}
 	
 	Client() {
+		Client.instance = this;
 		this.clientview = new ClientView();
 		this.clientview.setVisible(true);
 		this.io = new IOFactory(15000);
-		Client.instance = this;
 		while(true) {
 			try {
 				Thread.sleep(100);
@@ -63,14 +64,32 @@ public class Client {
 			} 
 			io.reset();
 			try {
-				Socket s = new Socket(Client.ip,Client.port);
+				Socket s = new Socket();
+				s.setSoTimeout(1000);
+				System.out.println("Establishing Connection");
+				s.connect(new InetSocketAddress(Client.ip,Client.port), 5000);
+				System.out.println("Connection Established");
 				s.setSoTimeout(15000);
 				s.setKeepAlive(true);
 				io.initIO(s);
 			} catch (IOException e) {
 				e.printStackTrace();
 				//do something
+				this.connectionStatus = DISCONNECTED;
+				this.setError(ClientError.CONNECT_SERVER_TIMEOUT, "connect failure: server timeout");
+				this.clientview.updateStatusTS();
 			}
+			//get md5 from server
+			//TODO: max wait time
+			while(!this.io.hasNextMessage(MessageFactory.LOGIN)) {
+				try {
+					Thread.sleep(250);
+				} catch (InterruptedException e) {
+					e.printStackTrace();
+				}
+			}
+			this.md5 = this.io.getNextMessage(MessageFactory.LOGIN);
+			
 			this.login(false);
 		}
 	}
@@ -87,10 +106,11 @@ public class Client {
 		return this.connectionStatus;
 	}
 	public boolean isConnected() {
-		return this.connectionStatus == CONNECTED && this.io.isAlive();
+		return this.io.isAlive();
 	}
 
 	public void login(boolean fork) {
+		this.connectionStatus = BEGIN_CONNECT;
 		if(fork) {
 			Thread login = new Thread("login") {
 				public void run() {
@@ -99,16 +119,7 @@ public class Client {
 			};
 			login.start();
 		} else {
-			//get md5 from server
-			//TODO: max wait time
-			while(!this.io.hasNextMessage(MessageFactory.LOGIN)) {
-				try {
-					Thread.sleep(250);
-				} catch (InterruptedException e) {
-					e.printStackTrace();
-				}
-			}
-			this.md5 = this.io.getNextMessage(MessageFactory.LOGIN);
+			
 
 			this.username = this.clientview.getUsername();
 			this.io.write(this.username,MessageFactory.LOGIN);
@@ -152,7 +163,7 @@ public class Client {
 		}
 	}
 	private void clearError() {
-		this.errorCode = null;
+		this.errorCode = ClientError.NO_ERROR;
 		this.errorMsg = null;
 	}
 	private void setError(ClientError error, String message) {

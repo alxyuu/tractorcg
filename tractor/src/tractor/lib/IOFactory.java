@@ -92,6 +92,9 @@ public class IOFactory extends MessageFactory {
 		keepalive.start();
 	}
 	
+	public boolean isAlive() {
+		return this.socket != null && this.socket.isConnected() && super.isAlive();
+	}
 	public void reset() {
 		
 		super.reset();

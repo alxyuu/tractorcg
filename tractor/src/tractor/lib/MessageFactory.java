@@ -1,6 +1,6 @@
 package tractor.lib;
 
-import java.util.concurrent.LinkedBlockingQueue;
+import java.util.concurrent.ConcurrentLinkedQueue;
 
 public class MessageFactory {
 
@@ -10,18 +10,18 @@ public class MessageFactory {
 	static public final int KEEPALIVE = 0;
 	static public final int LOGIN = 1;
 
-	private LinkedBlockingQueue<String>[] in;
+	private ConcurrentLinkedQueue<String>[] in;
 	private long lastUpdate;
-	private LinkedBlockingQueue<String> out;
+	private ConcurrentLinkedQueue<String> out;
 	private long timeout;
 
 	@SuppressWarnings("unchecked")
 	public MessageFactory(long timeout) {
-		this.in = (LinkedBlockingQueue<String>[]) new LinkedBlockingQueue[5];
+		this.in = (ConcurrentLinkedQueue<String>[]) new ConcurrentLinkedQueue[5];
 		for(int i=0; i<this.in.length; i++) {
-			this.in[i] = new LinkedBlockingQueue<String>();
+			this.in[i] = new ConcurrentLinkedQueue<String>();
 		}
-		this.out = new LinkedBlockingQueue<String>();
+		this.out = new ConcurrentLinkedQueue<String>();
 		
 		this.timeout = timeout;
 		this.lastUpdate = System.currentTimeMillis();

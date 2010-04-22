@@ -27,6 +27,7 @@ public class Server {
 	private final int PORT;
 	private ServerSocket socket;
 	private ConcurrentHashMap<String,User> users;
+	private ConcurrentHashMap<Integer,Chatroom> chatrooms;
 	private Vector<User> waiting;
 
 	Server() {
@@ -40,6 +41,7 @@ public class Server {
 			System.out.println("initing socket");
 			this.socket = new ServerSocket(this.PORT);
 			this.users = new ConcurrentHashMap<String,User>();
+			this.chatrooms = new ConcurrentHashMap<Integer,Chatroom>();
 			this.waiting = new Vector<User>();	
 			this.handlers = new ThreadGroup("Server Handlers");
 		} catch (IOException e) {
@@ -60,6 +62,10 @@ public class Server {
 
 	public ServerSocket getSocket() {
 		return this.socket;
+	}
+	
+	public ConcurrentHashMap<Integer,Chatroom> getChatrooms() {
+		return this.chatrooms;
 	}
 	
 	public ConcurrentHashMap<String,User> getUsers() {

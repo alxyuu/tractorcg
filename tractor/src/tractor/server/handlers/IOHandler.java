@@ -4,6 +4,7 @@ import java.io.IOException;
 
 import tractor.server.User;
 
+// "threadedhandler" class?
 public class IOHandler extends ThreadGroup {
 
 	private InputThread[] in;

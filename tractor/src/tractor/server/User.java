@@ -1,16 +1,13 @@
 package tractor.server;
 
-import java.io.BufferedReader;
 import java.io.IOException;
-import java.io.InputStreamReader;
-import java.io.PrintWriter;
 import java.net.Socket;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.util.Queue;
 import tractor.lib.MessageFactory;
 
-class User {
+public class User {
 	
 	private static MessageDigest md;
 	private static String md5salt;
@@ -32,7 +29,7 @@ class User {
 	private boolean error;
 	private Socket socket; 
 	
-	User(Socket socket) {
+	public User(Socket socket) {
 		try {
 			this.socket = socket;
 			

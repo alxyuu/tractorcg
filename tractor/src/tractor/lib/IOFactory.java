@@ -34,7 +34,8 @@ public class IOFactory extends MessageFactory {
 							read(line);
 							if(!line.equals("00")) System.out.println("input: "+line+"-end-");
 						} else {
-							Thread.sleep(250);
+							//dynamic sleeping?
+							Thread.sleep(100);
 						}
 					} catch (IOException e) {
 						e.printStackTrace();
@@ -63,7 +64,8 @@ public class IOFactory extends MessageFactory {
 						} while(hasNextWrite());
 					} else {
 						try {
-							Thread.sleep(250);
+							//dynamic sleeping?
+							Thread.sleep(100);
 						} catch (InterruptedException e) {
 							return;
 						}

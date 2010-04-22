@@ -1,4 +1,4 @@
-package tractor.server;
+package tractor.server.handlers;
 
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -9,6 +9,7 @@ import java.util.concurrent.ConcurrentHashMap;
 
 
 import tractor.lib.ErroneousMessageException;
+import tractor.server.User;
 
 public class InputThread extends Thread {
 	private ConcurrentHashMap<User,BufferedReader> users;
@@ -21,6 +22,9 @@ public class InputThread extends Thread {
 	}
 
 	public void run() {
+		/* INHERENT DESIGN FLAW:
+		 * server will not handle messages as it receives them, user are not synchronized
+		 */
 		//TODO: flood detection/prevention
 		System.out.println("listening with "+this.getName());
 		while(!users.isEmpty()) {
@@ -49,7 +53,8 @@ public class InputThread extends Thread {
 			}
 			
 			try {
-				Thread.sleep(250);
+				//dynamic sleeping?
+				Thread.sleep(100);
 			} catch (InterruptedException e) {
 				e.printStackTrace();
 			}

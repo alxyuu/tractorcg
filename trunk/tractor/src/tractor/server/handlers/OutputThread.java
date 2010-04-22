@@ -1,10 +1,13 @@
-package tractor.server;
+package tractor.server.handlers;
 
 import java.io.PrintWriter;
 import java.io.IOException;
 import java.util.Iterator;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
+
+import tractor.server.User;
+
 
 
 public class OutputThread extends Thread {
@@ -39,7 +42,8 @@ public class OutputThread extends Thread {
 			}
 			
 			try {
-				Thread.sleep(250);
+				//dynamic sleeping?
+				Thread.sleep(100);
 			} catch (InterruptedException e) {
 				e.printStackTrace();
 			}

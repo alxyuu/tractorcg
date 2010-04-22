@@ -31,6 +31,15 @@ public class MessageFactory {
 		this.in[type].clear();
 	}
 	
+	public void flush() {
+		while(this.hasNextWrite()) {
+			try {
+				Thread.sleep(100);
+			} catch (InterruptedException e) {
+				
+			}
+		}
+	}
 	public int getMessageSize(int type) {
 		return this.in[type].size();
 	}

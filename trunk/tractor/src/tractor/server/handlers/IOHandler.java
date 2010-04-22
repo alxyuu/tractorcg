@@ -1,6 +1,8 @@
-package tractor.server;
+package tractor.server.handlers;
 
 import java.io.IOException;
+
+import tractor.server.User;
 
 public class IOHandler extends ThreadGroup {
 

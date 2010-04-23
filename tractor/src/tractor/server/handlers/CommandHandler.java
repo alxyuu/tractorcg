@@ -23,14 +23,14 @@ public class CommandHandler extends ServerHandler {
 					User user = i.next();
 					MessageFactory io = user.getIO();
 					while(io.hasNextMessage(MessageFactory.CHATCMD)) {
-						String cmd = io.getNextMessage(MessageFactory.CHATCMD);
+						String cmd = io.getNextMessage(MessageFactory.CHATCMD).toUpperCase();
 						int index = cmd.indexOf(" ");
 						String command;
 						if(index == -1) {
 							index = cmd.length();
 							command = "";
 						} else {
-							command = cmd.substring(index+1).trim();
+							command = cmd.substring(index+1).trim().toUpperCase();
 						}
 						switch (ChatCommand.get(cmd.substring(0,index))) {
 						case C_JOIN:
@@ -51,9 +51,11 @@ public class CommandHandler extends ServerHandler {
 							if(topart != null) {
 								topart.part(user);
 								user.removeChatroom(topart);
+								System.out.println(user.getName() + " has left "+command);
 								io.write("PART "+command, MessageFactory.CHATCMD);
+							} else {
+								//do nothing?
 							}
-							//do nothing?
 							break;
 						default:
 							//some error handler+

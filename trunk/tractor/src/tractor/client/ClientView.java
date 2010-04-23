@@ -13,11 +13,20 @@ import java.awt.event.KeyEvent;
 import javax.swing.JButton;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
+import javax.swing.JMenu;
+import javax.swing.JMenuBar;
+import javax.swing.JMenuItem;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JTextArea;
 import javax.swing.JTextField;
 import javax.swing.SwingUtilities;
+import javax.swing.event.ChangeEvent;
+import javax.swing.event.ChangeListener;
+
+import tractor.lib.IOFactory;
+import tractor.thirdparty.CloseableTabbedPane;
+import tractor.thirdparty.CloseableTabbedPaneListener;
 
 public class ClientView extends JFrame {
 
@@ -35,6 +44,8 @@ public class ClientView extends JFrame {
 	private JPanel mainPane;
 	private JPanel chatPane;
 	private JLabel errorLabel;
+	private CloseableTabbedPane chatTabs;
+	private ChatPane console;
 	private final static String statusMessages[] = {
 		" Error! Could not connect!", " Disconnected",
 		" Disconnecting...", " Connecting...", " Connected"
@@ -101,8 +112,36 @@ public class ClientView extends JFrame {
 		//this.nameField.selectAll();
 		return this.nameField.getText();
 	}
+	private void initMenu() {
+		JMenuBar jMenuBar1 = new JMenuBar();
+		setJMenuBar(jMenuBar1);
+		{
+			JMenu jMenu1 = new JMenu();
+			jMenuBar1.add(jMenu1);
+			jMenu1.setText("File");
+			{
+				JMenuItem jMenuItem1 = new JMenuItem();
+				jMenu1.add(jMenuItem1);
+				jMenuItem1.setText("Disconnect");
+				JMenuItem jMenuItem2 = new JMenuItem();
+				jMenu1.add(jMenuItem2);
+				jMenuItem2.setText("Exit");
+				jMenuItem2.addActionListener(new ActionListener() {
+					public void actionPerformed(ActionEvent e) {
+						//TODO: clean up and disconnect
+						System.exit(0);
+					}
+				});
+			}
+		}
+	}
+	public void focusChat() {
+		this.chatLine.grabFocus();
+	}
 	private void initComponents() {
 
+		this.initMenu();
+		
 		statusField = new JLabel();
 		statusField.setText(statusMessages[Client.DISCONNECTED]);
 		statusColor = new JTextField(1);
@@ -114,25 +153,67 @@ public class ClientView extends JFrame {
 
 		// Set up the chat pane
 		chatPane = new JPanel(new BorderLayout());
-		chatText = new JTextArea(10, 20);
-		chatText.setLineWrap(true);
-		chatText.setEditable(false);
-		chatText.setForeground(Color.blue);
-		JScrollPane chatTextPane = new JScrollPane(chatText,
-				JScrollPane.VERTICAL_SCROLLBAR_ALWAYS,
-				JScrollPane.HORIZONTAL_SCROLLBAR_NEVER);
+		
+
 		chatLine = new JTextField();
 		chatLine.setEnabled(false);
 		chatLine.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
 				String s = chatLine.getText();
 				if (!s.equals("")) {
-					//cock goes here
+					if(s.charAt(0)== '/') {
+						int index = s.indexOf(" ");
+						String cmd,args;
+						if( index == -1) {
+							cmd = s.substring(1).toUpperCase();
+							args = "";
+						} else {
+							cmd = s.substring(1,index).toUpperCase();
+							args = s.substring(index+1);
+						}
+						if(cmd.equals("JOIN")) {
+							client.getIO().write("JOIN "+args, IOFactory.CHATCMD);
+						} else if(cmd.equals("PART")) {
+							if(args.equals(""))
+								args = getSelectedChatroomName();
+							client.getIO().write("PART "+args, IOFactory.CHATCMD);
+						} else if(cmd.equals("QUIT")) {
+							client.getIO().write("QUIT", IOFactory.CHATCMD);
+						} else {
+							System.out.println("no such command");
+						}
+					} else {
+						ChatPane chat = (ChatPane)chatTabs.getSelectedComponent();
+						if(chat != console) {
+							client.getIO().write(chat.getName()+"|"+s, IOFactory.CHAT);
+							chat.append(client.getUsername()+"> "+s);
+						} else {
+							chat.append("> "+s);
+						}
+					}
+					chatLine.setText("");
 				}
 			}
 		});
+		
+		chatTabs = new CloseableTabbedPane();
+		chatTabs.addCloseableTabbedPaneListener(new CloseableTabbedPaneListener() {
+			public boolean closeTab(int tabIndexToClose) {
+				client.getIO().write("PART "+chatTabs.getComponentAt(tabIndexToClose).getName(), IOFactory.CHATCMD);
+				return true;
+			}
+		});
+		chatTabs.addChangeListener(new ChangeListener() {
+			public void stateChanged(ChangeEvent e) {
+				ClientView.getInstance().focusChat();
+			}
+		});
+		
+		console = new ChatPane("Console");
+		chatTabs.addTab(console, false);
+		
 		chatPane.add(chatLine, BorderLayout.SOUTH);
-		chatPane.add(chatTextPane, BorderLayout.CENTER);
+		chatPane.add(chatTabs, BorderLayout.CENTER);
 		chatPane.setPreferredSize(new Dimension(600, 200));
 
 		// Create an options pane
@@ -174,7 +255,6 @@ public class ClientView extends JFrame {
 		nameField.addActionListener(loginListener);
 		userPane.add(nameField);
 		loginPane.add(userPane, new GridBagConstraints(0, 3, 1, 1, 0.0, 0.0, GridBagConstraints.CENTER, GridBagConstraints.NONE, new Insets(0, 0, 0, 0), 0, 0));
-
 		
 		connectButton = new JButton("Connect");
 		connectButton.setMnemonic(KeyEvent.VK_C);
@@ -191,6 +271,27 @@ public class ClientView extends JFrame {
 		this.setSize(this.getPreferredSize());
 		this.setLocation(200, 200);
 		this.pack();
+	}
+	
+	public void join(String name) {
+		this.chatTabs.addTab(new ChatPane(name),true);
+		this.chatTabs.setSelectedComponent(getChatroom(name));
+	}
+	
+	public void part(String name) {
+		int index = this.chatTabs.indexOfTab(name);
+		if(index != -1) {
+			this.chatTabs.remove(index);
+		}
+	}
+	public String getSelectedChatroomName() {
+		return this.chatTabs.getSelectedComponent().getName();
+	}
+	public ChatPane getChatroom(String name) {
+		int index = this.chatTabs.indexOfTab(name);
+		if(index == -1)
+			return null;
+		return (ChatPane) this.chatTabs.getComponentAt(index);
 	}
 
 }

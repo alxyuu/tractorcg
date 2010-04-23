@@ -17,7 +17,7 @@ public class Client {
 	private static Client instance;
 	//do something with this...
 	//support hostnames?
-	public final static String ip = "10.4.6.197";
+	public final static String ip = "192.168.0.2";
 	public final static int NULL = 0;
 	public final static int port = 443;
 	public static Client getInstance() {
@@ -41,11 +41,11 @@ public class Client {
 		this.clientview = new ClientView();
 		this.clientview.setVisible(true);
 		this.io = new IOFactory(15000);
-		while(true) {
+		/*while(true) {
 			try {
 				Thread.sleep(100);
 			} catch (InterruptedException e) {}
-		}
+		}*/
 	}
 
 	public void connect(boolean fork) {
@@ -67,7 +67,7 @@ public class Client {
 				Socket s = new Socket();
 				s.setSoTimeout(1000);
 				System.out.println("Establishing Connection");
-				s.connect(new InetSocketAddress(Client.ip,Client.port), 5000);
+				s.connect(new InetSocketAddress(Client.ip,Client.port), 2000);
 				System.out.println("Connection Established");
 				s.setSoTimeout(15000);
 				s.setKeepAlive(true);
@@ -92,6 +92,9 @@ public class Client {
 			
 			this.login(false);
 		}
+	}
+	public IOFactory getIO() {
+		return this.io;
 	}
 	public String getUsername() {
 		return username;
@@ -133,6 +136,7 @@ public class Client {
 					case '1': 
 						this.connectionStatus = CONNECTED;
 						this.clearError();
+						this.io.write("JOIN #lobby", MessageFactory.CHATCMD);
 						this.clientview.updateStatusTS();
 						break;
 					case '2':

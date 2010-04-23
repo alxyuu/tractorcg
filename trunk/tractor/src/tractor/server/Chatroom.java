@@ -2,17 +2,21 @@ package tractor.server;
 
 import java.util.Collections;
 import java.util.HashSet;
+import java.util.Iterator;
 import java.util.Set;
+
+import tractor.lib.MessageFactory;
 
 public class Chatroom {
 	private final String name;
 	private Set<User> users;
-	Chatroom(String name) {
+	public Chatroom(String name) {
 		this.name = name;
 		this.users = Collections.synchronizedSet(new HashSet<User>());
 	}
 	public void join(User user) {
 		this.users.add(user);
+		this.send(user, user.getName() + " has joined " + this.getName());
 	}
 	public void part(User user) {
 		this.users.remove(user);
@@ -28,5 +32,12 @@ public class Chatroom {
 	}
 	public int getID() {
 		return this.hashCode();
+	}
+	public void send(User user, String message) {
+		for(Iterator<User> i=this.users.iterator(); i.hasNext();) {
+			User u = i.next();
+			if(u!=user)
+				u.getIO().write(this.getName()+"|"+message, MessageFactory.CHAT);
+		}
 	}
 }

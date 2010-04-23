@@ -4,7 +4,10 @@ import java.io.IOException;
 import java.net.Socket;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
+import java.util.Iterator;
 import java.util.Queue;
+import java.util.Vector;
+
 import tractor.lib.MessageFactory;
 
 public class User {
@@ -24,7 +27,7 @@ public class User {
 	
 	private MessageFactory io;
 	private String md5;
-	public Queue<String> messages;
+	private Vector<Chatroom> chatrooms;
 	private String name;
 	private boolean error;
 	private Socket socket; 
@@ -46,6 +49,7 @@ public class User {
 			this.error = false;
 			
 			this.io = new MessageFactory(15000);
+			this.chatrooms = new Vector<Chatroom>();
 
 			this.io.write(this.md5,MessageFactory.LOGIN);
 			
@@ -53,6 +57,14 @@ public class User {
 			e.printStackTrace();
 			this.kill();
 		}
+	}
+	
+	public void addChatroom(Chatroom chat) {
+		this.chatrooms.add(chat);
+	}
+	
+	public void removeChatroom(Chatroom chat) {
+		this.chatrooms.remove(chat);
 	}
 
 	public boolean checkError() {
@@ -77,7 +89,11 @@ public class User {
 		return this.socket;
 	}
 
-	public void kill() {	
+	public void kill() {
+		for(Iterator<Chatroom> i=this.chatrooms.iterator();i.hasNext();) {
+			i.next().part(this);
+			i.remove();
+		}
 		try {
 			if(this.socket != null) {
 				this.socket.close();

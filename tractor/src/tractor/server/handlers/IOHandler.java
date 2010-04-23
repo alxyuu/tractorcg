@@ -5,16 +5,19 @@ import java.io.IOException;
 import tractor.server.User;
 
 // "threadedhandler" class?
-public class IOHandler extends ThreadGroup {
+class IOHandler extends ThreadGroup {
 
 	private InputThread[] in;
 	private OutputThread[] out;
+	private ChatThread[] chat;
 
 	IOHandler() {
 		super("IOHandler");
 
 		this.in = new InputThread[50];
 		this.out = new OutputThread[50];
+		this.chat = new ChatThread[50];
+		
 
 	}
 
@@ -47,6 +50,21 @@ public class IOHandler extends ThreadGroup {
 					//return i; 
 				} else if(!this.out[i].isFull()) {
 					this.out[i].add(user);
+					break;
+					//return i;
+				}	
+			}
+			for(int i=0;i<this.chat.length;i++) {
+				if(this.chat[i] != null && this.chat[i].getState() == Thread.State.TERMINATED)
+					this.chat[i] = null;
+				if(this.chat[i]==null) {
+					this.chat[i] = new ChatThread(this,"ChatThread-"+(i+1),10);
+					this.chat[i].add(user);
+					this.chat[i].start();
+					break;
+					//return i; 
+				} else if(!this.chat[i].isFull()) {
+					this.chat[i].add(user);
 					break;
 					//return i;
 				}	

@@ -1,14 +1,9 @@
 package tractor.server.handlers;
 
-import java.io.BufferedReader;
-import java.io.IOException;
-import java.io.InputStreamReader;
-import java.util.HashSet;
 import java.util.Iterator;
 import java.util.Vector;
 import java.util.concurrent.ConcurrentHashMap;
 
-import tractor.lib.ErroneousMessageException;
 import tractor.lib.MessageFactory;
 import tractor.server.Chatroom;
 import tractor.server.Server;
@@ -18,7 +13,7 @@ public class ChatThread extends Thread {
 
 	private final int limit;
 	private Vector<User> users;
-	private ConcurrentHashMap<Integer, Chatroom> chatrooms;
+	private ConcurrentHashMap<String, Chatroom> chatrooms;
 
 	ChatThread(ThreadGroup g, String n, int limit) {
 		super(g,n);
@@ -28,29 +23,31 @@ public class ChatThread extends Thread {
 	}
 
 	public void run() {
+		//TODO: LOTS OF OPTIMIZATION
 		System.out.println("handling chat with "+this.getName());
 		while(!users.isEmpty()) {
 			for(Iterator<User> i = users.iterator();i.hasNext();) {
 				User user = i.next();
+				if(user.checkError()) {
+					i.remove();
+					System.out.println(user+" chat handler closed");
+					continue;
+				}
 				MessageFactory io = user.getIO();
 				while(io.hasNextMessage(MessageFactory.CHAT)){
 					String msg = io.getNextMessage(MessageFactory.CHAT);
 					int index = msg.indexOf("|");
-					int id = -1;
-					try {
-						id = Integer.parseInt(msg.substring(0,index));
-					} catch (Exception e) { //both negative index and number format
-						System.out.println("exception in \""+this.getName()+"\": no chatroom id found");
-						continue;
-					}
-					if(!this.chatrooms.contains(id)) {
+					String id = msg.substring(0,index);
+					Chatroom chat = this.chatrooms.get(id);
+					if(chat == null) {
 						System.out.println("exception in \""+this.getName()+"\": chatroom "+id+" not found");
 						continue;
 					}
-					if(!this.chatrooms.get(id).contains(user)) {
+					if(!chat.contains(user)) {
 						System.out.println("security exception in \""+this.getName()+"\": "+user+" is not joined to "+this.chatrooms.get(id));
 						continue;
 					}
+					chat.send(user, user.getName()+"> "+msg.substring(index+1));
 				}
 			}
 			try {
@@ -67,8 +64,7 @@ public class ChatThread extends Thread {
 		return this.users.size() == this.limit;
 	}
 	
-	public void add(User user) throws IOException {
-		BufferedReader in = new BufferedReader(new InputStreamReader(user.getSocket().getInputStream()));
+	public void add(User user) {
 		this.users.add(user);
 	}
 }

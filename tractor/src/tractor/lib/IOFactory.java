@@ -6,24 +6,28 @@ import java.io.InputStreamReader;
 import java.io.PrintWriter;
 import java.net.Socket;
 
+import tractor.client.ChatPane;
+import tractor.client.ClientView;
+import tractor.server.Chatroom;
+
 //messagefactory with built in io handling, should only be used by client
 public class IOFactory extends MessageFactory {
-	
+
 	private Socket socket;
 	private BufferedReader in;
 	private PrintWriter out;
 	private ThreadGroup iogroup;
-	
+
 	public IOFactory(long timeout) {
 		super(timeout);
 		iogroup = new ThreadGroup("IOFactory");
 	}
-	
+
 	public void initIO(Socket s) throws IOException {
 		this.socket = s;
 		this.in = new BufferedReader(new InputStreamReader(socket.getInputStream()));
 		this.out = new PrintWriter(socket.getOutputStream(),false);
-		
+
 		Thread listener = new Thread(iogroup,"listener") {
 			public void run() {
 				System.out.println("waiting for incoming messages");
@@ -92,15 +96,76 @@ public class IOFactory extends MessageFactory {
 		};
 		keepalive.setDaemon(true);
 		keepalive.start();
+
+		Thread commands = new Thread(iogroup, "commands") {
+			public void run() {
+				while(true) {
+					if(hasNextMessage(CHATCMD)) {
+						String cmd = getNextMessage(CHATCMD);
+						int index = cmd.indexOf(" ");
+						String command;
+						if(index == -1) {
+							index = cmd.length();
+							command = "";
+						} else {
+							command = cmd.substring(index+1).trim();
+						}
+						switch (ChatCommand.get(cmd.substring(0,index))) {
+						case C_JOIN:
+							ClientView.getInstance().join(command);
+							break;
+						case C_PART:
+							ClientView.getInstance().part(command);
+							//do nothing?
+							break;
+						default:
+							//some error handler
+						}
+					} else {
+						try {
+							Thread.sleep(100);
+						} catch (InterruptedException e) {
+							return;
+						}
+					}
+				}
+			}
+		};
+		commands.start();
+
+		Thread chat = new Thread(iogroup, "chat") {
+			public void run() {
+				while(true) {
+					if(hasNextMessage(CHAT)){
+					String msg = getNextMessage(CHAT);
+					int index = msg.indexOf("|");
+					String room = msg.substring(0,index).trim();
+					ChatPane chat = ClientView.getInstance().getChatroom(room);
+					if( chat != null)
+						chat.append(msg.substring(index+1));
+					else
+						System.out.println("NOTICE: "+room+" not joined");
+						
+					} else {
+						try {
+							Thread.sleep(100);
+						} catch (InterruptedException e) {
+							return;
+						}
+					}
+				}
+			}
+		};
+		chat.start();
 	}
-	
+
 	public boolean isAlive() {
 		return this.socket != null && this.socket.isConnected() && super.isAlive();
 	}
 	public void reset() {
-		
+
 		super.reset();
-		
+
 		Thread[] threads = new Thread[this.iogroup.activeCount()];
 		this.iogroup.interrupt();
 		this.iogroup.enumerate(threads);
@@ -111,7 +176,7 @@ public class IOFactory extends MessageFactory {
 			} catch (InterruptedException e) {}
 		}
 		System.out.println("threads dead");
-		
+
 		try {
 			if(this.socket != null) {
 				this.socket.close();
@@ -130,7 +195,7 @@ public class IOFactory extends MessageFactory {
 			this.out.close();
 			this.out = null;
 		}
-		
+
 		//clean up messagefactory
 	}
 }

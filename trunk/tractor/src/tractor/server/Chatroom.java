@@ -20,6 +20,7 @@ public class Chatroom {
 	}
 	public void part(User user) {
 		this.users.remove(user);
+		this.send(user, user.getName() + " has left " + this.getName());
 	}
 	public String getName() {
 		return this.name;

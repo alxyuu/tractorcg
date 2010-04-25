@@ -81,6 +81,7 @@ public class ClientView extends JFrame {
 				errorLabel.setText(this.client.getErrorMessage());
 				loginPane.add(errorLabel, new GridBagConstraints(0, 2, 1, 1, 0.0, 0.0, GridBagConstraints.CENTER, GridBagConstraints.NONE, new Insets(0, 0, 0, 0), 0, 0));
 			}
+			nameField.grabFocus();
 			mainPane.add(loginPane, BorderLayout.CENTER);
 			mainPane.add(statusBar, BorderLayout.SOUTH);
 			break;
@@ -129,6 +130,7 @@ public class ClientView extends JFrame {
 				jMenuItem2.addActionListener(new ActionListener() {
 					public void actionPerformed(ActionEvent e) {
 						//TODO: clean up and disconnect
+						Client.getInstance().getIO().kill();
 						System.exit(0);
 					}
 				});
@@ -215,11 +217,6 @@ public class ClientView extends JFrame {
 		chatPane.add(chatLine, BorderLayout.SOUTH);
 		chatPane.add(chatTabs, BorderLayout.CENTER);
 		chatPane.setPreferredSize(new Dimension(600, 200));
-
-		// Create an options pane
-
-
-
 
 		loginPane = new JPanel();
 

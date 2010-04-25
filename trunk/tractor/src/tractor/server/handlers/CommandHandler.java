@@ -30,7 +30,7 @@ public class CommandHandler extends ServerHandler {
 							index = cmd.length();
 							command = "";
 						} else {
-							command = cmd.substring(index+1).trim().toUpperCase();
+							command = cmd.substring(index+1).trim();
 						}
 						switch (ChatCommand.get(cmd.substring(0,index))) {
 						case C_JOIN:

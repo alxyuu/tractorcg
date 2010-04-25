@@ -162,10 +162,7 @@ public class IOFactory extends MessageFactory {
 	public boolean isAlive() {
 		return this.socket != null && this.socket.isConnected() && super.isAlive();
 	}
-	public void reset() {
-
-		super.reset();
-
+	public void kill() {
 		Thread[] threads = new Thread[this.iogroup.activeCount()];
 		this.iogroup.interrupt();
 		this.iogroup.enumerate(threads);
@@ -173,7 +170,7 @@ public class IOFactory extends MessageFactory {
 		for(int i=0;i<threads.length;i++) {
 			try {
 				threads[i].join();
-			} catch (InterruptedException e) {}
+			} catch (Exception e) {/*interrupted or nullpointer, shouldn't matter*/}
 		}
 		System.out.println("threads dead");
 
@@ -195,7 +192,10 @@ public class IOFactory extends MessageFactory {
 			this.out.close();
 			this.out = null;
 		}
-
 		//clean up messagefactory
+	}
+	public void reset() {
+		this.kill();
+		super.reset();
 	}
 }

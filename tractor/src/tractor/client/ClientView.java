@@ -24,6 +24,11 @@ import javax.swing.SwingUtilities;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 
+import org.newdawn.slick.AppGameContainer;
+import org.newdawn.slick.CanvasGameContainer;
+import org.newdawn.slick.SlickException;
+
+import tractor.client.game.TractorGame;
 import tractor.lib.IOFactory;
 import tractor.thirdparty.CloseableTabbedPane;
 import tractor.thirdparty.CloseableTabbedPaneListener;
@@ -261,6 +266,37 @@ public class ClientView extends JFrame {
 		loginPane.add(connectButton, new GridBagConstraints(0, 4, 1, 1, 0.0, 0.0, GridBagConstraints.CENTER, GridBagConstraints.NONE, new Insets(0, 0, 0, 0), 0, 0));
 
 		mainPane = new JPanel(new BorderLayout());
+		
+		/*
+		 * test code
+		 */
+		this.setVisible(true);
+		CanvasGameContainer app = null;
+		JPanel gamePanel = new JPanel();
+		gamePanel.setSize(704,396);
+		gamePanel.setPreferredSize(new Dimension(704,396));
+		gamePanel.setMinimumSize(new Dimension(704,396));
+		try {
+			app = new CanvasGameContainer(new TractorGame());
+			//gamePanel.add(app);
+			app.getContainer().setAlwaysRender(true);
+			app.setPreferredSize(new Dimension(704,396));
+			app.setSize(704,396);
+			app.setMinimumSize(new Dimension(704,396));
+			app.setVisible(true);
+			app.start();
+			
+		} catch (SlickException e1) {
+			// TODO Auto-generated catch block
+			e1.printStackTrace();
+		}
+        //app.setDisplayMode(704,396,false);
+        //app.setTargetFrameRate(30);
+        mainPane.add(app, BorderLayout.CENTER);
+        /*
+         * test code
+         */
+        
 		mainPane.add(loginPane, BorderLayout.CENTER);
 		mainPane.add(statusBar, BorderLayout.SOUTH);
 		this.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);

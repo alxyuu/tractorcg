@@ -1,7 +1,10 @@
 package tractor.client;
 
+import java.awt.BorderLayout;
 import java.awt.Color;
+import java.awt.Point;
 
+import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JTextArea;
 import javax.swing.text.BadLocationException;
@@ -11,17 +14,22 @@ public class ChatPane extends JScrollPane {
 	 * 
 	 */
 	private static final long serialVersionUID = 1L;
-	private static final int MAX_LINES = 3;
+	private static final int MAX_LINES = 50;
 	private JTextArea textarea;
 	private int lines;
 	ChatPane(String name) {
 		super(JScrollPane.VERTICAL_SCROLLBAR_ALWAYS, JScrollPane.HORIZONTAL_SCROLLBAR_NEVER);
 		this.setName(name);
-		this.textarea = new JTextArea(10, 20);
+		this.textarea = new JTextArea();
 		textarea.setLineWrap(true);
 		textarea.setEditable(false);
 		textarea.setForeground(Color.blue);
-		this.setViewportView(textarea);
+		textarea.setWrapStyleWord(true);
+		JPanel panel = new JPanel( new BorderLayout() );
+		panel.setBackground( textarea.getBackground() );
+		panel.setBorder( textarea.getBorder() );
+		panel.add(textarea, BorderLayout.SOUTH);
+		this.setViewportView(panel);
 		//this.putClientProperty("isClosable",true);
 		this.lines = 0;
 	}
@@ -40,5 +48,6 @@ public class ChatPane extends JScrollPane {
 			this.textarea.replaceRange("",0,offset);
 			this.lines = this.textarea.getLineCount();
 		}
+		getVerticalScrollBar().setValue(getVerticalScrollBar().getMaximum()); // do I need to invoke later?
 	}
 }

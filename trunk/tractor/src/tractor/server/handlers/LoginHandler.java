@@ -27,6 +27,7 @@ public class LoginHandler extends ServerHandler {
 							io.write("3",MessageFactory.LOGIN);
 							System.out.println("Auth Failure: MD5 mismatch from "+user.toString()+", booting");
 							io.flush(); // wait until user gets the message
+							// maybe fork so other users don't have to wait
 							user.kill();
 							user = null;
 						}

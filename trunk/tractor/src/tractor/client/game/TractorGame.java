@@ -12,8 +12,11 @@ import tractor.lib.IOFactory;
 public class TractorGame extends BasicGame {
 
 	private IOFactory io;
-    public TractorGame() {
-        super("SimpleTest");
+	private OtherPlayerHand hand;
+	private int players;
+    public TractorGame(int players) {
+        super("Tractor "+players+"-way");
+        this.players = players;
     }
     
     @Override
@@ -21,6 +24,10 @@ public class TractorGame extends BasicGame {
     	System.out.println("init");
     	//this.io = Client.getInstance().getIO();
         GraphicsCard.populateDeck();
+        this.hand = new OtherPlayerHand(100,200);
+        for(int i=0;i<20;i++) {
+        	this.hand.addCard();
+        }
     }
 
     @Override
@@ -37,16 +44,19 @@ public class TractorGame extends BasicGame {
             throws SlickException {
         g.drawString("Hello, Slick world!", 0, 100);
        g.drawImage(GraphicsCard.getCard(GraphicsCard.CLUBS,GraphicsCard.ACE).getImage(), 100,100);
+       this.hand.render(g);
     }
 
     public static void main(String[] args) {
         try {
-            AppGameContainer app = new AppGameContainer(new TractorGame());
-            app.setDisplayMode(704,396,false);
+            AppGameContainer app = new AppGameContainer(new TractorGame(4));
+            app.setDisplayMode(960,600,false);
             //app.setTargetFrameRate(30);
+            System.out.println("start");
             app.start();
         } catch (SlickException e) {
             e.printStackTrace();
         }
+        System.out.println("continue");
     }
 }

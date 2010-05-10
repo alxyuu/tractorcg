@@ -269,7 +269,7 @@ public class ClientView extends JFrame {
 		
 		/*
 		 * test code
-		 */
+		 
 		this.setVisible(true);
 		CanvasGameContainer app = null;
 		JPanel gamePanel = new JPanel();

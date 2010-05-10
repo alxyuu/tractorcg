@@ -7,10 +7,13 @@ import tractor.lib.Card;
 
 public class GraphicsCard extends Card {
 	
-	private static Image back;
+	private static Image back,scaledback;
+	public static final int SCALED_HEIGHT = 98;
+	public static final int SCALED_WIDTH = 66;
 	static {
 		try {
 			back = new Image("images/cards/back.png");
+			scaledback = back.getScaledCopy(GraphicsCard.SCALED_WIDTH,GraphicsCard.SCALED_HEIGHT);
 		} catch (SlickException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
@@ -18,6 +21,10 @@ public class GraphicsCard extends Card {
 	}
 	
 	public static Image getBackImage() {
+		return GraphicsCard.scaledback;
+	}
+	
+	public static Image getFullsizeBackImage() {
 		return GraphicsCard.back;
 	}
 
@@ -36,11 +43,13 @@ public class GraphicsCard extends Card {
 	}
 	
 	private Image image;
+	private Image scaled;
 	
 	GraphicsCard(int suit, int value, String filename) {
 		super(suit,value);
 		try {
 			this.image = new Image(filename);
+			this.scaled = image.getScaledCopy(GraphicsCard.SCALED_WIDTH,GraphicsCard.SCALED_HEIGHT);
 		} catch (SlickException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
@@ -48,6 +57,10 @@ public class GraphicsCard extends Card {
 	}
 	 
 	public Image getImage() {
+		return this.scaled;
+	}
+	
+	public Image getFullsizeImage() {
 		return this.image;
 	}
 }

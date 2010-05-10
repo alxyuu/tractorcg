@@ -34,17 +34,21 @@ public class CommandHandler extends ServerHandler {
 						}
 						switch (ChatCommand.get(cmd.substring(0,index))) {
 						case C_JOIN:
-							//TODO: check valid room name
-							Chatroom tojoin = chatrooms.get(command);
-							if(tojoin == null) {
-								System.out.println(command+" not found, creating");
-								tojoin = new Chatroom(command);
-								chatrooms.put(command, tojoin);
+							if(command.charAt(0) != '#') { //TODO: valid characters check
+								System.out.println(user.getName() + " tried to join invalid room name: "+command);
+								io.write("ERR Invalid room name", MessageFactory.CHATCMD);
+							} else {
+								Chatroom tojoin = chatrooms.get(command);
+								if(tojoin == null) {
+									System.out.println(command+" not found, creating");
+									tojoin = new Chatroom(command);
+									chatrooms.put(command, tojoin);
+								}
+								tojoin.join(user);
+								user.addChatroom(tojoin);
+								System.out.println(user.getName() + " has joined "+command);
+								io.write("JOIN "+command, MessageFactory.CHATCMD);
 							}
-							tojoin.join(user);
-							user.addChatroom(tojoin);
-							System.out.println(user.getName() + " has joined "+command);
-							io.write("JOIN "+command, MessageFactory.CHATCMD);
 							break;
 						case C_PART:
 							Chatroom topart = chatrooms.get(command);
@@ -58,7 +62,8 @@ public class CommandHandler extends ServerHandler {
 							}
 							break;
 						default:
-							//some error handler+
+							//some error handler
+							io.write("ERR Unsupported command", MessageFactory.CHATCMD);
 						}
 					}
 				}

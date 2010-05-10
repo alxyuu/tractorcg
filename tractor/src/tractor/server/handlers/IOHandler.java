@@ -21,6 +21,10 @@ class IOHandler extends ThreadGroup {
 
 	}
 
+	/** It adds a user to the IO handler.
+	 * @param user
+	 *
+	 */
 	public void add(User user) {
 		try {
 			//TODO: synchronize input and output?

@@ -9,14 +9,19 @@ import javax.swing.JScrollPane;
 import javax.swing.JTextArea;
 import javax.swing.text.BadLocationException;
 
+/**
+ * @author 378250
+ *Displays the chat window
+ */
 public class ChatPane extends JScrollPane {
-	/**
-	 * 
-	 */
 	private static final long serialVersionUID = 1L;
 	private static final int MAX_LINES = 50;
 	private JTextArea textarea;
 	private int lines;
+	/** Constructor
+	 * @param name
+	 *
+	 */
 	ChatPane(String name) {
 		super(JScrollPane.VERTICAL_SCROLLBAR_ALWAYS, JScrollPane.HORIZONTAL_SCROLLBAR_NEVER);
 		this.setName(name);
@@ -33,6 +38,10 @@ public class ChatPane extends JScrollPane {
 		//this.putClientProperty("isClosable",true);
 		this.lines = 0;
 	}
+	/**
+	 * Adds a string to the chat window
+	 * @param s
+	 */
 	synchronized public void append(String s) {
 		this.textarea.append("\n"+s);
 		this.lines = this.textarea.getLineCount();

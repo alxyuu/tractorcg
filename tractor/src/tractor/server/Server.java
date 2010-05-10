@@ -12,6 +12,10 @@ public class Server {
 	private static Server instance;
 	//private final int MAX_USERS = 500;
 	
+	/**It returns the instance of the server
+	 * @return
+	 * 
+	 */
 	public static Server getInstance() {
 		return Server.instance;
 	}
@@ -52,27 +56,52 @@ public class Server {
 		}
 	}
 	
+	/**It adds a server handler.
+	 * @param handler
+	 * @param name
+	 * 
+	 */
 	public void addHandler(ServerHandler handler, String name) {
 		Thread t = new Thread(this.handlers, handler, name);
 		t.start();
 	}
 
+	/**It closes a server socket.
+	 * @throws IOException
+	 * 
+	 */
 	public void close() throws IOException {
 		this.socket.close();
 	}
 
+	/**It returns the socket of the server
+	 * @return
+	 * 
+	 */
 	public ServerSocket getSocket() {
 		return this.socket;
 	}
 	
+	/**It returns the various chatrooms on the server.
+	 * @return
+	 * 
+	 */
 	public ConcurrentHashMap<String,Chatroom> getChatrooms() {
 		return this.chatrooms;
 	}
 	
+	/**It gets the users on the server.
+	 * @return
+	 * 
+	 */
 	public ConcurrentHashMap<String,User> getUsers() {
 		return this.users;
 	}
 	
+	/**It returns the users waiting to login
+	 * @return
+	 * 
+	 */
 	public Vector<User> getWaiting() {
 		return this.waiting;
 	}

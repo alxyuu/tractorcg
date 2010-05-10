@@ -56,14 +56,24 @@ public class ClientView extends JFrame {
 		" Disconnecting...", " Connecting...", " Connected"
 	};
 
+	/**Constructor
+	 * 
+	 */
 	public ClientView() {
 		ClientView.instance = this;
 		this.client = Client.getInstance();
 		initComponents();
 	}
+	/**Returns an instance
+	 * @return
+	 * 
+	 */
 	public static ClientView getInstance() {
 		return ClientView.instance;
 	}
+	/**It updates the status asynchronously
+	 * 
+	 */
 	public void updateStatusTS() {
 		SwingUtilities.invokeLater(new Runnable() {
 			public void run() {
@@ -71,6 +81,9 @@ public class ClientView extends JFrame {
 			}
 		});
 	}
+	/**It updates the status 
+	 * 
+	 */
 	public void updateStatus() {
 		mainPane.removeAll();
 		switch(this.client.getConnectionStatus()) {
@@ -114,10 +127,17 @@ public class ClientView extends JFrame {
 		this.repaint();
 	}
 
+	/**Returns the username
+	 * @return
+	 * 
+	 */
 	public String getUsername() {
 		//this.nameField.selectAll();
 		return this.nameField.getText();
 	}
+	/**Initializes the menu
+	 * 
+	 */
 	private void initMenu() {
 		JMenuBar jMenuBar1 = new JMenuBar();
 		setJMenuBar(jMenuBar1);
@@ -142,9 +162,15 @@ public class ClientView extends JFrame {
 			}
 		}
 	}
+	/**It focuses on the chat window
+	 * 
+	 */
 	public void focusChat() {
 		this.chatLine.grabFocus();
 	}
+	/**It initializes the components
+	 * 
+	 */
 	private void initComponents() {
 
 		this.initMenu();
@@ -306,20 +332,37 @@ public class ClientView extends JFrame {
 		this.pack();
 	}
 	
+	/**It joins the new chatroom
+	 * @param name
+	 * 
+	 */
 	public void join(String name) {
 		this.chatTabs.addTab(new ChatPane(name),true);
 		this.chatTabs.setSelectedComponent(getChatroom(name));
 	}
 	
+	/**It leaves the chatroom
+	 * @param name
+	 * 
+	 */
 	public void part(String name) {
 		int index = this.chatTabs.indexOfTab(name);
 		if(index != -1) {
 			this.chatTabs.remove(index);
 		}
 	}
+	/**It gets the particular chatroom name
+	 * @return
+	 * 
+	 */
 	public String getSelectedChatroomName() {
 		return this.chatTabs.getSelectedComponent().getName();
 	}
+	/**Returns the chatroom
+	 * @param name
+	 * @return
+	 * 
+	 */
 	public ChatPane getChatroom(String name) {
 		int index = this.chatTabs.indexOfTab(name);
 		if(index == -1)

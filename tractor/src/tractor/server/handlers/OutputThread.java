@@ -51,10 +51,19 @@ public class OutputThread extends Thread {
 		System.out.println(this.getName()+" no longer serving users");
 	}
 	
+	/** It checks if the output thread is full.
+	 * @return
+	 *
+	 */
 	public boolean isFull() {
 		return this.users.size() == this.limit;
 	}
 	
+	/** It adds the user to the output thread.
+	 * @param user
+	 * @throws IOException
+	 *
+	 */
 	public void add(User user) throws IOException {
 		PrintWriter out = new PrintWriter(user.getSocket().getOutputStream(),false);
 		this.users.put(user,out);

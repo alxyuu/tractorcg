@@ -15,6 +15,9 @@ public class MessageFactory {
 	private ConcurrentLinkedQueue<String> out;
 	private long timeout;
 
+	/**Constructs the message factory.
+	 * @param timeout
+	 */
 	@SuppressWarnings("unchecked")
 	public MessageFactory(long timeout) {
 		this.in = (ConcurrentLinkedQueue<String>[]) new ConcurrentLinkedQueue[5];
@@ -27,10 +30,16 @@ public class MessageFactory {
 		this.lastUpdate = System.currentTimeMillis();
 	}
 	
+	/** It clears the message queue.
+	 * @param type
+	 */
 	public void clearMessageQueue(int type) {
 		this.in[type].clear();
 	}
 	
+	/** It waits until the write queue finishes writing.
+	 * 
+	 */
 	public void flush() {
 		while(this.hasNextWrite()) {
 			try {
@@ -40,14 +49,27 @@ public class MessageFactory {
 			}
 		}
 	}
+	/** Returns the size of the message
+	 * @param type
+	 * @return
+	 */
 	public int getMessageSize(int type) {
 		return this.in[type].size();
 	}
 
+	/** It returns the next message
+	 * @param type
+	 * @return
+	 */
 	public String getNextMessage(int type) {
 		return this.in[type].poll();
 	}
 
+	/** It returns the next message with type and blocking parameters
+	 * @param type
+	 * @param blocking
+	 * @return
+	 */
 	public String getNextMessage(int type, boolean blocking) {
 		if(blocking) {
 			while(!this.hasNextMessage(type)) {
@@ -61,22 +83,39 @@ public class MessageFactory {
 		return this.getNextMessage(type);
 	}
 
+	/** It returns what is being written next.
+	 * @return
+	 */
 	public String getNextWrite() {
 		return this.out.poll();
 	}
 
+	/** It checks whether there is another message.
+	 * @param type
+	 * @return
+	 */
 	public boolean hasNextMessage(int type) {
 		return !this.in[type].isEmpty();
 	}
 
+	/** It checks whether there is another message to be written.
+	 * @return
+	 */
 	public boolean hasNextWrite() {
 		return !this.out.isEmpty();
 	}
 
+	/** It checks whether the message factory is alive.
+	 * @return
+	 */
 	public boolean isAlive() {
 		return System.currentTimeMillis()-lastUpdate < timeout;
 	}
 	
+	/** It reads the message.
+	 * @param message
+	 * @throws ErroneousMessageException
+	 */
 	public void read(String message) throws ErroneousMessageException {
 		try {
 			int type = Integer.parseInt(message.substring(0,1));
@@ -89,10 +128,16 @@ public class MessageFactory {
 		}
 	}
 	
+	/** It updates the message.
+	 * 
+	 */
 	public void renew() {
 		this.lastUpdate = System.currentTimeMillis();
 	}
 	
+	/** It resets the message factory.
+	 * 
+	 */
 	public void reset() {
 		for(int i=0;i<this.in.length;i++) {
 			this.in[i].clear();
@@ -101,6 +146,10 @@ public class MessageFactory {
 		this.renew();
 	}
 	
+	/** It writes the message.
+	 * @param message
+	 * @param type
+	 */
 	public void write(String message, int type) {
 		this.out.offer(type+message);
 	}

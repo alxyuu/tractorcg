@@ -12,6 +12,5 @@
 			<attribute name="javadoc_location" value="file:/home/xshadowfire/Desktop/etc/slick/javadoc/"/>
 		</attributes>
 	</classpathentry>
-	<classpathentry combineaccessrules="false" kind="src" path="/org.eclipse.swt"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>

@@ -32,6 +32,10 @@ public class User {
 	private boolean error;
 	private Socket socket; 
 	
+	/** Constructor of the User class that initializes the attributes
+	 * @param socket
+	 *
+	 */
 	public User(Socket socket) {
 		try {
 			this.socket = socket;
@@ -59,36 +63,67 @@ public class User {
 		}
 	}
 	
+	/** It adds the user to the chatroom.
+	 * @param chat
+	 *
+	 */
 	public void addChatroom(Chatroom chat) {
 		this.chatrooms.add(chat);
 	}
 	
+	/**It removes the user from the chatroom.
+	 * @param chat
+	 * 
+	 */
 	public void removeChatroom(Chatroom chat) {
 		this.chatrooms.remove(chat);
 	}
 
+	/**It checks whether there is an error for the user.
+	 * @return
+	 * 
+	 */
 	public boolean checkError() {
 		if( this.error || this.socket == null || !this.socket.isConnected() || !this.io.isAlive())
 			return true;
 		return false;
 	}
 	
+	/**It returns the IO.
+	 * @return
+	 * 
+	 */
 	public MessageFactory getIO() {
 		return this.io;
 	}
 
+	/**It returns the MD5 of the user.
+	 * @return
+	 * 
+	 */
 	public String getMD5() {
 		return this.md5;
 	}
 
+	/**It returns the name of the user.
+	 * @return
+	 * 
+	 */
 	public String getName() {
 		return name;
 	}
 
+	/**It returns the server socket of the user.
+	 * @return
+	 * 
+	 */
 	public Socket getSocket() {
 		return this.socket;
 	}
 
+	/**
+	 * It removes the suer from the chatroom and closes the server socket.
+	 */
 	public void kill() {
 		for(Iterator<Chatroom> i=this.chatrooms.iterator();i.hasNext();) {
 			i.next().part(this);
@@ -104,14 +139,24 @@ public class User {
 		catch (IOException e) { this.socket = null; }
 	}
 
+	/**It sets the name of the user.
+	 * @param name
+	 * 
+	 */
 	public void setName(String name) {
 		this.name = name;
 	}
 	
+	/**
+	 * It sets the user's error.
+	 */
 	public void setError() {
 		this.error = true;
 	}
 	
+	/**
+	 * It gets rid of the user's error
+	 */
 	public void clearError() {
 		this.error = false;
 	}

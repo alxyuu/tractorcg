@@ -49,6 +49,10 @@ public class Client {
 		}*/
 	}
 
+	/**It connects to the network
+	 * @param fork
+	 * 
+	 */
 	public void connect(boolean fork) {
 		this.connectionStatus = BEGIN_CONNECT;
 		if(fork) {
@@ -94,25 +98,53 @@ public class Client {
 			this.login(false);
 		}
 	}
+	/**It gets the message factory
+	 * @return
+	 * 
+	 */
 	public IOFactory getIO() {
 		return this.io;
 	}
+	/**It gets the username
+	 * @return
+	 * 
+	 */
 	public String getUsername() {
 		return username;
 	}
+	/**It gets the error code
+	 * @return
+	 * 
+	 */
 	public ClientError getErrorCode() {
 		return this.errorCode;
 	}
+	/**It gets error message
+	 * @return
+	 * 
+	 */
 	public String getErrorMessage() {
 		return this.errorMsg;
 	}
+	/**It gets the connection status
+	 * @return
+	 * 
+	 */
 	public int getConnectionStatus() {
 		return this.connectionStatus;
 	}
+	/**It returns whether the client is connected
+	 * @return
+	 * 
+	 */
 	public boolean isConnected() {
 		return this.io.isAlive();
 	}
 
+	/**It logs in to the network
+	 * @param fork
+	 * 
+	 */
 	public void login(boolean fork) {
 		this.connectionStatus = BEGIN_CONNECT;
 		if(fork) {
@@ -167,15 +199,27 @@ public class Client {
 			}
 		}
 	}
+	/**It clears errors
+	 * 
+	 */
 	private void clearError() {
 		this.errorCode = ClientError.NO_ERROR;
 		this.errorMsg = null;
 	}
+	/**It sets what the error is
+	 * @param error
+	 * @param message
+	 * 
+	 */
 	private void setError(ClientError error, String message) {
 		this.errorCode = error;
 		this.errorMsg = message;
 	}
 
+	/**It sets what the username is
+	 * @param username
+	 * 
+	 */
 	public void setUsername(String username) {
 		this.username = username;
 	}

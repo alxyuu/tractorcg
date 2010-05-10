@@ -12,6 +12,10 @@ import tractor.server.Chatroom;
 import tractor.server.Server;
 import tractor.server.User;
 
+/**
+ * @author 378250
+ *
+ */
 public class CommandHandler extends ServerHandler {
 	public void run() {
 		System.out.println("listening for commands");
@@ -30,7 +34,7 @@ public class CommandHandler extends ServerHandler {
 							index = cmd.length();
 							command = "";
 						} else {
-							command = cmd.substring(index+1).trim();
+							command = cmd.substring(index+1).trim().toUpperCase();
 						}
 						switch (ChatCommand.get(cmd.substring(0,index))) {
 						case C_JOIN:
@@ -51,7 +55,7 @@ public class CommandHandler extends ServerHandler {
 							}
 							break;
 						case C_PART:
-							Chatroom topart = chatrooms.get(command);
+							Chatroom topart = chatrooms.get(command.toUpperCase());
 							if(topart != null) {
 								topart.part(user);
 								user.removeChatroom(topart);

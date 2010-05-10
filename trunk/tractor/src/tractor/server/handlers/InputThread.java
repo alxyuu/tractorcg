@@ -62,10 +62,19 @@ public class InputThread extends Thread {
 		System.out.println(this.getName()+" no longer serving users");
 	}
 	
+	/** It checks if the input thread is full.
+	 * @return
+	 *
+	 */
 	public boolean isFull() {
 		return this.users.size() == this.limit;
 	}
 	
+	/** It adds a user to the input thread.
+	 * @param user
+	 * @throws IOException
+	 *
+	 */
 	public void add(User user) throws IOException {
 		BufferedReader in = new BufferedReader(new InputStreamReader(user.getSocket().getInputStream()));
 		this.users.put(user,in);

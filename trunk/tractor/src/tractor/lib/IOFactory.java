@@ -18,11 +18,20 @@ public class IOFactory extends MessageFactory {
 	private PrintWriter out;
 	private ThreadGroup iogroup;
 
+	/**Constructs.
+	 * @param timeout
+	 * 
+	 */
 	public IOFactory(long timeout) {
 		super(timeout);
 		iogroup = new ThreadGroup("IOFactory");
 	}
 
+	/**It initializes the IO.
+	 * @param s
+	 * @throws IOException
+	 * 
+	 */
 	public void initIO(Socket s) throws IOException {
 		this.socket = s;
 		this.in = new BufferedReader(new InputStreamReader(socket.getInputStream()));
@@ -162,6 +171,9 @@ public class IOFactory extends MessageFactory {
 	public boolean isAlive() {
 		return this.socket != null && this.socket.isConnected() && super.isAlive();
 	}
+	/**It kills the factory.
+	 * 
+	 */
 	public void kill() {
 		Thread[] threads = new Thread[this.iogroup.activeCount()];
 		this.iogroup.interrupt();

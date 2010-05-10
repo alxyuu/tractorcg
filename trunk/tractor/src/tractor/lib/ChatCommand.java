@@ -22,6 +22,11 @@ public enum ChatCommand {
 		cset.put("QUIT", S_QUIT);
 	}
 	
+	/**It returns a command
+	 * @param s
+	 * @return
+	 * 
+	 */
 	public static ChatCommand get(String s) {
 		return cset.get(s);
 	}

@@ -20,6 +20,10 @@ public class GraphicsCard extends Card {
 		}
 	}
 	
+	/**Returns the image of the back of the card
+	 * @return
+	 * 
+	 */
 	public static Image getBackImage() {
 		return GraphicsCard.scaledback;
 	}
@@ -28,10 +32,19 @@ public class GraphicsCard extends Card {
 		return GraphicsCard.back;
 	}
 
+	/**It gets the card
+	 * @param suit
+	 * @param value
+	 * @return
+	 * 
+	 */
 	public static GraphicsCard getCard(int suit, int value) {
 		return (GraphicsCard)Card.getCard(suit,value);
 	}
 	
+	/**Fills the deck
+	 * 
+	 */
 	public static void populateDeck() {
 		for(int i=0; i<4; i++) {
 			for(int k=0; k<13; k++) {
@@ -56,6 +69,10 @@ public class GraphicsCard extends Card {
 		}
 	}
 	 
+	/**It returns the image of the card
+	 * @return
+	 * 
+	 */
 	public Image getImage() {
 		return this.scaled;
 	}

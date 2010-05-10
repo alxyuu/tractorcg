@@ -36,10 +36,20 @@ public class Card {
 		
 	}
 	
+	/**It gets the card
+	 * @param suit
+	 * @param value
+	 * @return
+	 * 
+	 */
 	public static Card getCard(int suit, int value) {
 		return cards.get(suit*Card.CARDS_PER_SUIT+value);
 	}
 	
+	/**It returns the deck
+	 * @return
+	 * 
+	 */
 	public static ArrayList<Card> getDeck() {
 		return cards;
 	}
@@ -47,6 +57,9 @@ public class Card {
 		System.out.println(Card.getCard(Card.HEARTS,Card.ACE));
 	}
 	
+	/**It populates the deck with cards
+	 * 
+	 */
 	public static void populateDeck() {
 		for(int i=0; i<4; i++) {
 			for(int k=0; k<13; k++) {
@@ -112,20 +125,37 @@ public class Card {
 	private int suit;
 	private int value;
 	
+	/**Creates the Card object
+	 * @param suit
+	 * @param value
+	 * 
+	 */
 	protected Card(int suit, int value) {
 		this.value = value;
 		this.suit = suit;
 	}
 	
+	/**Returns the number on the card
+	 * @return
+	 * 
+	 */
 	public int getNumber() {
 		return this.value;
 	}
 	
+	/**Returns the sorted rank of the card
+	 * @return
+	 * 
+	 */
 	public int getSortingValue() {
 		//return ( (this.suit == Card.TRUMP_SUIT) ? Card.TRUMP : this.suit ) *
 		//wait for aaron
 		return 0;
 	}
+	/**It gets the suit of the card
+	 * @return
+	 * 
+	 */
 	public int getSuit() {
 		return this.suit;
 	}

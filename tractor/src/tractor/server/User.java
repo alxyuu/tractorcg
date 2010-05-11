@@ -31,6 +31,7 @@ public class User {
 	private String name;
 	private boolean error;
 	private Socket socket; 
+	private Gameroom game;
 	
 	/** Constructor of the User class that initializes the attributes
 	 * @param socket
@@ -69,6 +70,14 @@ public class User {
 	 */
 	public void addChatroom(Chatroom chat) {
 		this.chatrooms.add(chat);
+	}
+	
+	public Gameroom getCurrentGame() {
+		return this.game;
+	}
+	
+	public void setCurrentGame(Gameroom game) {
+		this.game = game;
 	}
 	
 	/**It removes the user from the chatroom.

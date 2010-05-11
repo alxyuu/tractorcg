@@ -4,11 +4,13 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.Iterator;
 import java.util.Set;
+import java.util.TreeSet;
 import java.util.concurrent.ConcurrentHashMap;
 
 import tractor.lib.ChatCommand;
 import tractor.lib.MessageFactory;
 import tractor.server.Chatroom;
+import tractor.server.Gameroom;
 import tractor.server.Server;
 import tractor.server.User;
 
@@ -19,11 +21,12 @@ import tractor.server.User;
 public class CommandHandler extends ServerHandler {
 	public void run() {
 		System.out.println("listening for commands");
-		Collection<User> users = Collections.synchronizedCollection(Server.getInstance().getUsers().values());
+		//Collection<User> users = Collections.synchronizedCollection(Server.getInstance().getUsers().values());
+		ConcurrentHashMap<String,User> users = Server.getInstance().getUsers();
 		ConcurrentHashMap<String,Chatroom> chatrooms = Server.getInstance().getChatrooms();
 		while(true) {
 			try {
-				for(Iterator<User> i = users.iterator(); i.hasNext();) {
+				for(Iterator<User> i = users.values().iterator(); i.hasNext();) {
 					User user = i.next();
 					MessageFactory io = user.getIO();
 					while(io.hasNextMessage(MessageFactory.CHATCMD)) {
@@ -34,27 +37,31 @@ public class CommandHandler extends ServerHandler {
 							index = cmd.length();
 							command = "";
 						} else {
-							command = cmd.substring(index+1).trim().toUpperCase();
+							//command = cmd.substring(index+1).trim().toUpperCase();
+							command = cmd.substring(index+1).trim();
 						}
 						switch (ChatCommand.get(cmd.substring(0,index))) {
 						case C_JOIN:
+						{
 							if(command.charAt(0) != '#') { //TODO: valid characters check
 								System.out.println(user.getName() + " tried to join invalid room name: "+command);
 								io.write("ERR Invalid room name", MessageFactory.CHATCMD);
 							} else {
-								Chatroom tojoin = chatrooms.get(command);
+								Chatroom tojoin = chatrooms.get(command.toUpperCase());
 								if(tojoin == null) {
 									System.out.println(command+" not found, creating");
 									tojoin = new Chatroom(command);
-									chatrooms.put(command, tojoin);
+									chatrooms.put(command.toUpperCase(), tojoin);
 								}
 								tojoin.join(user);
 								user.addChatroom(tojoin);
 								System.out.println(user.getName() + " has joined "+command);
 								io.write("JOIN "+command, MessageFactory.CHATCMD);
 							}
-							break;
+						}
+						break;
 						case C_PART:
+						{
 							Chatroom topart = chatrooms.get(command.toUpperCase());
 							if(topart != null) {
 								topart.part(user);
@@ -64,9 +71,53 @@ public class CommandHandler extends ServerHandler {
 							} else {
 								//do nothing?
 							}
+						}
 							break;
+						case G_CREATE:
+						{
+							if(user.getCurrentGame() == null) {
+								Gameroom room = new Gameroom(4);
+								chatrooms.put(room.getName(), room);
+								room.join(user);
+								user.setCurrentGame(room);
+								user.addChatroom(room);
+							} else {
+								//TODO: already in game, error handler
+							}
+						}
+						break;
+						case G_HOOK:
+						{
+							User tohook = users.get(command.toUpperCase());
+							if(tohook != null) {
+								Gameroom tojoin = tohook.getCurrentGame();
+								if(tojoin != null) {
+									if(tojoin.join(user)) {
+										user.setCurrentGame(tojoin);
+										user.addChatroom(tojoin);
+									} else {
+										//TODO: game full error
+									}
+									
+								} else {
+									//TODO: game not found error
+								}
+							} else {
+								//TODO: user not found error
+							}
+						}
+						case G_PART:
+						{
+							Chatroom topart;
+							if((topart = chatrooms.get(command)) != null && topart == user.getCurrentGame()) {
+								topart.part(user);
+								user.setCurrentGame(null);
+								user.removeChatroom(topart);
+							}
+						}
+						break;
 						default:
-							//some error handler
+							//TODO: some error handler
 							io.write("ERR Unsupported command", MessageFactory.CHATCMD);
 						}
 					}

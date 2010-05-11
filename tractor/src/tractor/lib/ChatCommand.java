@@ -9,6 +9,7 @@ public enum ChatCommand {
 	E_ERR,
 	G_CREATE,
 	G_HOOK,
+	G_PART,
 	S_QUIT;
 	
 	private static HashMap<String,ChatCommand> cset;
@@ -19,6 +20,7 @@ public enum ChatCommand {
 		cset.put("ERR", E_ERR);
 		cset.put("GCREATE", G_CREATE);
 		cset.put("GHOOK", G_HOOK);
+		cset.put("GPART", G_PART);
 		cset.put("QUIT", S_QUIT);
 	}
 	

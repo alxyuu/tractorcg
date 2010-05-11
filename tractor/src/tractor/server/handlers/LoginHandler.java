@@ -14,10 +14,10 @@ public class LoginHandler extends ServerHandler {
 					if(io.getMessageSize(MessageFactory.LOGIN) >= 2) {
 						String name = io.getNextMessage(MessageFactory.LOGIN);
 						if(io.getNextMessage(MessageFactory.LOGIN).equals(user.getMD5())) {
-							if(!users.containsKey(name)) {
+							if(!users.containsKey(name.toUpperCase())) {
 								user.setName(name);
 								io.write("1",MessageFactory.LOGIN);
-								users.put(name,user);
+								users.put(name.toUpperCase(),user);
 							} else {
 								io.write("2",MessageFactory.LOGIN);
 								io.clearMessageQueue(MessageFactory.LOGIN);

@@ -36,9 +36,10 @@ public class Chatroom {
 	 * @param user
 	 * 
 	 */
-	public void join(User user) {
+	public boolean join(User user) {
 		this.users.add(user);
 		this.send(user, user.getName() + " has joined " + this.getName());
+		return true;
 	}
 
 	/**It removes the user from the chatroom

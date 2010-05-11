@@ -28,6 +28,10 @@ public class Chatroom {
 		this.name = name;
 	}
 
+	public int getSize() {
+		return this.users.size();
+	}
+	
 	/**It joins the user to the chatroom
 	 * @param user
 	 * 

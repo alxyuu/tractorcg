@@ -7,7 +7,7 @@ import org.newdawn.slick.SlickException;
 import org.newdawn.slick.AppGameContainer;
 
 import tractor.client.Client;
-import tractor.lib.IOFactory;
+import tractor.client.handlers.IOFactory;
 
 public class TractorGame extends BasicGame {
 

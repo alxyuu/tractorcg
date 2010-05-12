@@ -81,6 +81,7 @@ public class CommandHandler extends ServerHandler {
 								room.join(user);
 								user.setCurrentGame(room);
 								user.addChatroom(room);
+								io.write("GCREATE "+room.getName(), MessageFactory.CHATCMD);
 							} else {
 								//TODO: already in game, error handler
 							}
@@ -95,6 +96,7 @@ public class CommandHandler extends ServerHandler {
 									if(tojoin.join(user)) {
 										user.setCurrentGame(tojoin);
 										user.addChatroom(tojoin);
+										io.write("GHOOK "+tojoin.getName(), MessageFactory.CHATCMD);
 									} else {
 										//TODO: game full error
 									}
@@ -113,6 +115,7 @@ public class CommandHandler extends ServerHandler {
 								topart.part(user);
 								user.setCurrentGame(null);
 								user.removeChatroom(topart);
+								io.write("GPART "+topart.getName(), MessageFactory.CHATCMD);
 							}
 						}
 						break;

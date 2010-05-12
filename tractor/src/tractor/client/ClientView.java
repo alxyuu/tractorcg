@@ -29,7 +29,7 @@ import org.newdawn.slick.CanvasGameContainer;
 import org.newdawn.slick.SlickException;
 
 import tractor.client.game.TractorGame;
-import tractor.lib.IOFactory;
+import tractor.client.handlers.IOFactory;
 import tractor.thirdparty.CloseableTabbedPane;
 import tractor.thirdparty.CloseableTabbedPaneListener;
 
@@ -190,44 +190,7 @@ public class ClientView extends JFrame {
 
 		chatLine = new JTextField();
 		chatLine.setEnabled(false);
-		chatLine.addActionListener(new ActionListener() {
-			public void actionPerformed(ActionEvent e) {
-				String s = chatLine.getText();
-				if (!s.equals("")) {
-					if(s.charAt(0)== '/') {
-						int index = s.indexOf(" ");
-						String cmd,args;
-						if( index == -1) {
-							cmd = s.substring(1).toUpperCase();
-							args = "";
-						} else {
-							cmd = s.substring(1,index).toUpperCase();
-							args = s.substring(index+1);
-						}
-						if(cmd.equals("JOIN")) {
-							client.getIO().write("JOIN "+args, IOFactory.CHATCMD);
-						} else if(cmd.equals("PART")) {
-							if(args.equals(""))
-								args = getSelectedChatroomName();
-							client.getIO().write("PART "+args, IOFactory.CHATCMD);
-						} else if(cmd.equals("QUIT")) {
-							client.getIO().write("QUIT", IOFactory.CHATCMD);
-						} else {
-							System.out.println("no such command");
-						}
-					} else {
-						ChatPane chat = (ChatPane)chatTabs.getSelectedComponent();
-						if(chat != console) {
-							client.getIO().write(chat.getName()+"|"+s, IOFactory.CHAT);
-							chat.append(client.getUsername()+"> "+s);
-						} else {
-							chat.append("> "+s);
-						}
-					}
-					chatLine.setText("");
-				}
-			}
-		});
+		chatLine.addActionListener(new CommandListener());
 		
 		chatTabs = new CloseableTabbedPane();
 		chatTabs.addCloseableTabbedPaneListener(new CloseableTabbedPaneListener() {
@@ -368,6 +331,18 @@ public class ClientView extends JFrame {
 		if(index == -1)
 			return null;
 		return (ChatPane) this.chatTabs.getComponentAt(index);
+	}
+	
+	public JTextField getChatLine() {
+		return this.chatLine;
+	}
+	
+	public CloseableTabbedPane getChatTabs() {
+		return this.chatTabs;
+	}
+	
+	public ChatPane getConsole() {
+		return this.console;
 	}
 
 }

@@ -4,7 +4,7 @@ import java.io.IOException;
 import java.net.InetSocketAddress;
 import java.net.Socket;
 
-import tractor.lib.IOFactory;
+import tractor.client.handlers.IOFactory;
 import tractor.lib.MessageFactory;
 
 public class Client {

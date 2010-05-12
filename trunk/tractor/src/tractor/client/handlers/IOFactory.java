@@ -1,4 +1,4 @@
-package tractor.lib; //move to tractor.client?
+package tractor.client.handlers; //move to tractor.client?
 
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -8,7 +8,9 @@ import java.net.Socket;
 
 import tractor.client.ChatPane;
 import tractor.client.ClientView;
-import tractor.server.Chatroom;
+import tractor.lib.ChatCommand;
+import tractor.lib.ErroneousMessageException;
+import tractor.lib.MessageFactory;
 
 //messagefactory with built in io handling, should only be used by client
 public class IOFactory extends MessageFactory {
@@ -106,41 +108,7 @@ public class IOFactory extends MessageFactory {
 		keepalive.setDaemon(true);
 		keepalive.start();
 
-		Thread commands = new Thread(iogroup, "commands") {
-			public void run() {
-				while(true) {
-					if(hasNextMessage(CHATCMD)) {
-						String cmd = getNextMessage(CHATCMD);
-						int index = cmd.indexOf(" ");
-						String command;
-						if(index == -1) {
-							index = cmd.length();
-							command = "";
-						} else {
-							command = cmd.substring(index+1).trim();
-						}
-						switch (ChatCommand.get(cmd.substring(0,index))) {
-						case C_JOIN:
-							ClientView.getInstance().join(command);
-							break;
-						case C_PART:
-							ClientView.getInstance().part(command);
-							//do nothing?
-							break;
-						default:
-							//some error handler
-						}
-					} else {
-						try {
-							Thread.sleep(100);
-						} catch (InterruptedException e) {
-							return;
-						}
-					}
-				}
-			}
-		};
-		commands.start();
+		this.addHandler(new CommandHandler());
 
 		Thread chat = new Thread(iogroup, "chat") {
 			public void run() {
@@ -168,6 +136,10 @@ public class IOFactory extends MessageFactory {
 		chat.start();
 	}
 
+	private void addHandler(ClientHandler handler) {
+		Thread run = new Thread(handler);
+		run.start();
+	}
 	public boolean isAlive() {
 		return this.socket != null && this.socket.isConnected() && super.isAlive();
 	}

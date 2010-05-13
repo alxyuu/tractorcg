@@ -39,105 +39,14 @@ public class IOFactory extends MessageFactory {
 		this.in = new BufferedReader(new InputStreamReader(socket.getInputStream()));
 		this.out = new PrintWriter(socket.getOutputStream(),false);
 
-		Thread listener = new Thread(iogroup,"listener") {
-			public void run() {
-				System.out.println("waiting for incoming messages");
-				while(socket.isConnected() && isAlive()) { //need both?
-					try {
-						if(in.ready()) {
-							String line = in.readLine();
-							read(line);
-							if(!line.equals("00")) System.out.println("input: "+line+"-end-");
-						} else {
-							//dynamic sleeping?
-							Thread.sleep(100);
-						}
-					} catch (IOException e) {
-						e.printStackTrace();
-						break;
-					} catch (ErroneousMessageException e) {
-						e.printStackTrace();
-					} catch (InterruptedException e) {
-						return;
-					}
-
-				}	
-			}
-		};
-		listener.start();
-
-		Thread output = new Thread(iogroup,"output") {
-			public void run() {
-				System.out.println("output stream open");
-				while(!out.checkError() && isAlive()) { //need both?
-					if(hasNextWrite()) {
-						do {
-							String line = getNextWrite();
-							if(!line.equals("00")) System.out.println("output: "+line+"-end-");
-							out.println(line);
-							out.flush();
-						} while(hasNextWrite());
-					} else {
-						try {
-							//dynamic sleeping?
-							Thread.sleep(100);
-						} catch (InterruptedException e) {
-							return;
-						}
-					}
-				}
-				out.close();
-				out = null;
-			}
-		};
-		output.start();
-
-		//TODO: merge with input
-		Thread keepalive = new Thread(iogroup,"keepalive") {
-			public void run() {
-				while(true) {
-					write("0", MessageFactory.KEEPALIVE);
-					try {
-						Thread.sleep(5000);
-					} catch (InterruptedException e) {
-						return;
-					}
-				}
-			}
-		};
-		keepalive.setDaemon(true);
-		keepalive.start();
-
+		this.addHandler(new InputHandler(in));
+		this.addHandler(new OutputHandler(out));
 		this.addHandler(new CommandHandler());
-
-		Thread chat = new Thread(iogroup, "chat") {
-			public void run() {
-				while(true) {
-					if(hasNextMessage(CHAT)){
-					String msg = getNextMessage(CHAT);
-					int index = msg.indexOf("|");
-					String room = msg.substring(0,index).trim();
-					ChatPane chat = ClientView.getInstance().getChatroom(room);
-					if( chat != null)
-						chat.append(msg.substring(index+1));
-					else
-						System.out.println("NOTICE: "+room+" not joined");
-						
-					} else {
-						try {
-							Thread.sleep(100);
-						} catch (InterruptedException e) {
-							return;
-						}
-					}
-				}
-			}
-		};
-		chat.start();
+		this.addHandler(new ChatHandler());
 	}
 
 	private void addHandler(ClientHandler handler) {
-		Thread run = new Thread(handler);
+		Thread run = new Thread( iogroup, handler, handler.getName() );
 		run.start();
 	}
 	public boolean isAlive() {

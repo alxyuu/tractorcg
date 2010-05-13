@@ -49,6 +49,7 @@ class CommandListener implements ActionListener {
 								args = clientview.getSelectedChatroomName();
 							io.write("PART "+args, IOFactory.CHATCMD);
 						} else if(cmd.equals("GCREATE")) {
+							if(io == null) System.out.println("OH NOES");
 							io.write("GCREATE", IOFactory.CHATCMD);
 						} else if(cmd.equals("GPART")) {
 							//io.write("GPART "+client.getGameID(), IOFactory.CHATCMD);

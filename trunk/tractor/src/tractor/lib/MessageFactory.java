@@ -11,9 +11,17 @@ public class MessageFactory {
 	static public final int LOGIN = 1;
 
 	private ConcurrentLinkedQueue<String>[] in;
-	private long lastUpdate;
 	private ConcurrentLinkedQueue<String> out;
 	private long timeout;
+	private long keepalive;
+	/*
+	 * Last outgoing message
+	 */
+	private long lastPing;
+	/*
+	 * Last incoming message
+	 */
+	private long lastPong;
 
 	/**Constructs the message factory.
 	 * @param timeout
@@ -27,7 +35,9 @@ public class MessageFactory {
 		this.out = new ConcurrentLinkedQueue<String>();
 		
 		this.timeout = timeout;
-		this.lastUpdate = System.currentTimeMillis();
+		this.keepalive = timeout/3;
+		this.lastPong = System.currentTimeMillis();
+		this.lastPing = System.currentTimeMillis();
 	}
 	
 	/** It clears the message queue.
@@ -109,7 +119,7 @@ public class MessageFactory {
 	 * @return
 	 */
 	public boolean isAlive() {
-		return System.currentTimeMillis()-lastUpdate < timeout;
+		return System.currentTimeMillis()-lastPong < timeout;
 	}
 	
 	/** It reads the message.
@@ -120,7 +130,7 @@ public class MessageFactory {
 		try {
 			int type = Integer.parseInt(message.substring(0,1));
 			this.in[type].add(message.substring(1,message.length()));
-			this.renew();
+			this.renewPong();
 		} catch (NumberFormatException e) {
 			throw new ErroneousMessageException("Message type not supplied");
 		} catch (ArrayIndexOutOfBoundsException e) {
@@ -131,8 +141,12 @@ public class MessageFactory {
 	/** It updates the message.
 	 * 
 	 */
-	public void renew() {
-		this.lastUpdate = System.currentTimeMillis();
+	public void renewPong() {
+		this.lastPong = System.currentTimeMillis();
+	}
+	
+	public void renewPing() {
+		this.lastPing = System.currentTimeMillis();
 	}
 	
 	/** It resets the message factory.
@@ -143,7 +157,8 @@ public class MessageFactory {
 			this.in[i].clear();
 		}
 		this.out.clear();
-		this.renew();
+		this.renewPong();
+		this.renewPing();
 	}
 	
 	/** It writes the message.
@@ -152,5 +167,10 @@ public class MessageFactory {
 	 */
 	public void write(String message, int type) {
 		this.out.offer(type+message);
+		this.renewPing();
+	}
+	
+	public boolean writeTimeout() {
+		return System.currentTimeMillis() - lastPing < keepalive;
 	}
 }

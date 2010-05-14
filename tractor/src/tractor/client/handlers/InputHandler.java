@@ -19,7 +19,6 @@ public class InputHandler extends ClientHandler {
 				if(in.ready()) {
 					String line = in.readLine();
 					io.read(line);
-					if(!line.equals("00")) System.out.println("input: "+line+"-end-");
 				} else {
 					//dynamic sleeping?
 					Thread.sleep(100);

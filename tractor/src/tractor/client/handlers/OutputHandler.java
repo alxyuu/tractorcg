@@ -18,7 +18,6 @@ public class OutputHandler extends ClientHandler {
 			if(io.hasNextWrite()) {
 				do {
 					String line = io.getNextWrite();
-					if(!line.equals("00")) System.out.println("output: "+line+"-end-");
 					out.println(line);
 					out.flush();
 				} while(io.hasNextWrite());

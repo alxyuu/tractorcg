@@ -37,7 +37,7 @@ public class ChatThread extends Thread {
 				while(io.hasNextMessage(MessageFactory.CHAT)){
 					String msg = io.getNextMessage(MessageFactory.CHAT);
 					int index = msg.indexOf("|");
-					String id = msg.substring(0,index);
+					String id = msg.substring(0,index).toUpperCase();
 					Chatroom chat = this.chatrooms.get(id);
 					if(chat == null) {
 						System.out.println("exception in \""+this.getName()+"\": chatroom "+id+" not found");

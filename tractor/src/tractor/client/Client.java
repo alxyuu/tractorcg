@@ -5,6 +5,7 @@ import java.net.InetSocketAddress;
 import java.net.Socket;
 
 import tractor.client.handlers.IOFactory;
+import tractor.client.game.TractorGame;
 import tractor.lib.MessageFactory;
 
 public class Client {
@@ -33,6 +34,8 @@ public class Client {
 
 	private String username;
 
+	private TractorGame game;
+	
 	public static void main(String ... bobby) {
 		new Client();
 	}

@@ -27,7 +27,11 @@ public class Chatroom {
 	protected void setName(String name) {
 		this.name = name;
 	}
-
+	
+	protected Set<User> getUsers() {
+		return this.users;
+	}
+	
 	public int getSize() {
 		return this.users.size();
 	}

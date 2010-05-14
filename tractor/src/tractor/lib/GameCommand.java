@@ -24,6 +24,7 @@ public class GameCommand {
 	private static HashMap<String,Integer> gset;
 	static {
 		gset = new HashMap<String,Integer>();
+		gset.put("0", GameCommand.JOIN);
 		gset.put("1",GameCommand.UPDATE_STATE);
 		gset.put("10",GameCommand.WAITING);
 		gset.put("11", GameCommand.DEALING);

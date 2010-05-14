@@ -1,6 +1,7 @@
 package tractor.client.handlers;
 
 import tractor.client.ClientView;
+import tractor.client.game.TractorGame;
 import tractor.lib.ChatCommand;
 import tractor.lib.GameCommand;
 
@@ -36,6 +37,8 @@ public class CommandHandler extends ClientHandler {
 					String[] args = command.split(" "); //[0] = game room name, [1] = user place
 					ClientView.getInstance().join(args[0]);
 					io.write(GameCommand.JOIN+" "+args[0],IOFactory.GAMECMD);
+					client.setGame(new TractorGame(4));
+					client.startGame();
 					break;
 				case G_PART:
 					ClientView.getInstance().part(command);

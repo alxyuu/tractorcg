@@ -4,6 +4,9 @@ import java.io.IOException;
 import java.net.InetSocketAddress;
 import java.net.Socket;
 
+import org.newdawn.slick.AppGameContainer;
+import org.newdawn.slick.SlickException;
+
 import tractor.client.handlers.IOFactory;
 import tractor.client.game.TractorGame;
 import tractor.lib.MessageFactory;
@@ -18,8 +21,8 @@ public class Client {
 	private static Client instance;
 	//do something with this...
 	//support hostnames?
-	//public final static String ip = "10.4.6.197";
-	public final static String ip = "192.168.0.3";
+	public final static String ip = "10.4.6.197";
+	//public final static String ip = "192.168.0.3";
 	public final static int NULL = 0;
 	public final static int port = 443;
 	public static Client getInstance() {
@@ -35,6 +38,7 @@ public class Client {
 	private String username;
 
 	private TractorGame game;
+	private Thread gamethread;
 	
 	public static void main(String ... bobby) {
 		new Client();
@@ -45,6 +49,7 @@ public class Client {
 		this.io = new IOFactory(15000);
 		this.clientview = new ClientView();
 		this.clientview.setVisible(true);
+		this.game = null;
 		/*while(true) {
 			try {
 				Thread.sleep(100);
@@ -108,6 +113,38 @@ public class Client {
 	public IOFactory getIO() {
 		return this.io;
 	}
+	
+	public TractorGame getGame() {
+		return this.game;
+	}
+	
+	public void setGame(TractorGame game) {
+		this.game = game;
+	}
+	
+	public void startGame() {
+		this.gamethread = new Thread("game thread") {
+			public void run() {
+				AppGameContainer app;
+				try {
+					
+					app = new AppGameContainer(game);
+		            app.setDisplayMode(960,600,false);
+		            app.setTargetFrameRate(30);
+		            app.start();
+				} catch (SlickException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}
+			}
+		};
+		this.gamethread.start();
+	}
+	
+	public void stopGame() {
+		
+	}
+	
 	/**It gets the username
 	 * @return
 	 * 

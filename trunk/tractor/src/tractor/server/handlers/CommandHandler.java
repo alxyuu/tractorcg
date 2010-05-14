@@ -120,6 +120,10 @@ public class CommandHandler extends ServerHandler {
 								user.setCurrentGame(null);
 								user.removeChatroom(topart);
 								io.write("GPART "+topart.getName(), MessageFactory.CHATCMD);
+								if(topart.getSize() == 0) {
+									((Gameroom)topart).dispose();
+									chatrooms.remove(topart);
+								}
 							}
 						}
 						break;

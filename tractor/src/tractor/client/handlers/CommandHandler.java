@@ -2,6 +2,7 @@ package tractor.client.handlers;
 
 import tractor.client.ClientView;
 import tractor.lib.ChatCommand;
+import tractor.lib.GameCommand;
 
 public class CommandHandler extends ClientHandler {
 	CommandHandler() {
@@ -32,8 +33,9 @@ public class CommandHandler extends ClientHandler {
 					//disconnect
 					break;
 				case G_HOOK:
-					String[] args = command.split(" "); //[1] = user place
+					String[] args = command.split(" "); //[0] = game room name, [1] = user place
 					ClientView.getInstance().join(args[0]);
+					io.write(GameCommand.JOIN+" "+args[0],IOFactory.GAMECMD);
 					break;
 				case G_PART:
 					ClientView.getInstance().part(command);

@@ -1,5 +1,7 @@
 package tractor.client.game;
 
+import java.util.HashMap;
+
 import org.newdawn.slick.BasicGame;
 import org.newdawn.slick.GameContainer;
 import org.newdawn.slick.Graphics;
@@ -8,15 +10,20 @@ import org.newdawn.slick.AppGameContainer;
 
 import tractor.client.Client;
 import tractor.client.handlers.IOFactory;
+import tractor.lib.GameCommand;
 
 public class TractorGame extends BasicGame {
 
 	private IOFactory io;
-	private OtherPlayerHand hand;
+	private HashMap<String,OtherPlayerHand> hands;
 	private int players;
     public TractorGame(int players) {
         super("Tractor "+players+"-way");
         this.players = players;
+        for(int i=1;i<players;i++) {
+        	//TODO: calculate positions
+        	hands.put("Player"+i, new OtherPlayerHand(0,0));
+        }
     }
     
     @Override
@@ -24,19 +31,41 @@ public class TractorGame extends BasicGame {
     	System.out.println("init");
     	//this.io = Client.getInstance().getIO();
         GraphicsCard.populateDeck();
-        this.hand = new OtherPlayerHand(100,200);
+        /*this.hand = new OtherPlayerHand(100,200);
         for(int i=0;i<20;i++) {
         	this.hand.addCard();
-        }
+        }*/
     }
 
     @Override
     public void update(GameContainer container, int delta)
             throws SlickException {
     	//System.out.println(delta);
-    	/*while(io.hasNextMessage(IOFactory.GAMECMD)) {
-    		io.getNextMessage(IOFactory.GAMECMD);
-    	}*/
+    	while(io.hasNextMessage(IOFactory.GAMECMD)) {
+    		String[] message = io.getNextMessage(IOFactory.GAMECMD).split(" ");
+    		int primary = GameCommand.get(message[0]);
+    		switch(primary) {
+    		case GameCommand.UPDATE_STATE:
+    			int secondary = GameCommand.get(message[1]);
+    			switch(secondary) {
+    			case GameCommand.WAITING:
+    				//clear stuff and sit there?
+    				break;
+    			}
+    			break;
+    		case GameCommand.JOIN:
+    			int position;
+    			try {
+    				position = Integer.parseInt(message[1]);
+    				if(!this.hands.containsKey("Player"+position))
+    					throw new Exception("random bullshit");
+    			} catch (Exception e) {
+    				//TODO: illegal position
+    				break;
+    			}
+    			String username = message[2];
+    		}
+    	}
     }
 
     @Override
@@ -44,7 +73,7 @@ public class TractorGame extends BasicGame {
             throws SlickException {
         g.drawString("Hello, Slick world!", 0, 100);
        g.drawImage(GraphicsCard.getCard(GraphicsCard.CLUBS,GraphicsCard.ACE).getImage(), 100,100);
-       this.hand.render(g);
+       //this.hand.render(g);
     }
 
     public static void main(String[] args) {

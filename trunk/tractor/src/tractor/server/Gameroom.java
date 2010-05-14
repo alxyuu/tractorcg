@@ -3,6 +3,7 @@ package tractor.server;
 import java.util.Iterator;
 import java.util.Set;
 
+import tractor.lib.GameCommand;
 import tractor.lib.MessageFactory;
 
 public class Gameroom extends Chatroom implements Runnable { // do I need a threadgroup? not really?
@@ -32,14 +33,35 @@ public class Gameroom extends Chatroom implements Runnable { // do I need a thre
 	public void sendCommand(String message) {
 		for(Iterator<User> i=this.users.iterator(); i.hasNext();) {
 			User u = i.next();
-			u.getIO().write(this.getName()+"|"+message, MessageFactory.GAMECMD);
+			//u.getIO().write(this.getName()+"|"+message, MessageFactory.GAMECMD);
+			this.sendCommand(message, u);
 		}
+	}
+	
+	public void sendCommand(String message, User user) {
+		user.getIO().write(this.getName()+"|"+message, MessageFactory.GAMECMD);
 	}
 	
 	public void run() {
 		while(!users.isEmpty()) {
 			for(Iterator<User> i = users.iterator();i.hasNext();) {
 				User user = i.next();
+				MessageFactory io = user.getIO();
+				while(io.hasNextMessage(MessageFactory.GAMECMD)) {
+					String[] message = io.getNextMessage(MessageFactory.GAMECMD).split(" ");
+					int primary = GameCommand.get(message[0]);
+					switch(primary) {
+					/*case GameCommand.NULL:
+						//TODO: command not found error
+						break;*/
+					case GameCommand.JOIN:
+						this.sendCommand(GameCommand.UPDATE_STATE + " " + GameCommand.WAITING, user);
+						break;
+					default:
+						//TODO: command not found error
+						break;
+					}
+				}
 			}
 		}
 	}

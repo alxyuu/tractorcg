@@ -20,6 +20,8 @@ public class TractorGame extends BasicGame {
     public TractorGame(int players) {
         super("Tractor "+players+"-way");
         this.players = players;
+        this.hands = new HashMap<String,OtherPlayerHand>();
+        this.io = Client.getInstance().getIO();
         for(int i=1;i<players;i++) {
         	//TODO: calculate positions
         	hands.put("Player"+i, new OtherPlayerHand(0,0));
@@ -64,6 +66,9 @@ public class TractorGame extends BasicGame {
     				break;
     			}
     			String username = message[2];
+    			OtherPlayerHand hand = this.hands.remove("Player"+position);
+    			this.hands.put(username, hand);
+    			break;
     		}
     	}
     }
@@ -74,18 +79,5 @@ public class TractorGame extends BasicGame {
         g.drawString("Hello, Slick world!", 0, 100);
        g.drawImage(GraphicsCard.getCard(GraphicsCard.CLUBS,GraphicsCard.ACE).getImage(), 100,100);
        //this.hand.render(g);
-    }
-
-    public static void main(String[] args) {
-        try {
-            AppGameContainer app = new AppGameContainer(new TractorGame(4));
-            app.setDisplayMode(960,600,false);
-            //app.setTargetFrameRate(30);
-            System.out.println("start");
-            app.start();
-        } catch (SlickException e) {
-            e.printStackTrace();
-        }
-        System.out.println("continue");
     }
 }

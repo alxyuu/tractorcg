@@ -1,5 +1,6 @@
 package tractor.server;
 
+import java.util.Arrays;
 import java.util.Iterator;
 import java.util.Set;
 
@@ -49,7 +50,9 @@ public class Gameroom extends Chatroom implements Runnable { // do I need a thre
 				MessageFactory io = user.getIO();
 				while(io.hasNextMessage(MessageFactory.GAMECMD)) {
 					String[] message = io.getNextMessage(MessageFactory.GAMECMD).split(" ");
+					System.out.println(Arrays.toString(message));
 					int primary = GameCommand.get(message[0]);
+					System.out.println(primary);
 					switch(primary) {
 					/*case GameCommand.NULL:
 						//TODO: command not found error
@@ -62,6 +65,12 @@ public class Gameroom extends Chatroom implements Runnable { // do I need a thre
 						break;
 					}
 				}
+			}
+			try {
+				//dynamic sleeping?
+				Thread.sleep(100);
+			} catch (InterruptedException e) {
+				e.printStackTrace();
 			}
 		}
 	}

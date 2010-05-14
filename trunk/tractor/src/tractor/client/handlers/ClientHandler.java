@@ -5,9 +5,11 @@ import tractor.client.Client;
 public abstract class ClientHandler implements Runnable {
 
 	protected IOFactory io;
+	protected Client client;
 	private String name;
 	ClientHandler(String name) {
-		this.io = Client.getInstance().getIO();
+		this.client = Client.getInstance();
+		this.io = client.getIO();
 		this.name = name;
 	}
 	

@@ -9,6 +9,7 @@ import java.awt.Insets;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.KeyEvent;
+import java.util.HashMap;
 
 import javax.swing.JButton;
 import javax.swing.JFrame;
@@ -51,6 +52,7 @@ public class ClientView extends JFrame {
 	private JLabel errorLabel;
 	private CloseableTabbedPane chatTabs;
 	private ChatPane console;
+	private HashMap<String, ChatPane> tabMap;
 	private final static String statusMessages[] = {
 		" Error! Could not connect!", " Disconnected",
 		" Disconnecting...", " Connecting...", " Connected"
@@ -187,15 +189,19 @@ public class ClientView extends JFrame {
 		// Set up the chat pane
 		chatPane = new JPanel(new BorderLayout());
 		
-
 		chatLine = new JTextField();
 		chatLine.setEnabled(false);
-		chatLine.addActionListener(new CommandListener());
 		
 		chatTabs = new CloseableTabbedPane();
+		tabMap = new HashMap<String, ChatPane>();
 		chatTabs.addCloseableTabbedPaneListener(new CloseableTabbedPaneListener() {
 			public boolean closeTab(int tabIndexToClose) {
-				client.getIO().write("PART "+chatTabs.getComponentAt(tabIndexToClose).getName(), IOFactory.CHATCMD);
+				String name = chatTabs.getComponentAt(tabIndexToClose).getName();
+				if(name.charAt(0) == '#')
+					client.getIO().write("PART "+name, IOFactory.CHATCMD);
+				else if(name.charAt(0) == '@')
+					client.getIO().write("GPART "+name, IOFactory.CHATCMD); // request confirmation?
+				//do nothing?
 				return true;
 			}
 		});
@@ -206,7 +212,9 @@ public class ClientView extends JFrame {
 		});
 		
 		console = new ChatPane("Console");
-		chatTabs.addTab(console, false);
+		chatTabs.addTab(console, false); // add to tab map?
+
+		chatLine.addActionListener(new CommandListener());
 		
 		chatPane.add(chatLine, BorderLayout.SOUTH);
 		chatPane.add(chatTabs, BorderLayout.CENTER);
@@ -300,8 +308,10 @@ public class ClientView extends JFrame {
 	 * 
 	 */
 	public void join(String name) {
-		this.chatTabs.addTab(new ChatPane(name),true);
-		this.chatTabs.setSelectedComponent(getChatroom(name));
+		ChatPane tojoin = new ChatPane(name);
+		this.tabMap.put(name.toUpperCase(),tojoin);
+		this.chatTabs.addTab(tojoin,true);
+		this.chatTabs.setSelectedComponent(tojoin);
 	}
 	
 	/**It leaves the chatroom
@@ -309,28 +319,26 @@ public class ClientView extends JFrame {
 	 * 
 	 */
 	public void part(String name) {
-		int index = this.chatTabs.indexOfTab(name);
-		if(index != -1) {
-			this.chatTabs.remove(index);
-		}
+		this.chatTabs.remove(this.tabMap.get(name.toUpperCase()));
+		this.tabMap.remove(name.toUpperCase());
 	}
-	/**It gets the particular chatroom name
-	 * @return
-	 * 
+	
+	/**
+	 * It gets the particular chatroom name
+	 * @return 
 	 */
 	public String getSelectedChatroomName() {
 		return this.chatTabs.getSelectedComponent().getName();
 	}
-	/**Returns the chatroom
+	
+	/**
+	 * Returns the chatroom
+	 * @pre name is upper case
 	 * @param name
 	 * @return
-	 * 
 	 */
 	public ChatPane getChatroom(String name) {
-		int index = this.chatTabs.indexOfTab(name);
-		if(index == -1)
-			return null;
-		return (ChatPane) this.chatTabs.getComponentAt(index);
+		return this.tabMap.get(name);
 	}
 	
 	public JTextField getChatLine() {

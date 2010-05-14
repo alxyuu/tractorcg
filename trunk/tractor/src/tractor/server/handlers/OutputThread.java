@@ -6,6 +6,7 @@ import java.util.Iterator;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
+import tractor.lib.MessageFactory;
 import tractor.server.User;
 
 
@@ -33,11 +34,14 @@ public class OutputThread extends Thread {
 					System.out.println(user+" output stream closed");
 					continue;
 				}
-				while(user.getIO().hasNextWrite()) {
-					String line = user.getIO().getNextWrite();
-					if(!line.equals("00")) System.out.println("output: "+line+"-end-");
-					out.println(line);
-					out.flush();
+				if(user.getIO().hasNextWrite()) {
+					do {
+						String line = user.getIO().getNextWrite();
+						out.println(line);
+						out.flush();
+					} while(user.getIO().hasNextWrite());
+				} else if(user.getIO().writeTimeout()) {
+					user.getIO().write("0", MessageFactory.KEEPALIVE);
 				}
 			}
 			

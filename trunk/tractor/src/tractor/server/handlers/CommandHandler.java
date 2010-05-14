@@ -30,7 +30,7 @@ public class CommandHandler extends ServerHandler {
 					User user = i.next();
 					MessageFactory io = user.getIO();
 					while(io.hasNextMessage(MessageFactory.CHATCMD)) {
-						String cmd = io.getNextMessage(MessageFactory.CHATCMD).toUpperCase();
+						String cmd = io.getNextMessage(MessageFactory.CHATCMD);
 						int index = cmd.indexOf(" ");
 						String command;
 						if(index == -1) {
@@ -50,8 +50,12 @@ public class CommandHandler extends ServerHandler {
 								Chatroom tojoin = chatrooms.get(command.toUpperCase());
 								if(tojoin == null) {
 									System.out.println(command+" not found, creating");
-									tojoin = new Chatroom(command);
+									tojoin = new Chatroom(command.toUpperCase());
 									chatrooms.put(command.toUpperCase(), tojoin);
+								}
+								if(tojoin.contains(user)) {
+									System.out.println(user.getName() + " already in "+command+", ignoring");
+									break; 
 								}
 								tojoin.join(user);
 								user.addChatroom(tojoin);

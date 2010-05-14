@@ -129,8 +129,10 @@ public class MessageFactory {
 	public void read(String message) throws ErroneousMessageException {
 		try {
 			int type = Integer.parseInt(message.substring(0,1));
-			this.in[type].add(message.substring(1,message.length()));
 			this.renewPong();
+			if(type == MessageFactory.KEEPALIVE) return;
+			this.in[type].add(message.substring(1,message.length()));
+			System.out.println("input: "+message+"-end-");
 		} catch (NumberFormatException e) {
 			throw new ErroneousMessageException("Message type not supplied");
 		} catch (ArrayIndexOutOfBoundsException e) {
@@ -168,9 +170,10 @@ public class MessageFactory {
 	public void write(String message, int type) {
 		this.out.offer(type+message);
 		this.renewPing();
+		if( type != MessageFactory.KEEPALIVE ) System.out.println("output: "+message+"-end-");
 	}
 	
 	public boolean writeTimeout() {
-		return System.currentTimeMillis() - lastPing < keepalive;
+		return System.currentTimeMillis() - lastPing > keepalive;
 	}
 }

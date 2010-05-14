@@ -17,8 +17,8 @@ public class Client {
 	private static Client instance;
 	//do something with this...
 	//support hostnames?
-	public final static String ip = "10.4.6.197";
-	//public final static String ip = "192.168.0.2";
+	//public final static String ip = "10.4.6.197";
+	public final static String ip = "192.168.0.3";
 	public final static int NULL = 0;
 	public final static int port = 443;
 	public static Client getInstance() {
@@ -39,9 +39,9 @@ public class Client {
 	
 	Client() {
 		Client.instance = this;
+		this.io = new IOFactory(15000);
 		this.clientview = new ClientView();
 		this.clientview.setVisible(true);
-		this.io = new IOFactory(15000);
 		/*while(true) {
 			try {
 				Thread.sleep(100);

@@ -42,7 +42,6 @@ public class InputThread extends Thread {
 					while(in.ready()) {
 						String line = in.readLine();
 						user.getIO().read(line);
-						if(!line.equals("00")) System.out.println("input: "+line+"-end-");
 					} 
 				} catch (IOException e) {
 					e.printStackTrace();

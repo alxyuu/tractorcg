@@ -33,12 +33,23 @@ public class Gameroom extends Chatroom implements Runnable { // do I need a thre
 		return false;
 		//error handler
 	}
+	public void part(User user) {
+		super.part(user);
+		this.sendCommand(GameCommand.PART + " " + user.getName() + " " + user.getGamePosition());
+		this.sendUpdateState(GameCommand.WAITING);
+	}
 	public void dispose() {
 		//cleanup
 		this.gthread.interrupt();
 	}
 	
-	public void sendCommand(String message) {
+	private void sendUpdateState(int state) {
+		this.sendCommand(GameCommand.UPDATE_STATE + " " + state);
+	}
+	private void sendUpdateState(int state, User user) {
+		this.sendCommand(GameCommand.UPDATE_STATE + " " + state, user);
+	}
+	private void sendCommand(String message) {
 		for(Iterator<User> i=this.users.iterator(); i.hasNext();) {
 			User u = i.next();
 			//u.getIO().write(this.getName()+"|"+message, MessageFactory.GAMECMD);
@@ -46,11 +57,11 @@ public class Gameroom extends Chatroom implements Runnable { // do I need a thre
 		}
 	}
 	
-	public void sendCommand(String message, User user) {
+	private void sendCommand(String message, User user) {
 		user.getIO().write(this.getName()+"|"+message, MessageFactory.GAMECMD);
 	}
 	
-	public void sendCommandExclude(String message, User user) {
+	private void sendCommandExclude(String message, User user) {
 		for(Iterator<User> i=this.users.iterator(); i.hasNext();) {
 			User u = i.next();
 			if(u != user) 
@@ -80,7 +91,7 @@ public class Gameroom extends Chatroom implements Runnable { // do I need a thre
 							if(u!=user)
 								this.sendCommand(GameCommand.JOIN + " " + u.getGamePosition() + " " + u.getName(), user);
 						}
-						this.sendCommand(GameCommand.UPDATE_STATE + " " + GameCommand.WAITING, user);
+						this.sendUpdateState(GameCommand.WAITING, user);
 						break;
 					default:
 						//TODO: command not found error

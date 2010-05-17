@@ -84,8 +84,9 @@ public class CommandHandler extends ServerHandler {
 								chatrooms.put(room.getName(), room);
 								room.join(user);
 								user.setCurrentGame(room);
+								user.setGamePosition(1);
 								user.addChatroom(room);
-								io.write("GHOOK "+room.getName()+" "+room.getSize(), MessageFactory.CHATCMD);
+								io.write("GHOOK " + room.getName() + " 1 " + room.getGameSize(), MessageFactory.CHATCMD);
 							} else {
 								//TODO: already in game, error handler
 							}
@@ -98,9 +99,11 @@ public class CommandHandler extends ServerHandler {
 								Gameroom tojoin = tohook.getCurrentGame();
 								if(tojoin != null) {
 									if(tojoin.join(user)) {
+										int position = tojoin.getSize();
 										user.setCurrentGame(tojoin);
+										user.setGamePosition(position);
 										user.addChatroom(tojoin);
-										io.write("GHOOK "+tojoin.getName()+" "+tojoin.getSize(), MessageFactory.CHATCMD);
+										io.write("GHOOK " + tojoin.getName() + " " + position + " " + tojoin.getGameSize(), MessageFactory.CHATCMD);
 									} else {
 										//TODO: game full error
 									}

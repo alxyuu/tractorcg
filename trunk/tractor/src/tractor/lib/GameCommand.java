@@ -17,18 +17,26 @@ public class GameCommand {
 	 * Argument commands
 	 */
 	public final static int WAITING = 10;
-	public final static int DEALING = 11;
-	public final static int PLAYING = 12;
+	public final static int READY = 11;
+	public final static int START = 12;
+	public final static int DEALING = 13;
+	public final static int DIPAI  = 14;
+	public final static int PLAYING = 15;
 	
 	
-	private static HashMap<String,Integer> gset;
+	/*private static HashMap<String,Integer> gset;
 	static {
 		gset = new HashMap<String,Integer>();
+		
 		gset.put("0", GameCommand.JOIN);
-		gset.put("1",GameCommand.UPDATE_STATE);
-		gset.put("10",GameCommand.WAITING);
-		gset.put("11", GameCommand.DEALING);
-		gset.put("12", GameCommand.PLAYING);
+		gset.put("1", GameCommand.UPDATE_STATE);
+		
+		gset.put("10", GameCommand.WAITING);
+		gset.put("11", GameCommand.READY);
+		gset.put("12", GameCommand.START);
+		gset.put("13", GameCommand.DEALING);
+		gset.put("14", GameCommand.DIPAI);
+		gset.put("15", GameCommand.PLAYING);
 	}
 	
 	/**It returns a command
@@ -36,11 +44,12 @@ public class GameCommand {
 	 * @return
 	 * 
 	 */
-	public static int get(String s) {
+	/*public static int get(String s) {
 		try {
 			return gset.get(s);
 		} catch (NullPointerException e) {
+			e.printStackTrace();
 			return GameCommand.NULL;
 		}
-	}
+	}*/
 }

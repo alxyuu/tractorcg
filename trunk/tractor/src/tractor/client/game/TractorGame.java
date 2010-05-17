@@ -22,6 +22,7 @@ public class TractorGame extends BasicGame {
 	private int position;
 	private GameContainer container;
 	private String name;
+	private PlayerHand hand;
 	//private OtherPlayerHand hand;
     public TractorGame(int position, int players, String name) {
         super("Tractor "+players+"-way");
@@ -98,6 +99,7 @@ public class TractorGame extends BasicGame {
     		int primary = Integer.parseInt(message[0]);
     		switch(primary) {
     		case GameCommand.UPDATE_STATE:
+    		{
     			//int secondary = GameCommand.get(message[1]);
     			int secondary = Integer.parseInt(message[1]);
     			switch(secondary) {
@@ -105,8 +107,10 @@ public class TractorGame extends BasicGame {
     				//clear stuff and sit there?
     				break;
     			}
-    			break;
+    		}
+    		break;
     		case GameCommand.JOIN:
+    		{
     			int position;
     			try {
     				position = Integer.parseInt(message[1]);
@@ -120,7 +124,21 @@ public class TractorGame extends BasicGame {
     			OtherPlayerHand hand = this.hands.remove("Player"+position);
     			hand.setPlayer(message[2]);
     			this.hands.put(message[2], hand);
-    			break;
+    		}
+    		break;
+    		case GameCommand.PART:
+    		{
+    			if(message[1].equals(Client.getInstance().getUsername())) {
+    				//TODO: clean up and part
+    			} else if(this.hands.containsKey(message[1])) {
+    				OtherPlayerHand hand = this.hands.remove(message[1]);
+    				hand.setPlayer(null);
+    				int position = Integer.parseInt(message[2]);
+    				this.hands.put("Player"+position, hand);
+    			}
+    			//TODO: user not found
+    		}
+    		break;
     		}
     	}
     }

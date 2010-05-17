@@ -8,8 +8,8 @@ import tractor.lib.Card;
 public class GraphicsCard extends Card {
 	
 	private static Image back,scaledback;
-	public static final int SCALED_HEIGHT = 98;
-	public static final int SCALED_WIDTH = 66;
+	public static final int SCALED_HEIGHT = 74;
+	public static final int SCALED_WIDTH = 50;
 	static {
 		try {
 			back = new Image("images/cards/back.png");

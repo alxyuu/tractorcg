@@ -1,6 +1,8 @@
 package tractor.client.game;
 
+import java.awt.geom.Point2D;
 import java.util.HashMap;
+import java.util.Set;
 
 import org.newdawn.slick.BasicGame;
 import org.newdawn.slick.GameContainer;
@@ -17,15 +19,16 @@ public class TractorGame extends BasicGame {
 	private IOFactory io;
 	private HashMap<String,OtherPlayerHand> hands;
 	private int players;
-    public TractorGame(int players) {
+	private int position;
+	private GameContainer container;
+	private String name;
+	//private OtherPlayerHand hand;
+    public TractorGame(int position, int players, String name) {
         super("Tractor "+players+"-way");
         this.players = players;
+        this.position = position;
+        this.name = name;
         this.hands = new HashMap<String,OtherPlayerHand>();
-        this.io = Client.getInstance().getIO();
-        for(int i=1;i<players;i++) {
-        	//TODO: calculate positions
-        	hands.put("Player"+i, new OtherPlayerHand(0,0));
-        }
     }
     
     @Override
@@ -37,6 +40,40 @@ public class TractorGame extends BasicGame {
         for(int i=0;i<20;i++) {
         	this.hand.addCard();
         }*/
+        this.container = container;
+        this.io = Client.getInstance().getIO();
+        Point2D.Double point;
+        switch(players) {
+        case 2:
+        	hands.put("Player" + ( (position == 1) ? 2 : 1 ), new OtherPlayerHand(container.getWidth()/2, 50));
+        	break;
+        case 3:
+        	point = getCoordinates(5*Math.PI/6);
+        	hands.put("Player"+(position%players+1), new OtherPlayerHand(point.x,point.y));
+        	point = getCoordinates(Math.PI/6);
+        	hands.put("Player"+((position+1)%players+1), new OtherPlayerHand(point.x,point.y));
+        	break;
+        default:
+        	if(players < 3) {
+        		//TODO: invalid players
+        		System.out.println("invalid players SOME SHIT WENT WRONG");
+        		break;
+        	}
+        	//hands.put("Player"+(position%players+1), new OtherPlayerHand(100, container.getHeight()/2));
+        	double increment = Math.PI/(players-2);
+        	double theta = Math.PI;
+	        for(int i=position;i<players+position-1;i++) {
+	        	point = getCoordinates(theta);
+	        	hands.put("Player"+(i%players+1), new OtherPlayerHand(point.x,point.y));
+	        	theta -= increment;
+	        }
+	        //hands.put("Player"+((players+position-2)%players+1), new OtherPlayerHand(container.getWidth()-100,container.getHeight()/2));
+        }
+    }
+    
+    public Point2D.Double getCoordinates(double theta) {
+       	double radius = (container.getWidth()/2-100)*(container.getHeight()/2-50)/Math.sqrt(Math.pow((container.getHeight()/2-50)*Math.cos(theta), 2) + Math.pow((container.getWidth()/2-100)*Math.sin(theta), 2));
+    	return new Point2D.Double(container.getWidth()/2+radius*Math.cos(theta), container.getHeight()/2-radius*Math.sin(theta));
     }
 
     @Override
@@ -44,11 +81,25 @@ public class TractorGame extends BasicGame {
             throws SlickException {
     	//System.out.println(delta);
     	while(io.hasNextMessage(IOFactory.GAMECMD)) {
-    		String[] message = io.getNextMessage(IOFactory.GAMECMD).split(" ");
-    		int primary = GameCommand.get(message[0]);
+    		String msg = io.getNextMessage(IOFactory.GAMECMD);
+    		int index = msg.indexOf("|");
+    		try {
+    			if(!msg.substring(0,index).equals(this.name)) {
+    				throw new SlickException("game name mismatch");
+    			}
+    		} catch (Exception e) {
+    			//TODO: some error handler
+    			e.printStackTrace();
+    			return;
+    		}
+    		msg = msg.substring(index+1);
+    		String[] message = msg.split(" ");
+    		//int primary = GameCommand.get(message[0]);
+    		int primary = Integer.parseInt(message[0]);
     		switch(primary) {
     		case GameCommand.UPDATE_STATE:
-    			int secondary = GameCommand.get(message[1]);
+    			//int secondary = GameCommand.get(message[1]);
+    			int secondary = Integer.parseInt(message[1]);
     			switch(secondary) {
     			case GameCommand.WAITING:
     				//clear stuff and sit there?
@@ -63,11 +114,12 @@ public class TractorGame extends BasicGame {
     					throw new Exception("random bullshit");
     			} catch (Exception e) {
     				//TODO: illegal position
+    				e.printStackTrace();
     				break;
     			}
-    			String username = message[2];
     			OtherPlayerHand hand = this.hands.remove("Player"+position);
-    			this.hands.put(username, hand);
+    			hand.setPlayer(message[2]);
+    			this.hands.put(message[2], hand);
     			break;
     		}
     	}
@@ -77,7 +129,11 @@ public class TractorGame extends BasicGame {
     public void render(GameContainer container, Graphics g)
             throws SlickException {
         g.drawString("Hello, Slick world!", 0, 100);
-       g.drawImage(GraphicsCard.getCard(GraphicsCard.CLUBS,GraphicsCard.ACE).getImage(), 100,100);
+       //g.drawImage(GraphicsCard.getCard(GraphicsCard.CLUBS,GraphicsCard.ACE).getImage(), 100,100);
        //this.hand.render(g);
+        Set<String> keyset = hands.keySet();
+        for(String key : keyset) {
+        	hands.get(key).render(g);
+        }
     }
 }

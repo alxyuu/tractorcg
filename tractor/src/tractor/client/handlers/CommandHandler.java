@@ -34,17 +34,27 @@ public class CommandHandler extends ClientHandler {
 					//disconnect
 					break;
 				case G_HOOK:
-					String[] args = command.split(" "); //[0] = game room name, [1] = user place
+					String[] args = command.split(" "); //[0] = game room name, [1] = user position, [2] = game size
+					int position, size;
+					try {
+						position = Integer.parseInt(args[1]);
+						size = Integer.parseInt(args[2]);
+					} catch (Exception e) { //numberformat or arrayindexoutofbounds
+						//TODO: invalid arguments
+						e.printStackTrace();
+						break;
+					}
 					ClientView.getInstance().join(args[0]);
 					io.write(GameCommand.JOIN+" "+args[0],IOFactory.GAMECMD);
-					client.setGame(new TractorGame(4));
+					client.setGame(new TractorGame(position, size, args[0]));
+					//client.setGame(new TractorGame(position, 3));
 					client.startGame();
 					break;
 				case G_PART:
 					ClientView.getInstance().part(command);
 					break;
 				default:
-					//some error handler
+					//TODO: some error handler
 				}
 			} else {
 				try {

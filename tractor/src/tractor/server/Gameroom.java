@@ -11,6 +11,7 @@ public class Gameroom extends Chatroom implements Runnable { // do I need a thre
 	private int players;
 	private Thread gthread;
 	private Set<User> users;
+	private User host;
 	public Gameroom(int players) {
 		super();
 		this.players = players;
@@ -18,6 +19,12 @@ public class Gameroom extends Chatroom implements Runnable { // do I need a thre
 		this.setName("@"+this.hashCode());
 		this.gthread = new Thread(this,this.getName());
 		this.gthread.start();
+	}
+	public void setHost(User user) {
+		this.host = user;
+	}
+	public int getGameSize() {
+		return this.players;
 	}
 	public boolean join(User user) {
 		if(this.getSize() < this.players) {
@@ -43,6 +50,14 @@ public class Gameroom extends Chatroom implements Runnable { // do I need a thre
 		user.getIO().write(this.getName()+"|"+message, MessageFactory.GAMECMD);
 	}
 	
+	public void sendCommandExclude(String message, User user) {
+		for(Iterator<User> i=this.users.iterator(); i.hasNext();) {
+			User u = i.next();
+			if(u != user) 
+				this.sendCommand(message, u);
+		}
+	}
+	
 	public void run() {
 		while(!users.isEmpty()) {
 			for(Iterator<User> i = users.iterator();i.hasNext();) {
@@ -51,13 +66,20 @@ public class Gameroom extends Chatroom implements Runnable { // do I need a thre
 				while(io.hasNextMessage(MessageFactory.GAMECMD)) {
 					String[] message = io.getNextMessage(MessageFactory.GAMECMD).split(" ");
 					System.out.println(Arrays.toString(message));
-					int primary = GameCommand.get(message[0]);
+					//int primary = GameCommand.get(message[0]);
+					int primary = Integer.parseInt(message[0]);
 					System.out.println(primary);
 					switch(primary) {
 					/*case GameCommand.NULL:
 						//TODO: command not found error
 						break;*/
 					case GameCommand.JOIN:
+						this.sendCommandExclude(GameCommand.JOIN + " " + user.getGamePosition() + " " + user.getName(), user);
+						for(Iterator<User> i2 = users.iterator();i2.hasNext();) {
+							User u = i2.next();
+							if(u!=user)
+								this.sendCommand(GameCommand.JOIN + " " + u.getGamePosition() + " " + u.getName(), user);
+						}
 						this.sendCommand(GameCommand.UPDATE_STATE + " " + GameCommand.WAITING, user);
 						break;
 					default:

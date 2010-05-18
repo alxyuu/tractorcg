@@ -23,6 +23,7 @@ public class TractorGame extends BasicGame {
 	private GameContainer container;
 	private String name;
 	private PlayerHand hand;
+	private Button startButton;
 	//private OtherPlayerHand hand;
     public TractorGame(int position, int players, String name) {
         super("Tractor "+players+"-way");
@@ -43,6 +44,8 @@ public class TractorGame extends BasicGame {
         }*/
         this.container = container;
         this.io = Client.getInstance().getIO();
+        this.startButton = new Button(container,GraphicsCard.getCard(GraphicsCard.CLUBS,GraphicsCard.ACE).getImage(),container.getWidth()/2,container.getHeight()/2);
+        this.startButton.setMouseOverImage(GraphicsCard.getCard(GraphicsCard.HEARTS,GraphicsCard.ACE).getImage());
         Point2D.Double point;
         switch(players) {
         case 2:
@@ -103,9 +106,21 @@ public class TractorGame extends BasicGame {
     			//int secondary = GameCommand.get(message[1]);
     			int secondary = Integer.parseInt(message[1]);
     			switch(secondary) {
-    			case GameCommand.WAITING:
+    			case GameCommand.WAITING: 
+    			{
     				//clear stuff and sit there?
-    				break;
+    			}
+    			break;
+    			case GameCommand.READY:
+    			{
+    				
+    			}
+    			break;
+    			default:
+    			{
+    				//TODO: state not found
+    			}
+    			break;
     			}
     		}
     		break;
@@ -129,6 +144,8 @@ public class TractorGame extends BasicGame {
     		case GameCommand.PART:
     		{
     			if(message[1].equals(Client.getInstance().getUsername())) {
+    				for(int a = 0; a<100000; a++)
+    					System.out.println("the game");
     				//TODO: clean up and part
     			} else if(this.hands.containsKey(message[1])) {
     				OtherPlayerHand hand = this.hands.remove(message[1]);
@@ -153,5 +170,6 @@ public class TractorGame extends BasicGame {
         for(String key : keyset) {
         	hands.get(key).render(g);
         }
+        this.startButton.render(container,g);
     }
 }

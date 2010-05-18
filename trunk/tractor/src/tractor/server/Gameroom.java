@@ -91,7 +91,11 @@ public class Gameroom extends Chatroom implements Runnable { // do I need a thre
 							if(u!=user)
 								this.sendCommand(GameCommand.JOIN + " " + u.getGamePosition() + " " + u.getName(), user);
 						}
-						this.sendUpdateState(GameCommand.WAITING, user);
+						if(this.getSize() == this.getGameSize()) {
+							this.sendUpdateState(GameCommand.READY);
+						} else {
+							this.sendUpdateState(GameCommand.WAITING, user);
+						}
 						break;
 					default:
 						//TODO: command not found error

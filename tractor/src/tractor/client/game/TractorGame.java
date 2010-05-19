@@ -44,8 +44,7 @@ public class TractorGame extends BasicGame {
         }*/
         this.container = container;
         this.io = Client.getInstance().getIO();
-        this.startButton = new Button(container,GraphicsCard.getCard(GraphicsCard.CLUBS,GraphicsCard.ACE).getImage(),container.getWidth()/2,container.getHeight()/2);
-        this.startButton.setMouseOverImage(GraphicsCard.getCard(GraphicsCard.HEARTS,GraphicsCard.ACE).getImage());
+        this.startButton = new Button(container,GraphicsCard.getCard(GraphicsCard.DIAMONDS,GraphicsCard.ACE).getImage(),GraphicsCard.getCard(GraphicsCard.CLUBS,GraphicsCard.ACE).getImage(),GraphicsCard.getCard(GraphicsCard.HEARTS,GraphicsCard.ACE).getImage(),container.getWidth()/2,container.getHeight()/2);
         Point2D.Double point;
         switch(players) {
         case 2:
@@ -109,11 +108,17 @@ public class TractorGame extends BasicGame {
     			case GameCommand.WAITING: 
     			{
     				//clear stuff and sit there?
+    				this.startButton.disable();
     			}
     			break;
     			case GameCommand.READY:
     			{
-    				
+    				this.startButton.enable();
+    			}
+    			break;
+    			case GameCommand.START:
+    			{
+    				this.startButton.hide();
     			}
     			break;
     			default:

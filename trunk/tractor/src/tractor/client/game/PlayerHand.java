@@ -11,14 +11,14 @@ import org.newdawn.slick.SlickException;
 public class PlayerHand {
 
 	private float x, y;
-	private static final int spacing = 4;
+	private static final int spacing = 22;
 	private ArrayList<GraphicsCard> cards;
 	//private String name;
 	
 	PlayerHand(float x, float y) {
 		//this.name = Client.getInstance().getUsername();
-		this.x = x;
-		this.y = y;
+		this.x = x - ( 172 - spacing )/2;
+		this.y = y-127;
 		this.cards = new ArrayList<GraphicsCard>();
 	}
 	
@@ -34,7 +34,7 @@ public class PlayerHand {
 	public void render(Graphics g) throws SlickException {
 		float start = this.x - (spacing * this.cards.size())/2;
 		for(GraphicsCard card : this.cards){ 
-			g.drawImage(card.getImage(), start, y);
+			g.drawImage(card.getFullsizeImage(), start, y);
 			start+=spacing;
 		}
 		//g.drawString(this.name,x,y);

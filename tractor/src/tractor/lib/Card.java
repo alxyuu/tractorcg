@@ -2,7 +2,7 @@ package tractor.lib;
 
 import java.util.ArrayList;
 
-public class Card {
+public class Card implements Comparable<Card> {
 	
 	protected static final ArrayList<Card> cards;
 	public static final int ACE = 12;
@@ -18,8 +18,10 @@ public class Card {
 	public static final int JACK = 9;
 	public static final int QUEEN = 10;
 	public static final int KING = 11;
-	public static final int SMALL_JOKER = 0;
-	public static final int BIG_JOKER = 1;
+	public static final int SMALL_JOKER = 9998;
+	public static final int BIG_JOKER = 9999;
+	public static final int SET_TRUMP_NUMBER = 9997;
+	public static final int SET_TRUMP = 9996;
 	public static final int SPADES = 0;
 	public static final int CLUBS = 1;
 	public static final int DIAMONDS = 2;
@@ -33,7 +35,6 @@ public class Card {
 	static {
 		
 		cards = new ArrayList<Card>();
-		
 	}
 	
 	/**It gets the card
@@ -44,6 +45,15 @@ public class Card {
 	 */
 	public static Card getCard(int suit, int value) {
 		return cards.get(suit*Card.CARDS_PER_SUIT+value);
+	}
+	
+	public static Card getCard(String s) {
+		String[] split = s.split(" ");
+		try {
+			return cards.get(Integer.parseInt(split[0])*Card.CARDS_PER_SUIT+Integer.parseInt(split[1]));
+		} catch (NumberFormatException e) {
+			return null;
+		}
 	}
 	
 	/**It returns the deck
@@ -143,15 +153,25 @@ public class Card {
 		return this.value;
 	}
 	
-	/**Returns the sorted rank of the card
-	 * @return
-	 * 
-	 */
-	public int getSortingValue() {
-		//return ( (this.suit == Card.TRUMP_SUIT) ? Card.TRUMP : this.suit ) *
-		//wait for aaron
-		return 0;
+	private int getSortingSuit() {
+		return (this.suit == Card.TRUMP_SUIT) ? Card.TRUMP : this.suit;
 	}
+	private int getSortingValue() {
+		return (this.value == Card.TRUMP_NUMBER) ? (this.suit == Card.TRUMP_SUIT ? Card.SET_TRUMP_NUMBER : Card.SET_TRUMP) : this.value;
+	}
+	
+	public int compareTo(Card card) {
+		if(this.suit == card.suit) {
+			return this.value-card.value;
+		} else {
+			return this.getSortingSuit() - card.getSortingSuit();
+		}
+	}
+	
+	public String toString() {
+		return this.suit + " " + this.value;
+	}
+	
 	/**It gets the suit of the card
 	 * @return
 	 * 

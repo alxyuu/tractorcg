@@ -4,6 +4,8 @@ import java.net.ServerSocket;
 import java.io.IOException;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.Vector;
+
+import tractor.lib.Card;
 import tractor.server.User;
 import tractor.server.handlers.*;
 
@@ -26,6 +28,7 @@ public class Server {
 		host.addHandler(new LoginHandler(), "login");
 		host.addHandler(new CleanupHandler(), "user cleanup");
 		host.addHandler(new CommandHandler(), "command handler");
+		Card.populateDeck();
 	}
 	
 	private ThreadGroup handlers;

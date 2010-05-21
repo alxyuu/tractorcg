@@ -56,7 +56,7 @@ public class GraphicsCard extends Card {
 			}
 		}
 		cards.add(new GraphicsCard(Card.TRUMP, Card.SMALL_JOKER, "images/cards/joker_s.png"));
-		cards.add(new GraphicsCard(Card.TRUMP, Card.BIG_JOKER, "images/cards/joker_s.png"));
+		cards.add(new GraphicsCard(Card.TRUMP, Card.BIG_JOKER, "images/cards/joker_b.png"));
 	}
 	
 	private Image image;

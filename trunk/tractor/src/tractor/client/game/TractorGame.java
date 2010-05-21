@@ -72,6 +72,7 @@ public class TractorGame extends BasicGame {
 	        }
 	        //hands.put("Player"+((players+position-2)%players+1), new OtherPlayerHand(container.getWidth()-100,container.getHeight()/2));
         }
+        this.hand = new PlayerHand(container.getWidth()/2,container.getHeight()-50);
     }
     
     public Point2D.Double getCoordinates(double theta) {
@@ -116,7 +117,7 @@ public class TractorGame extends BasicGame {
     				this.startButton.enable();
     			}
     			break;
-    			case GameCommand.START:
+    			case GameCommand.DEALING:
     			{
     				this.startButton.hide();
     			}
@@ -160,6 +161,14 @@ public class TractorGame extends BasicGame {
     			}
     			//TODO: user not found
     		}
+    		case GameCommand.DEALING:
+    		{
+    			if(message[1].equals(Client.getInstance().getUsername())) {
+    				this.hand.addCard(GraphicsCard.getCard(message[2]+" "+message[3]));
+    			} else {
+    				this.hands.get(message[1]).addCard();
+    			}
+    		}
     		break;
     		}
     	}
@@ -176,5 +185,6 @@ public class TractorGame extends BasicGame {
         	hands.get(key).render(g);
         }
         this.startButton.render(container,g);
+        this.hand.render(g);
     }
 }

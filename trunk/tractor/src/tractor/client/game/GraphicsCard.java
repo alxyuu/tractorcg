@@ -42,6 +42,10 @@ public class GraphicsCard extends Card {
 		return (GraphicsCard)Card.getCard(suit,value);
 	}
 	
+	public static GraphicsCard getCard(String s) {
+		return (GraphicsCard)Card.getCard(s);
+	}
+	
 	/**Fills the deck
 	 * 
 	 */

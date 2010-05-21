@@ -1,9 +1,12 @@
 package tractor.server;
 
+import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.Iterator;
 import java.util.Set;
 
+import tractor.lib.Card;
 import tractor.lib.GameCommand;
 import tractor.lib.MessageFactory;
 
@@ -12,6 +15,7 @@ public class Gameroom extends Chatroom implements Runnable { // do I need a thre
 	private Thread gthread;
 	private Set<User> users;
 	private User host;
+	private int state;
 	public Gameroom(int players) {
 		super();
 		this.players = players;
@@ -19,6 +23,7 @@ public class Gameroom extends Chatroom implements Runnable { // do I need a thre
 		this.setName("@"+this.hashCode());
 		this.gthread = new Thread(this,this.getName());
 		this.gthread.start();
+		this.state = GameCommand.WAITING;
 	}
 	public void setHost(User user) {
 		this.host = user;
@@ -45,9 +50,11 @@ public class Gameroom extends Chatroom implements Runnable { // do I need a thre
 	
 	private void sendUpdateState(int state) {
 		this.sendCommand(GameCommand.UPDATE_STATE + " " + state);
+		this.state = state;
 	}
 	private void sendUpdateState(int state, User user) {
 		this.sendCommand(GameCommand.UPDATE_STATE + " " + state, user);
+		this.state = state;
 	}
 	private void sendCommand(String message) {
 		for(Iterator<User> i=this.users.iterator(); i.hasNext();) {
@@ -96,6 +103,36 @@ public class Gameroom extends Chatroom implements Runnable { // do I need a thre
 						} else {
 							this.sendUpdateState(GameCommand.WAITING, user);
 						}
+						break;
+					case GameCommand.START:
+						this.sendUpdateState(GameCommand.DEALING);
+						Thread dealing = new Thread("dealing-"+this.getName()) {
+							public void run() {
+								int decks = 3;
+								ArrayList<Card> cards = new ArrayList<Card>();
+								for(int i=0;i<decks; i++)
+									cards.addAll(Card.getDeck());
+								Collections.shuffle(cards);
+								System.out.println("something");
+								while(cards.size() > 4+users.size()) {
+									System.out.println("something else");
+									for(Iterator<User> i = users.iterator();i.hasNext();) {
+										User user = i.next();
+										Card todeal = cards.remove(0);
+										sendCommand(GameCommand.DEALING + " " + user.getName() + " " + todeal, user);
+										sendCommandExclude(GameCommand.DEALING + " " + user.getName(), user);
+										try {
+											Thread.sleep(50);
+										} catch (InterruptedException e) {
+											e.printStackTrace();
+											return;
+										}
+									}
+								}
+								sendUpdateState(GameCommand.START);
+							}
+						};
+						dealing.start();
 						break;
 					default:
 						//TODO: command not found error

@@ -12,7 +12,7 @@ public class GraphicsCard extends Card {
 	public static final int SCALED_WIDTH = 50;
 	static {
 		try {
-			back = new Image("images/cards/back.png");
+			back = new Image("images/cards/back.png").getScaledCopy(100,148);
 			scaledback = back.getScaledCopy(GraphicsCard.SCALED_WIDTH,GraphicsCard.SCALED_HEIGHT);
 		} catch (SlickException e) {
 			// TODO Auto-generated catch block
@@ -65,7 +65,7 @@ public class GraphicsCard extends Card {
 	GraphicsCard(int suit, int value, String filename) {
 		super(suit,value);
 		try {
-			this.image = new Image(filename);
+			this.image = new Image(filename).getScaledCopy(100,148);
 			this.scaled = image.getScaledCopy(GraphicsCard.SCALED_WIDTH,GraphicsCard.SCALED_HEIGHT);
 		} catch (SlickException e) {
 			// TODO Auto-generated catch block

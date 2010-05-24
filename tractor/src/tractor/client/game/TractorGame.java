@@ -176,8 +176,10 @@ public class TractorGame extends BasicGame {
     		{
     			if(message[1].equals(Client.getInstance().getUsername())) {
     				this.isHost = true;
+    				this.startButton.show();
     			} else {
     				this.isHost = false;
+    				this.startButton.hide();
     			}
     		}
     		break;
@@ -195,7 +197,7 @@ public class TractorGame extends BasicGame {
         for(String key : keyset) {
         	hands.get(key).render(g);
         }
-        this.startButton.render(container,g);
+        	this.startButton.render(container,g);
         this.hand.render(g);
     }
 }

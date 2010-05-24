@@ -30,6 +30,7 @@ public class Gameroom extends Chatroom implements Runnable { // do I need a thre
 	}
 	public void setHost(User user) {
 		this.host = user;
+		sendCommand(GameCommand.SET_HOST + " " + user.getName(),user);
 	}
 	public int getGameSize() {
 		return this.players;

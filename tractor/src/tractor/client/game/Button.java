@@ -26,8 +26,7 @@ public class Button extends MouseOverArea {
 		this.mouseoverImage = mouseoverImage;
 		this.io = Client.getInstance().getIO();
 		
-		this.show();
-		this.disable();
+		this.hide();
 	}
 	
 	public void show() {

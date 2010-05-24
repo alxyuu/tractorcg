@@ -33,6 +33,7 @@ public class User {
 	private Socket socket; 
 	private Gameroom game;
 	private int gameposition;
+	private int gamescore;
 	
 	/** Constructor of the User class that initializes the attributes
 	 * @param socket
@@ -87,6 +88,14 @@ public class User {
 	
 	public void setGamePosition(int position) {
 		this.gameposition = position;
+	}
+	
+	public void setGameScore(int score) {
+		this.gamescore = score;
+	}
+	
+	public int getGameScore() {
+		return this.gamescore;
 	}
 	
 	/**It removes the user from the chatroom.

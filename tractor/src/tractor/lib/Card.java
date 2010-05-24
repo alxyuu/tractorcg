@@ -30,6 +30,7 @@ public class Card implements Comparable<Card> {
 	public static final int CARDS_PER_SUIT = 13;
 	public static int TRUMP_SUIT = 0;
 	public static int TRUMP_NUMBER = 4;
+	//TODO: EL PROBLEMO - MORE THAN ONE TRUMP SUIT/NUMBER WHEN RUNNING SERVER BECAUSE OF MULTIPLE GAMES BAWWW
 	//public static final int SET_TRUMP_BONUS = 13;
 	
 	static {
@@ -47,10 +48,17 @@ public class Card implements Comparable<Card> {
 		return cards.get(suit*Card.CARDS_PER_SUIT+value);
 	}
 	
-	public static Card getCard(String s) {
+	/*public static Card getCard(String s) {
 		String[] split = s.split(" ");
 		try {
 			return cards.get(Integer.parseInt(split[0])*Card.CARDS_PER_SUIT+Integer.parseInt(split[1]));
+		} catch (NumberFormatException e) {
+			return null;
+		}
+	}*/
+	public static Card getCard(String suit, String value) {
+		try {
+			return cards.get(Integer.parseInt(suit)*Card.CARDS_PER_SUIT+Integer.parseInt(value));
 		} catch (NumberFormatException e) {
 			return null;
 		}
@@ -105,9 +113,6 @@ public class Card implements Comparable<Card> {
 		return (this.value == Card.TRUMP_NUMBER) ? ((this.suit == Card.TRUMP_SUIT) ? Card.SET_TRUMP_NUMBER : Card.SET_TRUMP) : this.value;
 	}
 	
-	private int getrandombs() {
-		return (this.getSortingSuit()+1)*Card.CARDS_PER_SUIT+getSortingValue();
-	}
 	public int compareTo(Card card) {
 		if(this.getSortingSuit() == card.getSortingSuit()) {
 			return this.getSortingValue()-card.getSortingValue();

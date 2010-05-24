@@ -42,8 +42,8 @@ public class GraphicsCard extends Card {
 		return (GraphicsCard)Card.getCard(suit,value);
 	}
 	
-	public static GraphicsCard getCard(String s) {
-		return (GraphicsCard)Card.getCard(s);
+	public static GraphicsCard getCard(String suit, String value) {
+		return (GraphicsCard)Card.getCard(suit,value);
 	}
 	
 	/**Fills the deck

@@ -1,5 +1,8 @@
 package tractor.server;
 
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
 import java.util.Iterator;
 import java.util.concurrent.ConcurrentLinkedQueue;
 
@@ -7,10 +10,10 @@ import tractor.lib.MessageFactory;
 
 public class Chatroom {
 	private String name;
-	protected ConcurrentLinkedQueue<User> users;
+	protected List<User> users;
 
 	Chatroom() {
-		this.users = new ConcurrentLinkedQueue<User>();
+		this.users = Collections.synchronizedList(new ArrayList<User>());
 	}
 	
 	/**Constructs the chatroom class and initializes the attributes.
@@ -26,7 +29,7 @@ public class Chatroom {
 		this.name = name;
 	}
 	
-	protected ConcurrentLinkedQueue<User> getUsers() {
+	protected List<User> getUsers() {
 		return this.users;
 	}
 	

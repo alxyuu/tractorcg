@@ -15,6 +15,11 @@ public class Gameroom extends Chatroom implements Runnable { // do I need a thre
 	private Thread gthread;
 	private User host;
 	private int state;
+	private int TRUMP_SUIT;
+	private int TRUMP_NUMBER;
+	private int called_cards;
+	private User caller;
+	private User lead;
 	public Gameroom(int players) {
 		super();
 		this.players = players;
@@ -74,6 +79,14 @@ public class Gameroom extends Chatroom implements Runnable { // do I need a thre
 		}
 	}
 	
+	private void setLead(User user) {
+		this.lead = user;
+		int index = this.users.indexOf(user);
+		if(index > 0) { // -1 = not found ruh roh, 0 = number 1 don't do anyone
+			Collections.rotate(this.users, index);
+		}
+	}
+	
 	private void deal() {
 		this.sendUpdateState(GameCommand.DEALING);
 		Thread dealing = new Thread("dealing-"+this.getName()) {
@@ -100,6 +113,9 @@ public class Gameroom extends Chatroom implements Runnable { // do I need a thre
 						}
 					}
 				}
+				if(caller != null)
+					setLead(caller);
+				//TODO: give lead dipai
 				sendUpdateState(GameCommand.START);
 			}
 		};
@@ -138,9 +154,38 @@ public class Gameroom extends Chatroom implements Runnable { // do I need a thre
 						//gtfo if you're not the host
 						if(user != this.host)
 							break;
+						for(Iterator<User> i2 = users.iterator();i2.hasNext();) {
+							i2.next().setGameScore(Card.TWO);
+						}
+						this.TRUMP_NUMBER = Card.TWO;
+						this.TRUMP_SUIT  = -1;
+						this.called_cards = 0;
+						this.setLead(host);
 						this.deal();
 					}
 					break;
+					case GameCommand.PLAY_CARD:
+					{
+						Card played = Card.getCard(message[1],message[2]);
+						int call_number = Integer.parseInt(message[3]);
+						if(this.state == GameCommand.DEALING) { //card being called
+							if(played.getNumber() == this.TRUMP_NUMBER || played.getSuit() == Card.TRUMP) { // make sure the call is valid 
+								//card number for jokers might cause first half to return true, shouldn't matter
+								if(call_number > this.called_cards || call_number == this.called_cards && played.getSuit() == Card.TRUMP) {
+									//TODO: differentiate between big and small jokers
+									this.called_cards = call_number;
+									this.TRUMP_SUIT = played.getSuit();
+									this.caller = user;
+								} else {
+									System.out.println("illegal call");
+								}
+							}
+						} else if(this.state == GameCommand.START) { //normally played
+							
+						} else {
+							System.out.println("STRANGER DANGER");
+						}
+					}
 					default:
 						//TODO: command not found error
 						break;

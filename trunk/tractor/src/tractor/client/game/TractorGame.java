@@ -166,7 +166,7 @@ public class TractorGame extends BasicGame {
     		case GameCommand.DEALING:
     		{
     			if(message[1].equals(Client.getInstance().getUsername())) {
-    				this.hand.addCard(GraphicsCard.getCard(message[2]+" "+message[3]));
+    				this.hand.addCard(GraphicsCard.getCard(message[2],message[3]));
     			} else {
     				this.hands.get(message[1]).addCard();
     			}

@@ -13,13 +13,11 @@ import tractor.lib.MessageFactory;
 public class Gameroom extends Chatroom implements Runnable { // do I need a threadgroup? not really?
 	private int players;
 	private Thread gthread;
-	private Set<User> users;
 	private User host;
 	private int state;
 	public Gameroom(int players) {
 		super();
 		this.players = players;
-		this.users = super.getUsers();
 		this.setName("@"+this.hashCode());
 		this.gthread = new Thread(this,this.getName());
 		this.gthread.start();
@@ -76,6 +74,37 @@ public class Gameroom extends Chatroom implements Runnable { // do I need a thre
 		}
 	}
 	
+	private void deal() {
+		this.sendUpdateState(GameCommand.DEALING);
+		Thread dealing = new Thread("dealing-"+this.getName()) {
+			public void run() {
+				int decks = 3;
+				ArrayList<Card> cards = new ArrayList<Card>();
+				for(int i=0;i<decks; i++)
+					cards.addAll(Card.getDeck());
+				for(int i=0;i<7;i++) // seven shuffles for fully random guffaw
+					Collections.shuffle(cards);
+				System.out.println("something");
+				while(cards.size() > 4+users.size()) {
+					System.out.println("something else");
+					for(Iterator<User> i = users.iterator();i.hasNext();) {
+						User user = i.next();
+						Card todeal = cards.remove(0);
+						sendCommand(GameCommand.DEALING + " " + user.getName() + " " + todeal, user);
+						sendCommandExclude(GameCommand.DEALING + " " + user.getName(), user);
+						try {
+							Thread.sleep(50);
+						} catch (InterruptedException e) {
+							e.printStackTrace();
+							return;
+						}
+					}
+				}
+				sendUpdateState(GameCommand.START);
+			}
+		};
+		dealing.start();
+	}
 	public void run() {
 		while(!users.isEmpty()) {
 			for(Iterator<User> i = users.iterator();i.hasNext();) {
@@ -104,36 +133,14 @@ public class Gameroom extends Chatroom implements Runnable { // do I need a thre
 							this.sendUpdateState(GameCommand.WAITING, user);
 						}
 						break;
-					case GameCommand.START:
-						this.sendUpdateState(GameCommand.DEALING);
-						Thread dealing = new Thread("dealing-"+this.getName()) {
-							public void run() {
-								int decks = 3;
-								ArrayList<Card> cards = new ArrayList<Card>();
-								for(int i=0;i<decks; i++)
-									cards.addAll(Card.getDeck());
-								Collections.shuffle(cards);
-								System.out.println("something");
-								while(cards.size() > 4+users.size()) {
-									System.out.println("something else");
-									for(Iterator<User> i = users.iterator();i.hasNext();) {
-										User user = i.next();
-										Card todeal = cards.remove(0);
-										sendCommand(GameCommand.DEALING + " " + user.getName() + " " + todeal, user);
-										sendCommandExclude(GameCommand.DEALING + " " + user.getName(), user);
-										try {
-											Thread.sleep(50);
-										} catch (InterruptedException e) {
-											e.printStackTrace();
-											return;
-										}
-									}
-								}
-								sendUpdateState(GameCommand.START);
-							}
-						};
-						dealing.start();
-						break;
+					case GameCommand.START: 
+					{
+						//gtfo if you're not the host
+						if(user != this.host)
+							break;
+						this.deal();
+					}
+					break;
 					default:
 						//TODO: command not found error
 						break;

@@ -83,6 +83,7 @@ public class CommandHandler extends ServerHandler {
 								Gameroom room = new Gameroom(4);
 								chatrooms.put(room.getName(), room);
 								room.join(user);
+								room.setHost(user);
 								user.setCurrentGame(room);
 								user.setGamePosition(1);
 								user.addChatroom(room);

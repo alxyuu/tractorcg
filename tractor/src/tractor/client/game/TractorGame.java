@@ -24,6 +24,7 @@ public class TractorGame extends BasicGame {
 	private String name;
 	private PlayerHand hand;
 	private Button startButton;
+	private boolean isHost;
 	//private OtherPlayerHand hand;
     public TractorGame(int position, int players, String name) {
         super("Tractor "+players+"-way");
@@ -31,6 +32,7 @@ public class TractorGame extends BasicGame {
         this.position = position;
         this.name = name;
         this.hands = new HashMap<String,OtherPlayerHand>();
+        this.isHost = false;
     }
     
     @Override
@@ -167,6 +169,15 @@ public class TractorGame extends BasicGame {
     				this.hand.addCard(GraphicsCard.getCard(message[2]+" "+message[3]));
     			} else {
     				this.hands.get(message[1]).addCard();
+    			}
+    		}
+    		break;
+    		case GameCommand.SET_HOST:
+    		{
+    			if(message[1].equals(Client.getInstance().getUsername())) {
+    				this.isHost = true;
+    			} else {
+    				this.isHost = false;
     			}
     		}
     		break;

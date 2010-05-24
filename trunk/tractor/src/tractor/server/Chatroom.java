@@ -1,18 +1,16 @@
 package tractor.server;
 
-import java.util.Collections;
-import java.util.HashSet;
 import java.util.Iterator;
-import java.util.Set;
+import java.util.concurrent.ConcurrentLinkedQueue;
 
 import tractor.lib.MessageFactory;
 
 public class Chatroom {
 	private String name;
-	private Set<User> users;
+	protected ConcurrentLinkedQueue<User> users;
 
 	Chatroom() {
-		this.users = Collections.synchronizedSet(new HashSet<User>());
+		this.users = new ConcurrentLinkedQueue<User>();
 	}
 	
 	/**Constructs the chatroom class and initializes the attributes.
@@ -28,7 +26,7 @@ public class Chatroom {
 		this.name = name;
 	}
 	
-	protected Set<User> getUsers() {
+	protected ConcurrentLinkedQueue<User> getUsers() {
 		return this.users;
 	}
 	
@@ -41,6 +39,8 @@ public class Chatroom {
 	 * 
 	 */
 	public boolean join(User user) {
+		if(this.users.contains(user))
+			return false;
 		this.users.add(user);
 		this.send(user, user.getName() + " has joined " + this.getName());
 		return true;

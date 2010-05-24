@@ -11,6 +11,7 @@ public class GameCommand {
 	public final static int JOIN = 0;
 	public final static int UPDATE_STATE = 1;
 	public final static int PART = 2;
+	public final static int SET_HOST = 3;
 	
 	
 	

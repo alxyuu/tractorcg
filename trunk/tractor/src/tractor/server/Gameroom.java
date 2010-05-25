@@ -90,6 +90,15 @@ public class Gameroom extends Chatroom implements Runnable { // do I need a thre
 		}
 	}
 	
+	private void updateStats() {
+		String stats = GameCommand.SET_STATS + " " + this.TRUMP_NUMBER + " " + 4;
+		for(Iterator<User> i = users.iterator();i.hasNext();) {
+			User user = i.next();
+			stats += " " + user.getName() + " " + user.getGameScore();
+		}
+		sendCommand(stats);
+	}
+	
 	private void deal() {
 		this.sendUpdateState(GameCommand.DEALING);
 		Thread dealing = new Thread("dealing-"+this.getName()) {
@@ -100,11 +109,13 @@ public class Gameroom extends Chatroom implements Runnable { // do I need a thre
 					cards.addAll(Card.getDeck());
 				for(int i=0;i<7;i++) // seven shuffles for fully random guffaw
 					Collections.shuffle(cards);
+				for(Iterator<User> i = users.iterator();i.hasNext();) {
+					i.next().newHand();
+				}
 				while(cards.size() > 4+users.size()) {
 					for(Iterator<User> i = users.iterator();i.hasNext();) {
 						User user = i.next();
 						Card todeal = cards.remove(0);
-						user.newHand();
 						user.getHand().addCard(todeal);
 						sendCommand(GameCommand.DEALING + " " + user.getName() + " " + todeal, user);
 						sendCommandExclude(GameCommand.DEALING + " " + user.getName(), user);
@@ -133,6 +144,7 @@ public class Gameroom extends Chatroom implements Runnable { // do I need a thre
 				}
 				sendCommand(GameCommand.DIPAI + dipai, lead);
 				sendUpdateState(GameCommand.DIPAI);
+				sendCommand(GameCommand.CLEAR_TABLE+"");
 			}
 		};
 		dealing.start();
@@ -177,6 +189,7 @@ public class Gameroom extends Chatroom implements Runnable { // do I need a thre
 						this.TRUMP_SUIT  = -1;
 						this.called_cards = 0;
 						this.setLead(host);
+						this.updateStats();
 						this.deal();
 					}
 					break;
@@ -195,6 +208,8 @@ public class Gameroom extends Chatroom implements Runnable { // do I need a thre
 									this.sendCommand(GameCommand.PLAY_CARD + " " + user.getName() + " " + played.getSuit() + " " + call_number);
 								} else {
 									System.out.println("illegal call");
+									System.out.println("cards in hand: "+(user.getHand().frequency(played) >= call_number));
+									System.out.println("enough cards to call: "+(call_number > this.called_cards || call_number == this.called_cards && played.getSuit() == Card.TRUMP));
 								}
 							}
 						} else if(this.state == GameCommand.START) { //normally played

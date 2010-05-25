@@ -1,8 +1,11 @@
 package tractor.client.game;
 
 import java.awt.geom.Point2D;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Set;
+
+import java.util.Iterator;
 
 import org.newdawn.slick.BasicGame;
 import org.newdawn.slick.Color;
@@ -32,6 +35,7 @@ public class TractorGame extends BasicGame {
 	private Color background;
 	private int called_cards;
 	private int state;
+	private int score;
 	//private OtherPlayerHand hand;
     public TractorGame(int position, int players, String name) {
         super("Tractor "+players+"-way");
@@ -65,25 +69,25 @@ public class TractorGame extends BasicGame {
 	        this.spades = new Button(container,new Image("images/suits/"+GraphicsCard.SPADES+".png"), new Image("images/suits/"+GraphicsCard.SPADES+"s.png"), 600, 380);
 	        this.spades.addButtonPressedListener(new ButtonPressedListener() {
 	        	public void buttonPressed() {
-	        		io.write(GameCommand.PLAY_CARD+" "+GraphicsCard.SPADES + " " + GraphicsCard.TRUMP_NUMBER + " " + (++called_cards), IOFactory.GAMECMD);
+	        		io.write(GameCommand.PLAY_CARD+" "+GraphicsCard.SPADES + " " + GraphicsCard.TRUMP_NUMBER + " " + (called_cards+1), IOFactory.GAMECMD);
 	        	}
 	        });
 	        this.clubs = new Button(container,new Image("images/suits/"+GraphicsCard.CLUBS+".png"), new Image("images/suits/"+GraphicsCard.CLUBS+"s.png"), 631, 380);
 	        this.clubs.addButtonPressedListener(new ButtonPressedListener() {
 	        	public void buttonPressed() {
-	        		io.write(GameCommand.PLAY_CARD+" "+GraphicsCard.CLUBS + " " + GraphicsCard.TRUMP_NUMBER + " " + (++called_cards), IOFactory.GAMECMD);
+	        		io.write(GameCommand.PLAY_CARD+" "+GraphicsCard.CLUBS + " " + GraphicsCard.TRUMP_NUMBER + " " + (called_cards+1), IOFactory.GAMECMD);
 	        	}
 	        });
 	        this.diamonds = new Button(container,new Image("images/suits/"+GraphicsCard.DIAMONDS+".png"), new Image("images/suits/"+GraphicsCard.DIAMONDS+"s.png"), 662, 380);
 	        this.diamonds.addButtonPressedListener(new ButtonPressedListener() {
 	        	public void buttonPressed() {
-	        		io.write(GameCommand.PLAY_CARD+" "+GraphicsCard.DIAMONDS + " " + GraphicsCard.TRUMP_NUMBER + " " + (++called_cards), IOFactory.GAMECMD);
+	        		io.write(GameCommand.PLAY_CARD+" "+GraphicsCard.DIAMONDS + " " + GraphicsCard.TRUMP_NUMBER + " " + (called_cards+1), IOFactory.GAMECMD);
 	        	}
 	        });
 	        this.hearts = new Button(container,new Image("images/suits/"+GraphicsCard.HEARTS+".png"), new Image("images/suits/"+GraphicsCard.HEARTS+"s.png"), 693, 380);
 	        this.hearts.addButtonPressedListener(new ButtonPressedListener() {
 	        	public void buttonPressed() {
-	        		io.write(GameCommand.PLAY_CARD+" "+GraphicsCard.HEARTS + " " + GraphicsCard.TRUMP_NUMBER + " " + (++called_cards), IOFactory.GAMECMD);
+	        		io.write(GameCommand.PLAY_CARD+" "+GraphicsCard.HEARTS + " " + GraphicsCard.TRUMP_NUMBER + " " + (called_cards+1), IOFactory.GAMECMD);
 	        	}
 	        });
 	        this.notrump = new Button(container,new Image("images/suits/"+GraphicsCard.TRUMP+".png"), new Image("images/suits/"+GraphicsCard.TRUMP+"s.png"), 724, 380);
@@ -97,16 +101,18 @@ public class TractorGame extends BasicGame {
         	e.printStackTrace();
         }
         
-        Point2D.Double point;
+        Point2D.Double point,point2;
         switch(players) {
         case 2:
-        	hands.put("Player" + ( (position == 1) ? 2 : 1 ), new OtherPlayerHand(container.getWidth()/2, 50));
+        	hands.put("Player" + ( (position == 1) ? 2 : 1 ), new OtherPlayerHand(container.getWidth()/2, 50, container.getWidth()/2,125));
         	break;
         case 3:
         	point = getCoordinates(5*Math.PI/6);
-        	hands.put("Player"+(position%players+1), new OtherPlayerHand(point.x,point.y));
+        	point2 = getTableCoordinates(5*Math.PI/6);
+        	hands.put("Player"+(position%players+1), new OtherPlayerHand(point.x,point.y,point2.x,point2.y));
         	point = getCoordinates(Math.PI/6);
-        	hands.put("Player"+((position+1)%players+1), new OtherPlayerHand(point.x,point.y));
+        	point2 = getTableCoordinates(Math.PI/6);
+        	hands.put("Player"+((position+1)%players+1), new OtherPlayerHand(point.x,point.y,point2.x,point2.y));
         	break;
         default:
         	if(players < 3) {
@@ -119,16 +125,22 @@ public class TractorGame extends BasicGame {
         	double theta = Math.PI;
 	        for(int i=position;i<players+position-1;i++) {
 	        	point = getCoordinates(theta);
-	        	hands.put("Player"+(i%players+1), new OtherPlayerHand(point.x,point.y));
+	        	point2 = getTableCoordinates(theta);
+	        	hands.put("Player"+(i%players+1), new OtherPlayerHand(point.x,point.y,point2.x,point2.y));
 	        	theta -= increment;
 	        }
 	        //hands.put("Player"+((players+position-2)%players+1), new OtherPlayerHand(container.getWidth()-100,container.getHeight()/2));
         }
-        this.hand = new PlayerHand(container.getWidth()/2,container.getHeight()-100);
+        this.hand = new PlayerHand(container.getWidth()/2,container.getHeight()-100, container.getWidth()/2,container.getHeight()-250 );
     }
     
     public Point2D.Double getCoordinates(double theta) {
-       	double radius = (container.getWidth()/2-100)*(container.getHeight()/2-50)/Math.sqrt(Math.pow((container.getHeight()/2-50)*Math.cos(theta), 2) + Math.pow((container.getWidth()/2-100)*Math.sin(theta), 2));
+       	double radius = (container.getWidth()/2-150)*(container.getHeight()/2-50)/Math.sqrt(Math.pow((container.getHeight()/2-50)*Math.cos(theta), 2) + Math.pow((container.getWidth()/2-150)*Math.sin(theta), 2));
+    	return new Point2D.Double(container.getWidth()/2+radius*Math.cos(theta), container.getHeight()/2-radius*Math.sin(theta));
+    }
+    
+    public Point2D.Double getTableCoordinates(double theta) {
+       	double radius = (container.getWidth()/2-350)*(container.getHeight()/2-125)/Math.sqrt(Math.pow((container.getHeight()/2-125)*Math.cos(theta), 2) + Math.pow((container.getWidth()/2-350)*Math.sin(theta), 2));
     	return new Point2D.Double(container.getWidth()/2+radius*Math.cos(theta), container.getHeight()/2-radius*Math.sin(theta));
     }
 
@@ -259,11 +271,34 @@ public class TractorGame extends BasicGame {
     		case GameCommand.PLAY_CARD:
     		{
     			if(this.state == GameCommand.DEALING) { // being called
-    				
+    				this.called_cards = Integer.parseInt(message[3]);
+    				GraphicsCard.TRUMP_SUIT = Integer.parseInt(message[2]);
+					ArrayList<GraphicsCard> list = new ArrayList<GraphicsCard>();
+					for(int i = 0; i < called_cards; i++) {
+						list.add(GraphicsCard.getCard(GraphicsCard.TRUMP_SUIT,GraphicsCard.TRUMP_NUMBER));
+					}
+    				if(message[1].equals(Client.getInstance().getUsername())) {
+    					this.hand.playCards(list);
+    				} else {
+    					this.hands.get(message[1]).playCards(list);
+    				}
     			} else if (this.state == GameCommand.PLAYING) {
     				
     			} else {
     				System.out.println("STRANGER DANGER");
+    			}
+    		}
+    		break;
+    		case GameCommand.SET_STATS: 
+    		{
+    			GraphicsCard.TRUMP_NUMBER = Integer.parseInt(message[1]);
+    			int players = Integer.parseInt(message[2]);
+    			for( int i = 0; i < players*2; i+=2 ) {
+    				if(message[i+3].equals(Client.getInstance().getUsername())) {
+    					this.score = Integer.parseInt(message[i+4]);
+    				} else {
+    					this.hands.get(message[i+3]).setScore(Integer.parseInt(message[i+4]));
+    				}
     			}
     		}
     		break;
@@ -278,6 +313,19 @@ public class TractorGame extends BasicGame {
     			}
     		}
     		break;
+    		case GameCommand.CLEAR_TABLE:
+    		{
+    			for(Iterator<OtherPlayerHand> i = hands.values().iterator(); i.hasNext(); ) {
+    				i.next().clearTable();
+    			}
+    			hand.clearTable();
+    		}
+    		break;
+    		default:
+    		{
+    			//some shit
+    		}
+    		break;
     		}
     	}
     }
@@ -287,11 +335,9 @@ public class TractorGame extends BasicGame {
             throws SlickException {
     	g.setColor(this.background);
     	g.fillRect(0,0,container.getWidth(),container.getHeight());
-    	g.setColor(Color.white);
-        g.drawString("Hello, Slick world!", 0, 100);
-        Set<String> keyset = hands.keySet();
-        for(String key : keyset) {
-        	hands.get(key).render(g);
+    	g.setColor(Color.black);
+        for(Iterator<OtherPlayerHand> i = hands.values().iterator(); i.hasNext(); ) {
+        	i.next().render(g);
         }
         this.startButton.render(container,g);
         if(this.callingEnabled) {

@@ -14,6 +14,10 @@ public class PlayerHand {
 		this.cards = new ArrayList<Card>();
 	}
 	
+	public int frequency(Card card) {
+		return Collections.frequency(this.cards, card);
+	}
+	
 	public void addCard(Card card) {
 		this.cards.add(card);
 		//Collections.sort(this.cards);

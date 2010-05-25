@@ -66,7 +66,7 @@ public class Button extends MouseOverArea {
 		this.listener = l;
 	}
 	public void mouseReleased(int button, int mx, int my) {
-		if(this.enabled && this.listener != null) {
+		if(this.enabled && this.listener != null && this.isMouseOver()) {
 			this.listener.buttonPressed();
 		}
 	}

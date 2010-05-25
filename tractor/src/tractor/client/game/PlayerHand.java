@@ -1,8 +1,10 @@
 package tractor.client.game;
 
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Iterator;
+import java.util.List;
 import java.util.Map;
 import java.util.TreeMap;
 
@@ -13,18 +15,22 @@ import org.newdawn.slick.gui.GUIContext;
 
 public class PlayerHand {
 
-	private float x, y;
+	private float x, y, x2, y2;
 	private static final int spacing = 20;
 	private Map<CardButton, GraphicsCard> hand;
 	private Collection<GraphicsCard> cards;
+	private List<GraphicsCard> playedcards;
 	//private String name;
 	
-	PlayerHand(float x, float y) {
+	PlayerHand(float x, float y, float x2, float y2) {
 		//this.name = Client.getInstance().getUsername();
 		this.x = x - ( 100 - spacing )/2;
 		this.y = y - 74;
+		this.x2 = x2 - ( 100 - spacing )/2;
+		this.y2 = y2 - 74;
 		this.hand = Collections.synchronizedMap(new TreeMap<CardButton, GraphicsCard>());
 		this.cards = Collections.synchronizedCollection(hand.values());
+		this.playedcards = Collections.emptyList();
 	}
 	
 	public int frequency(GraphicsCard card) {
@@ -38,6 +44,18 @@ public class PlayerHand {
 	public void removeCard(GraphicsCard card) {
 		this.cards.remove(card);
 		updateLocations();
+	}
+	
+	public void playCards(GraphicsCard ... played) {
+		this.playedcards = Collections.synchronizedList(Arrays.asList(played));
+	}
+	
+	public void playCards(List<GraphicsCard> played) {
+		this.playedcards = Collections.synchronizedList(played);
+	}
+	
+	public void clearTable() {
+		this.playedcards.clear();
 	}
 	
 	private void updateLocations() {
@@ -58,6 +76,11 @@ public class PlayerHand {
 	public void render(GUIContext container, Graphics g) throws SlickException {
 		for(Iterator<CardButton> i = hand.keySet().iterator(); i.hasNext(); ) {
 			i.next().render(container, g);
+		}
+		float start = this.x2 - (spacing * this.playedcards.size())/2;
+		for(GraphicsCard card : this.playedcards) {
+			g.drawImage(card.getFullsizeImage(), start, y2);
+			start+=spacing;
 		}
 	}
 	

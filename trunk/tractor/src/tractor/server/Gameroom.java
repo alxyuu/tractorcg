@@ -1,10 +1,10 @@
 package tractor.server;
 
+import java.util.List;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.Iterator;
-import java.util.Set;
 
 import tractor.lib.Card;
 import tractor.lib.GameCommand;
@@ -18,6 +18,7 @@ public class Gameroom extends Chatroom implements Runnable { // do I need a thre
 	private int TRUMP_SUIT;
 	private int TRUMP_NUMBER;
 	private int called_cards;
+	private boolean firstgame;
 	private User caller;
 	private User lead;
 	public Gameroom(int players) {
@@ -27,6 +28,7 @@ public class Gameroom extends Chatroom implements Runnable { // do I need a thre
 		this.gthread = new Thread(this,this.getName());
 		this.gthread.start();
 		this.state = GameCommand.WAITING;
+		this.firstgame = true;
 	}
 	public void setHost(User user) {
 		this.host = user;
@@ -98,26 +100,39 @@ public class Gameroom extends Chatroom implements Runnable { // do I need a thre
 					cards.addAll(Card.getDeck());
 				for(int i=0;i<7;i++) // seven shuffles for fully random guffaw
 					Collections.shuffle(cards);
-				System.out.println("something");
 				while(cards.size() > 4+users.size()) {
-					System.out.println("something else");
 					for(Iterator<User> i = users.iterator();i.hasNext();) {
 						User user = i.next();
 						Card todeal = cards.remove(0);
+						user.newHand();
+						user.getHand().addCard(todeal);
 						sendCommand(GameCommand.DEALING + " " + user.getName() + " " + todeal, user);
 						sendCommandExclude(GameCommand.DEALING + " " + user.getName(), user);
 						try {
-							Thread.sleep(50);
+							Thread.sleep(100);
 						} catch (InterruptedException e) {
 							e.printStackTrace();
 							return;
 						}
 					}
 				}
-				if(caller != null)
+				try {
+					Thread.sleep(1000);	
+				} catch (InterruptedException e) {
+					e.printStackTrace();
+					return;
+				}
+				
+				if(firstgame && caller != null)
 					setLead(caller);
-				//TODO: give lead dipai
-				sendUpdateState(GameCommand.START);
+				
+				//TODO: flip dipai if no one calls
+				String dipai = " "+cards.size();
+				for(Card card : cards) {
+					dipai += " "+card.getSuit()+" "+card.getNumber();
+				}
+				sendCommand(GameCommand.DIPAI + dipai, lead);
+				sendUpdateState(GameCommand.DIPAI);
 			}
 		};
 		dealing.start();
@@ -129,15 +144,14 @@ public class Gameroom extends Chatroom implements Runnable { // do I need a thre
 				MessageFactory io = user.getIO();
 				while(io.hasNextMessage(MessageFactory.GAMECMD)) {
 					String[] message = io.getNextMessage(MessageFactory.GAMECMD).split(" ");
-					System.out.println(Arrays.toString(message));
 					//int primary = GameCommand.get(message[0]);
 					int primary = Integer.parseInt(message[0]);
-					System.out.println(primary);
 					switch(primary) {
 					/*case GameCommand.NULL:
 						//TODO: command not found error
 						break;*/
-					case GameCommand.JOIN:
+					case GameCommand.JOIN: 
+					{
 						this.sendCommandExclude(GameCommand.JOIN + " " + user.getGamePosition() + " " + user.getName(), user);
 						for(Iterator<User> i2 = users.iterator();i2.hasNext();) {
 							User u = i2.next();
@@ -145,11 +159,12 @@ public class Gameroom extends Chatroom implements Runnable { // do I need a thre
 								this.sendCommand(GameCommand.JOIN + " " + u.getGamePosition() + " " + u.getName(), user);
 						}
 						if(this.getSize() == this.getGameSize()) {
-							this.sendUpdateState(GameCommand.READY);
+							this.sendUpdateState(GameCommand.READY, host); // only need to send to host right?
 						} else {
 							this.sendUpdateState(GameCommand.WAITING, user);
 						}
-						break;
+					}
+					break;
 					case GameCommand.START: 
 					{
 						//gtfo if you're not the host
@@ -172,11 +187,12 @@ public class Gameroom extends Chatroom implements Runnable { // do I need a thre
 						if(this.state == GameCommand.DEALING) { //card being called
 							if(played.getNumber() == this.TRUMP_NUMBER || played.getSuit() == Card.TRUMP) { // make sure the call is valid 
 								//card number for jokers might cause first half to return true, shouldn't matter
-								if(call_number > this.called_cards || call_number == this.called_cards && played.getSuit() == Card.TRUMP) {
+								if( user.getHand().frequency(played) >= call_number && (call_number > this.called_cards || call_number == this.called_cards && played.getSuit() == Card.TRUMP) ) {
 									//TODO: differentiate between big and small jokers
 									this.called_cards = call_number;
 									this.TRUMP_SUIT = played.getSuit();
 									this.caller = user;
+									this.sendCommand(GameCommand.PLAY_CARD + " " + user.getName() + " " + played.getSuit() + " " + call_number);
 								} else {
 									System.out.println("illegal call");
 								}
@@ -187,6 +203,7 @@ public class Gameroom extends Chatroom implements Runnable { // do I need a thre
 							System.out.println("STRANGER DANGER");
 						}
 					}
+					break;
 					default:
 						//TODO: command not found error
 						break;

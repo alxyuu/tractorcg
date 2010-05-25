@@ -4,7 +4,7 @@ import org.newdawn.slick.Graphics;
 import org.newdawn.slick.Image;
 import org.newdawn.slick.SlickException;
 import org.newdawn.slick.gui.GUIContext;
-import org.newdawn.slick.gui.MouseOverArea;
+import tractor.thirdparty.MouseOverArea;
 
 import tractor.client.Client;
 import tractor.client.handlers.IOFactory;
@@ -17,7 +17,21 @@ public class Button extends MouseOverArea {
 	private Image disabledImage;
 	private Image mouseoverImage;
 	private IOFactory io;
+	private ButtonPressedListener listener;
 	
+	public Button(GUIContext container, Image normal, Image mouseover, int x, int y) {
+		super(container, normal, x, y);
+		
+		this.normalImage = normal;
+		this.mouseoverImage = mouseover;
+		this.setNormalImage(normalImage);
+		this.setMouseOverImage(mouseoverImage);
+
+		this.io = Client.getInstance().getIO();
+		
+		this.hide();
+		//this.show();
+	}
 	public Button(GUIContext container, Image normalImage, Image disabledImage, Image mouseoverImage, int x, int y) {
 		super(container, normalImage, x-normalImage.getWidth()/2, y-normalImage.getHeight()/2);
 		
@@ -47,10 +61,13 @@ public class Button extends MouseOverArea {
 		this.setNormalImage(disabledImage);
 		this.setMouseOverImage(disabledImage);
 	}
-
+	
+	public void addButtonPressedListener(ButtonPressedListener l) {
+		this.listener = l;
+	}
 	public void mouseReleased(int button, int mx, int my) {
-		if(this.enabled) {
-			io.write(GameCommand.START+"",IOFactory.GAMECMD);
+		if(this.enabled && this.listener != null) {
+			this.listener.buttonPressed();
 		}
 	}
 	/*public void mousePressed(int button, int mx, int my) {

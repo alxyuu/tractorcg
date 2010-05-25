@@ -21,8 +21,8 @@ public class Client {
 	private static Client instance;
 	//do something with this...
 	//support hostnames?
-	public final static String ip = "10.4.6.197";
-	//public final static String ip = "192.168.0.3";
+	//public final static String ip = "10.4.6.197";
+	public final static String ip = "192.168.0.3";
 	public final static int NULL = 0;
 	public final static int port = 443;
 	public static Client getInstance() {
@@ -131,6 +131,7 @@ public class Client {
 					app = new AppGameContainer(game);
 		            app.setDisplayMode(960,600,false);
 		            app.setTargetFrameRate(30);
+		            app.setAlwaysRender(true);
 		            app.start();
 				} catch (SlickException e) {
 					// TODO Auto-generated catch block

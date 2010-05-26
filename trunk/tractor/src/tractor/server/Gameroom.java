@@ -271,7 +271,8 @@ public class Gameroom extends Chatroom implements Runnable { // do I need a thre
 								}
 							} else {
 								//not lead, check following suit, playing doubles/tractors/triples/whatever
-								//compare to highest user's play to do 
+								//compare to highest user's play
+								//make sure the number of cards are correct
 							}
 						
 							

@@ -9,9 +9,9 @@ import javax.swing.JScrollPane;
 import javax.swing.JTextArea;
 import javax.swing.text.BadLocationException;
 
-/**
+/** Displays the chat window
  * @author 378250
- *Displays the chat window
+ *
  */
 public class ChatPane extends JScrollPane {
 	private static final long serialVersionUID = 1L;
@@ -38,8 +38,7 @@ public class ChatPane extends JScrollPane {
 		//this.putClientProperty("isClosable",true);
 		this.lines = 0;
 	}
-	/**
-	 * Adds a string to the chat window
+	/** Adds a string to the chat window
 	 * @param s
 	 */
 	synchronized public void append(String s) {

@@ -28,6 +28,9 @@ public class GraphicsCard extends Card {
 		return GraphicsCard.scaledback;
 	}
 
+	/** It gets the full size of the back image.
+	 * @return
+	 */
 	public static Image getFullsizeBackImage() {
 		return GraphicsCard.back;
 	}
@@ -42,6 +45,11 @@ public class GraphicsCard extends Card {
 		return (GraphicsCard)Card.getCard(suit,value);
 	}
 
+	/** It gets the card.
+	 * @param suit
+	 * @param value
+	 * @return
+	 */
 	public static GraphicsCard getCard(String suit, String value) {
 		return (GraphicsCard)Card.getCard(suit,value);
 	}
@@ -62,6 +70,11 @@ public class GraphicsCard extends Card {
 	private Image image;
 	private Image scaled;
 
+	/** It constructs the graphics card.
+	 * @param suit
+	 * @param value
+	 * @param filename
+	 */
 	GraphicsCard(int suit, int value, String filename) {
 		super(suit,value);
 		try {
@@ -81,6 +94,9 @@ public class GraphicsCard extends Card {
 		return this.scaled;
 	}
 
+	/**It returns the full size image of the card
+	 * @return
+	 */
 	public Image getFullsizeImage() {
 		return this.image;
 	}

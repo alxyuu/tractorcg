@@ -341,14 +341,23 @@ public class ClientView extends JFrame {
 		return this.tabMap.get(name);
 	}
 
+	/** It gets the chat line
+	 * @return
+	 */
 	public JTextField getChatLine() {
 		return this.chatLine;
 	}
 
+	/** It gets the chat tabs.
+	 * @return
+	 */
 	public CloseableTabbedPane getChatTabs() {
 		return this.chatTabs;
 	}
 
+	/** It gets the console
+	 * @return
+	 */
 	public ChatPane getConsole() {
 		return this.console;
 	}

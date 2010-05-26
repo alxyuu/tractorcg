@@ -114,14 +114,23 @@ public class Client {
 		return this.io;
 	}
 
+	/** It getts the game.
+	 * @return
+	 */
 	public TractorGame getGame() {
 		return this.game;
 	}
 
+	/** It sets the game.
+	 * @param game
+	 */
 	public void setGame(TractorGame game) {
 		this.game = game;
 	}
 
+	/** It starts the game
+	 * 
+	 */
 	public void startGame() {
 		this.gamethread = new Thread("game thread") {
 			public void run() {
@@ -142,6 +151,9 @@ public class Client {
 		this.gamethread.start();
 	}
 
+	/** It stops the game.
+	 * 
+	 */
 	public void stopGame() {
 
 	}

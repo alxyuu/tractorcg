@@ -46,6 +46,11 @@ public class TractorGame extends BasicGame {
 	private Button playButton;
 	private String errorMessage;
 	//private OtherPlayerHand hand;
+	/** It constructs the tractor game.
+	 * @param position
+	 * @param players
+	 * @param name
+	 */
 	public TractorGame(int position, int players, String name) {
 		super("Tractor "+players+"-way");
 		this.players = players;
@@ -158,11 +163,19 @@ public class TractorGame extends BasicGame {
 		this.hand = new PlayerHand(container.getWidth()/2,container.getHeight()-100, container.getWidth()/2,container.getHeight()-250 );
 	}
 
+	/** It gets the coordinates of the game.
+	 * @param theta
+	 * @return
+	 */
 	public Point2D.Double getCoordinates(double theta) {
 		double radius = (gamecontainer.getWidth()/2-150)*(gamecontainer.getHeight()/2-50)/Math.sqrt(Math.pow((gamecontainer.getHeight()/2-50)*Math.cos(theta), 2) + Math.pow((gamecontainer.getWidth()/2-150)*Math.sin(theta), 2));
 		return new Point2D.Double(gamecontainer.getWidth()/2+radius*Math.cos(theta), gamecontainer.getHeight()/2-radius*Math.sin(theta));
 	}
 
+	/** It gets teh table coordinates of the game.
+	 * @param theta
+	 * @return
+	 */
 	public Point2D.Double getTableCoordinates(double theta) {
 		double radius = (gamecontainer.getWidth()/2-350)*(gamecontainer.getHeight()/2-125)/Math.sqrt(Math.pow((gamecontainer.getHeight()/2-125)*Math.cos(theta), 2) + Math.pow((gamecontainer.getWidth()/2-350)*Math.sin(theta), 2));
 		return new Point2D.Double(gamecontainer.getWidth()/2+radius*Math.cos(theta), gamecontainer.getHeight()/2-radius*Math.sin(theta));
@@ -447,16 +460,28 @@ public class TractorGame extends BasicGame {
 		this.hand.render(container,g);
 	}
 
+	/** It gets the state of the tractor game.
+	 * @return
+	 */
 	public int getState() {
 		return this.state;
 	}
 
+	/** It adds the selected card to the tractor game.
+	 * @param card
+	 */
 	public void addSelected(CardButton card) {
 		this.selected.add(card);
 	}
+	/** It removes the selected card from the game.
+	 * @param card
+	 */
 	public void removeSelected(CardButton card) {
 		this.selected.remove(card);
 	}
+	/** It checks whether a player has called the trump suit in the game.
+	 * @param card
+	 */
 	public void checkCalling(GraphicsCard card) {
 		System.out.println("Card: "+card);
 		if( ( card.getNumber() == GraphicsCard.TRUMP_NUMBER && this.hand.frequency(card) > called_cards ) || ( card.getSuit() == GraphicsCard.TRUMP && this.hand.frequency(card) >= called_cards && this.hand.frequency(card) >= 2 ) ) {
@@ -488,6 +513,9 @@ public class TractorGame extends BasicGame {
 		}
 	}
 
+	/** It checks whether anyone has called any suit.
+	 * 
+	 */
 	public void checkAllCalling() {
 		this.spades.hide();
 		this.clubs.hide();
@@ -499,6 +527,9 @@ public class TractorGame extends BasicGame {
 		}
 	}
 
+	/** It sends a command.
+	 * @param message
+	 */
 	private void sendCommand(String message) {
 		this.io.write(message, IOFactory.GAMECMD);
 	}

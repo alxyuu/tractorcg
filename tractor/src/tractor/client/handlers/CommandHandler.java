@@ -6,6 +6,9 @@ import tractor.lib.ChatCommand;
 import tractor.lib.GameCommand;
 
 public class CommandHandler extends ClientHandler {
+	/** It constructs the command handler
+	 * 
+	 */
 	CommandHandler() {
 		super("CommandHandler");
 	}

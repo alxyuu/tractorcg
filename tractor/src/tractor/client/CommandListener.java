@@ -15,6 +15,9 @@ class CommandListener implements ActionListener {
 	private CloseableTabbedPane chatTabs;
 	private ChatPane console;
 	private IOFactory io;
+	/**It constructs the command listener.
+	 * 
+	 */
 	CommandListener() {
 		clientview = ClientView.getInstance();
 		client = Client.getInstance();

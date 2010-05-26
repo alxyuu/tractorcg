@@ -11,6 +11,9 @@ class IOHandler extends ThreadGroup {
 	private OutputThread[] out;
 	private ChatThread[] chat;
 
+	/** It constructs the IO Handler
+	 * 
+	 */
 	IOHandler() {
 		super("IOHandler");
 

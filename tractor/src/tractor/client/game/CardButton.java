@@ -10,6 +10,14 @@ public class CardButton extends MouseOverArea implements Comparable<CardButton> 
 	private GraphicsCard card;
 	private boolean selected;
 	private TractorGame game;
+	/** It constructs the card button.
+	 * @param container
+	 * @param card
+	 * @param x
+	 * @param y
+	 * @param width
+	 * @param height
+	 */
 	public CardButton(GUIContext container, GraphicsCard card, int x, int y, int width, int height) {
 		super(container, card.getFullsizeImage(), x, y, width, height);
 		this.card = card;
@@ -28,6 +36,9 @@ public class CardButton extends MouseOverArea implements Comparable<CardButton> 
 			this.selected = !this.selected;
 		}
 	}
+	/** It gets the card.
+	 * @return
+	 */
 	public GraphicsCard getCard() {
 		return this.card;
 	}

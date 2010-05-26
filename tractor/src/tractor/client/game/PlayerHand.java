@@ -26,6 +26,12 @@ public class PlayerHand {
 	private ReentrantReadWriteLock handlock;
 	//private String name;
 
+	/** It constructs the player hand.
+	 * @param x
+	 * @param y
+	 * @param x2
+	 * @param y2
+	 */
 	PlayerHand(float x, float y, float x2, float y2) {
 		//this.name = Client.getInstance().getUsername();
 		this.x = x - ( 100 - spacing )/2;
@@ -38,39 +44,68 @@ public class PlayerHand {
 		this.lasthand = Collections.emptyList();
 	}
 
+	/** It gets the cards.
+	 * @return
+	 */
 	public Collection<GraphicsCard> getCards() {
 		return this.cards;
 	}
+	/** it returns the frequency of a card.
+	 * @param card
+	 * @return
+	 */
 	public int frequency(GraphicsCard card) {
 		return Collections.frequency(this.cards, card);
 	}
+	/** It adds a card to the players hand.
+	 * @param container
+	 * @param card
+	 */
 	public void addCard(GUIContext container, GraphicsCard card) {
 		this.hand.put(new CardButton(container,card,0,(int)y,spacing,148),card);
 		updateLocations();
 	}
 
+	/** It removes a card from the players hand.
+	 * @param card
+	 */
 	public void removeCard(CardButton card) {
 		System.out.println(this.hand.remove(card));
 		updateLocations();
 	}
+	/** It removes a card from the players hand.
+	 * @param card
+	 */
 	public void removeCard(GraphicsCard card) {
 		System.out.println(this.cards.remove(card));
 		updateLocations();
 	}
 
+	/** It plays the card.
+	 * @param played
+	 */
 	public void playCards(GraphicsCard ... played) {
 		this.playedcards = Collections.synchronizedList(Arrays.asList(played));
 	}
 
+	/** It plays the card.
+	 * @param played
+	 */
 	public void playCards(List<GraphicsCard> played) {
 		this.playedcards = Collections.synchronizedList(played);
 	}
 
+	/** It clears the table.
+	 * 
+	 */
 	public void clearTable() {
 		this.lasthand = this.playedcards;
 		this.playedcards.clear();
 	}
 	
+	/** It sorts the players hand based on the trump suit.
+	 * @param trumpsuit
+	 */
 	public void sort(int trumpsuit) {
 		synchronized(this) {
 			//REMOVE EVERYTHING AND READD TO SORT LOL
@@ -92,6 +127,9 @@ public class PlayerHand {
 		}
 	}
 
+	/** It updates the location of the players hand.
+	 * 
+	 */
 	private void updateLocations() {
 		synchronized(this) {
 			float start = this.x - (spacing * this.cards.size())/2;
@@ -109,6 +147,11 @@ public class PlayerHand {
 			}		
 		}
 	}
+	/** It draws the hand.
+	 * @param container
+	 * @param g
+	 * @throws SlickException
+	 */
 	public void render(GUIContext container, Graphics g) throws SlickException {
 		synchronized(this) {
 			for(Iterator<CardButton> i = hand.keySet().iterator(); i.hasNext(); ) {

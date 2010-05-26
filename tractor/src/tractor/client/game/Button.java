@@ -12,7 +12,7 @@ import tractor.lib.GameCommand;
 
 public class Button extends MouseOverArea {
 
-	boolean enabled,show;
+	boolean show;
 	private Image normalImage;
 	private Image disabledImage;
 	private Image mouseoverImage;
@@ -75,7 +75,7 @@ public class Button extends MouseOverArea {
 	 * 
 	 */
 	public void enable() {
-		this.enabled = true;
+		this.setAcceptingInput(true);
 		this.setNormalImage(normalImage);
 		this.setMouseOverImage(mouseoverImage);
 	}
@@ -84,7 +84,7 @@ public class Button extends MouseOverArea {
 	 * 
 	 */
 	public void disable() {
-		this.enabled = false;
+		this.setAcceptingInput(false);
 		this.setNormalImage(disabledImage);
 		this.setMouseOverImage(disabledImage);
 	}
@@ -96,7 +96,7 @@ public class Button extends MouseOverArea {
 		this.listener = l;
 	}
 	public void mouseReleased(int button, int mx, int my) {
-		if(this.enabled && this.listener != null && this.isMouseOver()) {
+		if(this.listener != null && this.isMouseOver()) {
 			this.listener.buttonPressed();
 		}
 	}

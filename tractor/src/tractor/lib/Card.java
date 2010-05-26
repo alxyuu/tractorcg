@@ -28,7 +28,7 @@ public class Card implements Comparable<Card> {
 	public static final int HEARTS = 3;
 	public static final int TRUMP = 4;
 	public static final int CARDS_PER_SUIT = 13;
-	public static int TRUMP_SUIT = 0;
+	public static int TRUMP_SUIT = 4;
 	public static int TRUMP_NUMBER = 4;
 	//TODO: EL PROBLEMO - MORE THAN ONE TRUMP SUIT/NUMBER WHEN RUNNING SERVER BECAUSE OF MULTIPLE GAMES BAWWW
 	//public static final int SET_TRUMP_BONUS = 13;

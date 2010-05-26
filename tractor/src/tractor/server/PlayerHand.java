@@ -19,6 +19,9 @@ public class PlayerHand {
 		return Collections.frequency(this.cards, card);
 	}
 	
+	public boolean contains(Card card) {
+		return this.cards.contains(card);
+	}
 	public List<Card> getCards() {
 		return this.cards;
 	}

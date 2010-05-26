@@ -6,7 +6,7 @@ import org.newdawn.slick.SlickException;
 import tractor.lib.Card;
 
 public class GraphicsCard extends Card {
-	
+
 	private static Image back,scaledback;
 	public static final int SCALED_HEIGHT = 74;
 	public static final int SCALED_WIDTH = 50;
@@ -19,7 +19,7 @@ public class GraphicsCard extends Card {
 			e.printStackTrace();
 		}
 	}
-	
+
 	/**Returns the image of the back of the card
 	 * @return
 	 * 
@@ -27,7 +27,7 @@ public class GraphicsCard extends Card {
 	public static Image getBackImage() {
 		return GraphicsCard.scaledback;
 	}
-	
+
 	public static Image getFullsizeBackImage() {
 		return GraphicsCard.back;
 	}
@@ -41,11 +41,11 @@ public class GraphicsCard extends Card {
 	public static GraphicsCard getCard(int suit, int value) {
 		return (GraphicsCard)Card.getCard(suit,value);
 	}
-	
+
 	public static GraphicsCard getCard(String suit, String value) {
 		return (GraphicsCard)Card.getCard(suit,value);
 	}
-	
+
 	/**Fills the deck
 	 * 
 	 */
@@ -58,10 +58,10 @@ public class GraphicsCard extends Card {
 		cards.add(new GraphicsCard(Card.TRUMP, Card.SMALL_JOKER, "images/cards/joker_s.png"));
 		cards.add(new GraphicsCard(Card.TRUMP, Card.BIG_JOKER, "images/cards/joker_b.png"));
 	}
-	
+
 	private Image image;
 	private Image scaled;
-	
+
 	GraphicsCard(int suit, int value, String filename) {
 		super(suit,value);
 		try {
@@ -72,7 +72,7 @@ public class GraphicsCard extends Card {
 			e.printStackTrace();
 		}
 	}
-	 
+
 	/**It returns the image of the card
 	 * @return
 	 * 
@@ -80,7 +80,7 @@ public class GraphicsCard extends Card {
 	public Image getImage() {
 		return this.scaled;
 	}
-	
+
 	public Image getFullsizeImage() {
 		return this.image;
 	}

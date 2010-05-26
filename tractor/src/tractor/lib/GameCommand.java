@@ -18,9 +18,9 @@ public class GameCommand {
 	public final static int SET_STATS = 7;
 	public final static int PLAY_INVALID = 8;
 	public final static int PLAY_SUCCESS = 9;
-	
-	
-	
+
+
+
 	/*
 	 * Argument commands
 	 */
@@ -30,15 +30,15 @@ public class GameCommand {
 	public final static int DEALING = 13;
 	public final static int DIPAI  = 14;
 	public final static int PLAYING = 15;
-	
-	
+
+
 	/*private static HashMap<String,Integer> gset;
 	static {
 		gset = new HashMap<String,Integer>();
-		
+
 		gset.put("0", GameCommand.JOIN);
 		gset.put("1", GameCommand.UPDATE_STATE);
-		
+
 		gset.put("10", GameCommand.WAITING);
 		gset.put("11", GameCommand.READY);
 		gset.put("12", GameCommand.START);
@@ -46,7 +46,7 @@ public class GameCommand {
 		gset.put("14", GameCommand.DIPAI);
 		gset.put("15", GameCommand.PLAYING);
 	}
-	
+
 	/**It returns a command
 	 * @param s
 	 * @return

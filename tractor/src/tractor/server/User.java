@@ -11,7 +11,7 @@ import java.util.Vector;
 import tractor.lib.MessageFactory;
 
 public class User {
-	
+
 	private static MessageDigest md;
 	private static String md5salt;
 	static {
@@ -24,7 +24,7 @@ public class User {
 			System.exit(0);
 		}
 	}
-	
+
 	private MessageFactory io;
 	private String md5;
 	private Vector<Chatroom> chatrooms;
@@ -35,7 +35,7 @@ public class User {
 	private int gameposition;
 	private int gamescore;
 	private PlayerHand hand;
-	
+
 	/** Constructor of the User class that initializes the attributes
 	 * @param socket
 	 *
@@ -43,7 +43,7 @@ public class User {
 	public User(Socket socket) {
 		try {
 			this.socket = socket;
-			
+
 			byte[] digest = md.digest((md5salt+this.socket.toString()).getBytes()); 
 			StringBuffer hexString = new StringBuffer();
 			for (int i=0;i<digest.length;i++) {
@@ -52,21 +52,21 @@ public class User {
 			this.md5 = hexString.toString();
 			hexString.setLength(0);
 			//this.md5 = new String(md.digest((md5salt+this.socket.toString()).getBytes()));
-			
+
 			this.name = "addr=" + this.socket.getInetAddress().toString() + ":" + this.socket.getPort();
 			this.error = false;
-			
+
 			this.io = new MessageFactory(15000);
 			this.chatrooms = new Vector<Chatroom>();
 
 			this.io.write(this.md5,MessageFactory.LOGIN);
-			
+
 		} catch (Exception e) {
 			e.printStackTrace();
 			this.kill();
 		}
 	}
-	
+
 	/** It adds the user to the chatroom.
 	 * @param chat
 	 *
@@ -74,27 +74,27 @@ public class User {
 	public void addChatroom(Chatroom chat) {
 		this.chatrooms.add(chat);
 	}
-	
+
 	public Gameroom getCurrentGame() {
 		return this.game;
 	}
-	
+
 	public void setCurrentGame(Gameroom game) {
 		this.game = game;
 	}
-	
+
 	public int getGamePosition() {
 		return this.gameposition;
 	}
-	
+
 	public void setGamePosition(int position) {
 		this.gameposition = position;
 	}
-	
+
 	public void setGameScore(int score) {
 		this.gamescore = score;
 	}
-	
+
 	public int getGameScore() {
 		return this.gamescore;
 	}
@@ -102,11 +102,11 @@ public class User {
 	public PlayerHand getHand() {
 		return this.hand;
 	}
-	
+
 	public void newHand() {
 		this.hand = new PlayerHand();
 	}
-	
+
 	/**It removes the user from the chatroom.
 	 * @param chat
 	 * 
@@ -124,7 +124,7 @@ public class User {
 			return true;
 		return false;
 	}
-	
+
 	/**It returns the IO.
 	 * @return
 	 * 
@@ -182,21 +182,21 @@ public class User {
 	public void setName(String name) {
 		this.name = name;
 	}
-	
+
 	/**
 	 * It sets the user's error.
 	 */
 	public void setError() {
 		this.error = true;
 	}
-	
+
 	/**
 	 * It gets rid of the user's error
 	 */
 	public void clearError() {
 		this.error = false;
 	}
-	
+
 	public String toString() {
 		return this.name;
 	}

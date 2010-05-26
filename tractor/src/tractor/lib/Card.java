@@ -3,7 +3,7 @@ package tractor.lib;
 import java.util.ArrayList;
 
 public class Card implements Comparable<Card> {
-	
+
 	protected static final ArrayList<Card> cards;
 	public static final int ACE = 12;
 	public static final int TWO = 0;
@@ -32,12 +32,12 @@ public class Card implements Comparable<Card> {
 	public static int TRUMP_NUMBER = 4;
 	//TODO: EL PROBLEMO - MORE THAN ONE TRUMP SUIT/NUMBER WHEN RUNNING SERVER BECAUSE OF MULTIPLE GAMES BAWWW
 	//public static final int SET_TRUMP_BONUS = 13;
-	
+
 	static {
-		
+
 		cards = new ArrayList<Card>();
 	}
-	
+
 	/**It gets the card
 	 * @param suit
 	 * @param value
@@ -47,7 +47,7 @@ public class Card implements Comparable<Card> {
 	public static Card getCard(int suit, int value) {
 		return cards.get(suit*Card.CARDS_PER_SUIT+value);
 	}
-	
+
 	/*public static Card getCard(String s) {
 		String[] split = s.split(" ");
 		try {
@@ -63,7 +63,7 @@ public class Card implements Comparable<Card> {
 			return null;
 		}
 	}
-	
+
 	/**It returns the deck
 	 * @return
 	 * 
@@ -84,10 +84,10 @@ public class Card implements Comparable<Card> {
 		cards.add(new Card(Card.TRUMP, Card.SMALL_JOKER));
 		cards.add(new Card(Card.TRUMP, Card.BIG_JOKER));
 	}
-	
+
 	private int suit;
 	private int value;
-	
+
 	/**Creates the Card object
 	 * @param suit
 	 * @param value
@@ -97,7 +97,7 @@ public class Card implements Comparable<Card> {
 		this.value = value;
 		this.suit = suit;
 	}
-	
+
 	/**Returns the number on the card
 	 * @return
 	 * 
@@ -105,14 +105,14 @@ public class Card implements Comparable<Card> {
 	public int getNumber() {
 		return this.value;
 	}
-	
+
 	private int getSortingSuit() {
 		return (this.suit == Card.TRUMP) ? Card.TRUMP+1 : (this.suit == Card.TRUMP_SUIT || this.value == Card.TRUMP_NUMBER) ? Card.TRUMP : this.suit;
 	}
 	private int getSortingValue() {
 		return (this.value == Card.TRUMP_NUMBER) ? ((this.suit == Card.TRUMP_SUIT) ? Card.SET_TRUMP_NUMBER : Card.SET_TRUMP) : this.value;
 	}
-	
+
 	public int compareTo(Card card) {
 		if(this.getSortingSuit() == card.getSortingSuit()) {
 			return this.getSortingValue()-card.getSortingValue();
@@ -121,11 +121,11 @@ public class Card implements Comparable<Card> {
 		}
 		//return this.getrandombs() - card.getrandombs();
 	}
-	
+
 	public String toString() {
 		return this.suit + " " + this.value;
 	}
-	
+
 	/**It gets the suit of the card
 	 * @return
 	 * 

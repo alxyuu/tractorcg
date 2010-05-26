@@ -17,7 +17,7 @@ public class OtherPlayerHand {
 	private String name;
 	private List<GraphicsCard> playedcards;
 	private int score;
-	
+
 	OtherPlayerHand(double x, double y, double x2, double y2) {
 		this.cards = 0;
 		this.name = null;
@@ -27,35 +27,35 @@ public class OtherPlayerHand {
 		this.y2 = (float)(y2-GraphicsCard.SCALED_HEIGHT);
 		this.playedcards = Collections.emptyList();
 	}
-	
+
 	public void setPlayer(String name) {
 		this.name = name;
 	}
-	
+
 	public void addCard() {
 		this.cards++;
 	}
-	
+
 	public void removeCard() {
 		this.cards--;
 	}
-	
+
 	public void playCards(GraphicsCard ... played) {
 		this.playedcards = Collections.synchronizedList(Arrays.asList(played));
 	}
-	
+
 	public void playCards(List<GraphicsCard> played) {
 		this.playedcards = Collections.synchronizedList(played);
 	}
-	
+
 	public void clearTable() {
 		this.playedcards.clear();
 	}
-	
+
 	public void reset() {
 		this.cards = 0;
 	}
-	
+
 	public void render(Graphics g) throws SlickException {
 		if(this.name == null) {
 			//TODO: paint no player stuff
@@ -81,6 +81,6 @@ public class OtherPlayerHand {
 	public int getScore() {
 		return this.score;
 	}
-	
-	
+
+
 }

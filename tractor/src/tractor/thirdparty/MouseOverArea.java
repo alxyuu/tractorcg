@@ -64,7 +64,7 @@ public class MouseOverArea extends AbstractComponent {
 
 	/** True if the mouse button is pressed */
 	private boolean mouseDown;
-	
+
 	/** The state of the area */
 	private int state = NORMAL;
 
@@ -89,7 +89,7 @@ public class MouseOverArea extends AbstractComponent {
 		this(container, image, x, y, image.getWidth(), image.getHeight());
 		addListener(listener);
 	}
-	
+
 	/**
 	 * Create a new mouse over area
 	 * 
@@ -125,7 +125,7 @@ public class MouseOverArea extends AbstractComponent {
 	 *            A listener to add to the area
 	 */
 	public MouseOverArea(GUIContext container, Image image, int x, int y,
-			             int width, int height, ComponentListener listener) {
+			int width, int height, ComponentListener listener) {
 		this(container,image,x,y,width,height);
 		addListener(listener);
 	}
@@ -150,7 +150,7 @@ public class MouseOverArea extends AbstractComponent {
 			int width, int height) {
 		this(container,image,new Rectangle(x,y,width,height));
 	}
-	
+
 	/**
 	 * Create a new mouse over area
 	 * 
@@ -200,7 +200,7 @@ public class MouseOverArea extends AbstractComponent {
 	public void setX(float x) {
 		area.setX(x);
 	}
-	
+
 	/**
 	 * Set the y coordinate of this area
 	 * 
@@ -209,12 +209,12 @@ public class MouseOverArea extends AbstractComponent {
 	public void setY(float y) {
 		area.setY(y);
 	}
-	
+
 	public void setSize(int width, int height) {
 		Shape shape = new Rectangle(area.getX(),area.getY(),width,height);
 		this.area = shape;
 	}
-	
+
 	/**
 	 * Returns the position in the X coordinate
 	 * 
@@ -232,7 +232,7 @@ public class MouseOverArea extends AbstractComponent {
 	public int getY() {
 		return (int) area.getY();
 	}
-	
+
 	/**
 	 * Set the normal color used on the image in the default state
 	 * 
@@ -325,7 +325,7 @@ public class MouseOverArea extends AbstractComponent {
 					currentImage = mouseDownImage;
 					currentColor = mouseDownColor;
 					state = MOUSE_DOWN;
-					
+
 					notifyListeners();
 					mouseUp = false;
 				}
@@ -382,7 +382,7 @@ public class MouseOverArea extends AbstractComponent {
 			mouseDown = true; 
 		}
 	}
-	
+
 	/**
 	 * @see org.newdawn.slick.util.InputAdapter#mouseReleased(int, int, int)
 	 */
@@ -406,7 +406,7 @@ public class MouseOverArea extends AbstractComponent {
 	public int getWidth() {
 		return (int) (area.getMaxX() - area.getX());
 	}
-	
+
 	/**
 	 * Check if the mouse is over this area
 	 * 

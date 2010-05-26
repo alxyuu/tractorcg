@@ -10,7 +10,7 @@ public abstract class ServerHandler implements Runnable {
 
 	protected Vector<User> waiting;
 	protected ConcurrentHashMap<String, User> users;
-	
+
 	ServerHandler() {
 		waiting = Server.getInstance().getWaiting();
 		users = Server.getInstance().getUsers();

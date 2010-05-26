@@ -15,17 +15,17 @@ public class ConnectionHandler extends ServerHandler {
 		while(true) {
 			//TODO: proper overflow response
 			//if(users.size()+waiting.size() < MAX_USERS) {
-				try {
-					Socket sock = socket.accept();
-					System.out.println(sock);
-					sock.setSoTimeout(15000);
-					sock.setKeepAlive(true);
-					User user = new User(sock);
-					io.add(user);
-					waiting.add(user);
-				} catch (IOException e) {
-					e.printStackTrace();
-				}
+			try {
+				Socket sock = socket.accept();
+				System.out.println(sock);
+				sock.setSoTimeout(15000);
+				sock.setKeepAlive(true);
+				User user = new User(sock);
+				io.add(user);
+				waiting.add(user);
+			} catch (IOException e) {
+				e.printStackTrace();
+			}
 			/*} else {
 				try {
 					Thread.sleep(1000);

@@ -39,11 +39,11 @@ public class Client {
 
 	private TractorGame game;
 	private Thread gamethread;
-	
+
 	public static void main(String ... bobby) {
 		new Client();
 	}
-	
+
 	Client() {
 		Client.instance = this;
 		this.io = new IOFactory(15000);
@@ -102,7 +102,7 @@ public class Client {
 				}
 			}
 			this.md5 = this.io.getNextMessage(MessageFactory.LOGIN);
-			
+
 			this.login(false);
 		}
 	}
@@ -113,26 +113,26 @@ public class Client {
 	public IOFactory getIO() {
 		return this.io;
 	}
-	
+
 	public TractorGame getGame() {
 		return this.game;
 	}
-	
+
 	public void setGame(TractorGame game) {
 		this.game = game;
 	}
-	
+
 	public void startGame() {
 		this.gamethread = new Thread("game thread") {
 			public void run() {
 				AppGameContainer app;
 				try {
-					
+
 					app = new AppGameContainer(game);
-		            app.setDisplayMode(960,600,false);
-		            app.setTargetFrameRate(30);
-		            app.setAlwaysRender(true);
-		            app.start();
+					app.setDisplayMode(960,600,false);
+					app.setTargetFrameRate(30);
+					app.setAlwaysRender(true);
+					app.start();
 				} catch (SlickException e) {
 					// TODO Auto-generated catch block
 					e.printStackTrace();
@@ -141,11 +141,11 @@ public class Client {
 		};
 		this.gamethread.start();
 	}
-	
+
 	public void stopGame() {
-		
+
 	}
-	
+
 	/**It gets the username
 	 * @return
 	 * 
@@ -196,7 +196,7 @@ public class Client {
 			};
 			login.start();
 		} else {
-			
+
 
 			this.username = this.clientview.getUsername();
 			this.io.write(this.username,MessageFactory.LOGIN);

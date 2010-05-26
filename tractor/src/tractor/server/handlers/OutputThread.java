@@ -44,7 +44,7 @@ public class OutputThread extends Thread {
 					user.getIO().write("0", MessageFactory.KEEPALIVE);
 				}
 			}
-			
+
 			try {
 				//dynamic sleeping?
 				Thread.sleep(100);
@@ -54,7 +54,7 @@ public class OutputThread extends Thread {
 		}
 		System.out.println(this.getName()+" no longer serving users");
 	}
-	
+
 	/** It checks if the output thread is full.
 	 * @return
 	 *
@@ -62,7 +62,7 @@ public class OutputThread extends Thread {
 	public boolean isFull() {
 		return this.users.size() == this.limit;
 	}
-	
+
 	/** It adds the user to the output thread.
 	 * @param user
 	 * @throws IOException

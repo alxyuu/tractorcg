@@ -33,20 +33,20 @@ public class MessageFactory {
 			this.in[i] = new ConcurrentLinkedQueue<String>();
 		}
 		this.out = new ConcurrentLinkedQueue<String>();
-		
+
 		this.timeout = timeout;
 		this.keepalive = timeout/3;
 		this.lastPong = System.currentTimeMillis();
 		this.lastPing = System.currentTimeMillis();
 	}
-	
+
 	/** It clears the message queue.
 	 * @param type
 	 */
 	public void clearMessageQueue(int type) {
 		this.in[type].clear();
 	}
-	
+
 	/** It waits until the write queue finishes writing.
 	 * 
 	 */
@@ -55,7 +55,7 @@ public class MessageFactory {
 			try {
 				Thread.sleep(100);
 			} catch (InterruptedException e) {
-				
+
 			}
 		}
 	}
@@ -121,7 +121,7 @@ public class MessageFactory {
 	public boolean isAlive() {
 		return System.currentTimeMillis()-lastPong < timeout;
 	}
-	
+
 	/** It reads the message.
 	 * @param message
 	 * @throws ErroneousMessageException
@@ -139,18 +139,18 @@ public class MessageFactory {
 			throw new ErroneousMessageException("Message type invalid");
 		}
 	}
-	
+
 	/** It updates the message.
 	 * 
 	 */
 	public void renewPong() {
 		this.lastPong = System.currentTimeMillis();
 	}
-	
+
 	public void renewPing() {
 		this.lastPing = System.currentTimeMillis();
 	}
-	
+
 	/** It resets the message factory.
 	 * 
 	 */
@@ -162,7 +162,7 @@ public class MessageFactory {
 		this.renewPong();
 		this.renewPing();
 	}
-	
+
 	/** It writes the message.
 	 * @param message
 	 * @param type
@@ -172,7 +172,7 @@ public class MessageFactory {
 		this.renewPing();
 		if( type != MessageFactory.KEEPALIVE ) System.out.println("output: "+message+"-end-");
 	}
-	
+
 	public boolean writeTimeout() {
 		return System.currentTimeMillis() - lastPing > keepalive;
 	}

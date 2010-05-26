@@ -12,11 +12,11 @@ public abstract class ClientHandler implements Runnable {
 		this.io = client.getIO();
 		this.name = name;
 	}
-	
+
 	public String getName() {
 		return this.name;
 	}
-	
+
 	abstract public void run();
 
 }

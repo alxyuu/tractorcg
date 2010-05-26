@@ -11,7 +11,7 @@ public class OutputHandler extends ClientHandler {
 		super("OutputHandler");
 		this.out = out;
 	}
-	
+
 	public void run() {
 		System.out.println("output stream open");
 		while(!out.checkError() && io.isAlive()) { //need both?

@@ -15,7 +15,7 @@ public class Chatroom {
 	Chatroom() {
 		this.users = Collections.synchronizedList(new ArrayList<User>());
 	}
-	
+
 	/**Constructs the chatroom class and initializes the attributes.
 	 * @param name
 	 * 
@@ -24,19 +24,19 @@ public class Chatroom {
 		this();
 		this.setName(name);
 	}
-	
+
 	protected void setName(String name) {
 		this.name = name;
 	}
-	
+
 	protected List<User> getUsers() {
 		return this.users;
 	}
-	
+
 	public int getSize() {
 		return this.users.size();
 	}
-	
+
 	/**It joins the user to the chatroom
 	 * @param user
 	 * 
@@ -65,7 +65,7 @@ public class Chatroom {
 	public String getName() {
 		return this.name;
 	}
-	
+
 	/**It checks if the user is in the chatroom
 	 * @param user
 	 * @return
@@ -74,7 +74,7 @@ public class Chatroom {
 	public boolean contains(User user) {
 		return this.users.contains(user);
 	}
-	
+
 	public String toString() {
 		return this.name;
 	}

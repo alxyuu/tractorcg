@@ -176,7 +176,7 @@ public class ClientView extends JFrame {
 	private void initComponents() {
 
 		this.initMenu();
-		
+
 		statusField = new JLabel();
 		statusField.setText(statusMessages[Client.DISCONNECTED]);
 		statusColor = new JTextField(1);
@@ -188,10 +188,10 @@ public class ClientView extends JFrame {
 
 		// Set up the chat pane
 		chatPane = new JPanel(new BorderLayout());
-		
+
 		chatLine = new JTextField();
 		chatLine.setEnabled(false);
-		
+
 		chatTabs = new CloseableTabbedPane();
 		tabMap = new HashMap<String, ChatPane>();
 		chatTabs.addCloseableTabbedPaneListener(new CloseableTabbedPaneListener() {
@@ -210,12 +210,12 @@ public class ClientView extends JFrame {
 				ClientView.getInstance().focusChat();
 			}
 		});
-		
+
 		console = new ChatPane("Console");
 		chatTabs.addTab(console, false); // add to tab map?
 
 		chatLine.addActionListener(new CommandListener());
-		
+
 		chatPane.add(chatLine, BorderLayout.SOUTH);
 		chatPane.add(chatTabs, BorderLayout.CENTER);
 		chatPane.setPreferredSize(new Dimension(600, 200));
@@ -235,7 +235,7 @@ public class ClientView extends JFrame {
 		errorLabel = new JLabel();
 		errorLabel.setForeground(Color.red);
 		//loginPane.add(errorLabel, new GridBagConstraints(0, 2, 1, 1, 0.0, 0.0, GridBagConstraints.CENTER, GridBagConstraints.NONE, new Insets(0, 0, 0, 0), 0, 0));
-		
+
 		ActionListener loginListener = new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
 				if(Client.getInstance().isConnected()) {
@@ -246,7 +246,7 @@ public class ClientView extends JFrame {
 				updateStatusTS();
 			}
 		};
-		
+
 		JPanel userPane = new JPanel();
 		userPane.add(new JLabel("Username: "));
 		nameField = new JTextField(10);
@@ -254,7 +254,7 @@ public class ClientView extends JFrame {
 		nameField.addActionListener(loginListener);
 		userPane.add(nameField);
 		loginPane.add(userPane, new GridBagConstraints(0, 3, 1, 1, 0.0, 0.0, GridBagConstraints.CENTER, GridBagConstraints.NONE, new Insets(0, 0, 0, 0), 0, 0));
-		
+
 		connectButton = new JButton("Connect");
 		connectButton.setMnemonic(KeyEvent.VK_C);
 		connectButton.setActionCommand("connect");
@@ -263,10 +263,10 @@ public class ClientView extends JFrame {
 		loginPane.add(connectButton, new GridBagConstraints(0, 4, 1, 1, 0.0, 0.0, GridBagConstraints.CENTER, GridBagConstraints.NONE, new Insets(0, 0, 0, 0), 0, 0));
 
 		mainPane = new JPanel(new BorderLayout());
-		
+
 		/*
 		 * test code
-		 
+
 		this.setVisible(true);
 		CanvasGameContainer app = null;
 		JPanel gamePanel = new JPanel();
@@ -282,7 +282,7 @@ public class ClientView extends JFrame {
 			app.setMinimumSize(new Dimension(704,396));
 			app.setVisible(true);
 			app.start();
-			
+
 		} catch (SlickException e1) {
 			// TODO Auto-generated catch block
 			e1.printStackTrace();
@@ -291,9 +291,9 @@ public class ClientView extends JFrame {
         //app.setTargetFrameRate(30);
         mainPane.add(app, BorderLayout.CENTER);
         /*
-         * test code
-         */
-        
+		 * test code
+		 */
+
 		mainPane.add(loginPane, BorderLayout.CENTER);
 		mainPane.add(statusBar, BorderLayout.SOUTH);
 		this.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
@@ -302,7 +302,7 @@ public class ClientView extends JFrame {
 		this.setLocation(200, 200);
 		this.pack();
 	}
-	
+
 	/**It joins the new chatroom
 	 * @param name
 	 * 
@@ -313,7 +313,7 @@ public class ClientView extends JFrame {
 		this.chatTabs.addTab(tojoin,true);
 		this.chatTabs.setSelectedComponent(tojoin);
 	}
-	
+
 	/**It leaves the chatroom
 	 * @param name
 	 * 
@@ -322,7 +322,7 @@ public class ClientView extends JFrame {
 		this.chatTabs.remove(this.tabMap.get(name.toUpperCase()));
 		this.tabMap.remove(name.toUpperCase());
 	}
-	
+
 	/**
 	 * It gets the particular chatroom name
 	 * @return 
@@ -330,7 +330,7 @@ public class ClientView extends JFrame {
 	public String getSelectedChatroomName() {
 		return this.chatTabs.getSelectedComponent().getName();
 	}
-	
+
 	/**
 	 * Returns the chatroom
 	 * @pre name is upper case
@@ -340,15 +340,15 @@ public class ClientView extends JFrame {
 	public ChatPane getChatroom(String name) {
 		return this.tabMap.get(name);
 	}
-	
+
 	public JTextField getChatLine() {
 		return this.chatLine;
 	}
-	
+
 	public CloseableTabbedPane getChatTabs() {
 		return this.chatTabs;
 	}
-	
+
 	public ChatPane getConsole() {
 		return this.console;
 	}

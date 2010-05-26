@@ -116,6 +116,7 @@ public class TractorGame extends BasicGame {
 			this.playButton.addButtonPressedListener(new ButtonPressedListener() {
 				public void buttonPressed() {
 					//might need to deselect cards but they sohuld be removed when the server responds anyways, doesn't matter?
+					System.out.println(selected);
 					String cmd = GameCommand.PLAY_CARD + " " + selected.size();
 					for(Iterator<CardButton> i = selected.iterator(); i.hasNext();) {
 						GraphicsCard card = i.next().getCard();
@@ -238,6 +239,7 @@ public class TractorGame extends BasicGame {
 				case GameCommand.PLAYING:
 				{
 					System.out.println("game start CLEAR DAT DIPAI");
+					System.out.println(this.selected);
 					//if doesn't have dipai this shouldn't do anything
 					for(Iterator<CardButton> i = this.selected.iterator(); i.hasNext();) {
 						this.hand.removeCard(i.next());
@@ -261,6 +263,7 @@ public class TractorGame extends BasicGame {
 			break;
 			case GameCommand.PLAY_SUCCESS:
 			{
+				System.out.println("selected cards: "+this.selected);
 				ArrayList<GraphicsCard> list = new ArrayList<GraphicsCard>();
 				for(Iterator<CardButton> i = this.selected.iterator(); i.hasNext();) {
 					CardButton card = i.next();
@@ -342,6 +345,7 @@ public class TractorGame extends BasicGame {
 						this.hand.playCards(list);
 					} else {
 						this.hands.get(message[1]).playCards(list);
+						this.hands.get(message[1]).removeCard(cards);
 					}
 				} else {
 					System.out.println("STRANGER DANGER");
@@ -471,19 +475,20 @@ public class TractorGame extends BasicGame {
 	 * @param card
 	 */
 	public void addSelected(CardButton card) {
+		System.out.println("SELECT: "+card);
 		this.selected.add(card);
 	}
 	/** It removes the selected card from the game.
 	 * @param card
 	 */
 	public void removeSelected(CardButton card) {
+		System.out.println("DESELECT: "+card);
 		this.selected.remove(card);
 	}
 	/** It checks whether a player has called the trump suit in the game.
 	 * @param card
 	 */
 	public void checkCalling(GraphicsCard card) {
-		System.out.println("Card: "+card);
 		if( ( card.getNumber() == GraphicsCard.TRUMP_NUMBER && this.hand.frequency(card) > called_cards ) || ( card.getSuit() == GraphicsCard.TRUMP && this.hand.frequency(card) >= called_cards && this.hand.frequency(card) >= 2 ) ) {
 			switch(card.getSuit()) {
 			case GraphicsCard.SPADES:

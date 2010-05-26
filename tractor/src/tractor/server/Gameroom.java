@@ -179,8 +179,10 @@ public class Gameroom extends Chatroom implements Runnable { // do I need a thre
 					return;
 				}
 
-				if(firstgame && caller != null)
+				if(firstgame && caller != null) {
 					setLead(caller);
+					firstgame = false;
+				}
 
 				dipaiSize = cards.size();
 				//TODO: flip dipai if no one calls
@@ -347,6 +349,12 @@ public class Gameroom extends Chatroom implements Runnable { // do I need a thre
 									break;
 								}
 								this.setLead(highest);
+								try {
+									Thread.sleep(1000);
+								} catch (InterruptedException e) {
+									// TODO Auto-generated catch block
+									e.printStackTrace();
+								}
 								sendCommand(GameCommand.CLEAR_TABLE+"");
 								for(Iterator<User> i2 = users.iterator(); i.hasNext();) 
 									i2.next().getHand().setCurrentPlay(null);

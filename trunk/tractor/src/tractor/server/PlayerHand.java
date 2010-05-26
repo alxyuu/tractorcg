@@ -31,7 +31,21 @@ public class PlayerHand {
 		this.cards.add(card);
 		//Collections.sort(this.cards);
 	}
-	
+	public Card Singles(int a,int s)
+	{
+		
+		return this.cards.get(0);
+	}
+	public List<Card> Pairs(int a,int s)
+	{
+		
+		return this.cards;
+	}
+	public List<Card> Tractors(int a,int l,int s)
+	{
+		
+		return this.cards;
+	}
 	public void removeCard(Card card) {
 		this.cards.remove(card);
 	}

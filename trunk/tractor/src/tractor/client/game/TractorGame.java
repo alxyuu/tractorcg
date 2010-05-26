@@ -222,8 +222,9 @@ public class TractorGame extends BasicGame {
 					this.notrump.hide();
 				}
 				break;
-				case GameCommand.START:
+				case GameCommand.PLAYING:
 				{
+					System.out.println("game start CLEAR DAT DIPAI");
 					//if doesn't have dipai this shouldn't do anything
 					for(Iterator<CardButton> i = this.selected.iterator(); i.hasNext();) {
 						this.hand.removeCard(i.next());
@@ -303,11 +304,14 @@ public class TractorGame extends BasicGame {
 			{
 				if(this.state == GameCommand.DEALING) { // being called
 					this.called_cards = Integer.parseInt(message[3]);
-					GraphicsCard.TRUMP_SUIT = Integer.parseInt(message[2]);
 					ArrayList<GraphicsCard> list = new ArrayList<GraphicsCard>();
 					for(int i = 0; i < called_cards; i++) {
-						list.add(GraphicsCard.getCard(GraphicsCard.TRUMP_SUIT,GraphicsCard.TRUMP_NUMBER));
+						list.add(GraphicsCard.getCard(Integer.parseInt(message[2]),GraphicsCard.TRUMP_NUMBER));
 					}
+
+					// I'm so cool
+					hand.sort(Integer.parseInt(message[2]));
+					
 					if(message[1].equals(Client.getInstance().getUsername())) {
 						this.hand.playCards(list);
 					} else {
@@ -315,7 +319,17 @@ public class TractorGame extends BasicGame {
 					}
 					checkAllCalling();
 				} else if (this.state == GameCommand.PLAYING) {
-
+					int cards = Integer.parseInt(message[2]);
+					ArrayList<GraphicsCard> list = new ArrayList<GraphicsCard>();
+					for(int i = 0; i < cards*2; i+=2) {
+						list.add(GraphicsCard.getCard(message[i+3],message[i+4]));
+					}
+					
+					if(message[1].equals(Client.getInstance().getUsername())) {
+						this.hand.playCards(list);
+					} else {
+						this.hands.get(message[1]).playCards(list);
+					}
 				} else {
 					System.out.println("STRANGER DANGER");
 				}
@@ -444,7 +458,8 @@ public class TractorGame extends BasicGame {
 		this.selected.remove(card);
 	}
 	public void checkCalling(GraphicsCard card) {
-		if(card.getNumber() == GraphicsCard.TRUMP_NUMBER && this.hand.frequency(card) > called_cards || card.getSuit() == GraphicsCard.TRUMP && this.hand.frequency(card) >= called_cards && this.hand.frequency(card) >= 2) {
+		System.out.println("Card: "+card);
+		if( ( card.getNumber() == GraphicsCard.TRUMP_NUMBER && this.hand.frequency(card) > called_cards ) || ( card.getSuit() == GraphicsCard.TRUMP && this.hand.frequency(card) >= called_cards && this.hand.frequency(card) >= 2 ) ) {
 			switch(card.getSuit()) {
 			case GraphicsCard.SPADES:
 				this.spades.enable();

@@ -220,7 +220,7 @@ public class Gameroom extends Chatroom implements Runnable { // do I need a thre
 							}
 						} else if(this.state == GameCommand.DIPAI) { // laying down dipai
 							if(user != this.lead) {
-								this.sendCommand(GameCommand.PLAY_INVALID + " playing out of turn", user);
+								this.sendCommand(GameCommand.PLAY_INVALID + " calling out of turn", user);
 								break;
 							}
 							if(Integer.parseInt(message[1]) != this.dipaiSize) {
@@ -231,13 +231,15 @@ public class Gameroom extends Chatroom implements Runnable { // do I need a thre
 							for(int k=0; k<this.dipaiSize*2; k+=2) {
 								this.dipai.add(Card.getCard(message[k+2],message[k+3]));
 							}
-							this.sendUpdateState(GameCommand.START);
+							this.sendUpdateState(GameCommand.PLAYING);
+							this.setLead(lead);
 							this.sendCommand(GameCommand.YOUR_TURN+"",lead);
 							this.userIterator = this.users.iterator();
 							this.currentUser = userIterator.next();
+							System.out.println("lead is current user? "+(currentUser==lead));
 							this.highest = currentUser;
 
-						} else if(this.state == GameCommand.START) { //normally played
+						} else if(this.state == GameCommand.PLAYING) { //normally played
 							if(user != currentUser) {
 								this.sendCommand(GameCommand.PLAY_INVALID + " playing out of turn",user);
 								break;
@@ -269,12 +271,33 @@ public class Gameroom extends Chatroom implements Runnable { // do I need a thre
 
 									}
 								}
+								
+								
+								
+								//do this if invalid
+								//sendCommand(GameCommand.PLAY_INVALID+" "+"error message",user);
+								//break;
 							} else {
 								//not lead, check following suit, playing doubles/tractors/triples/whatever
 								//compare to highest user's play
 								//make sure the number of cards are correct
-							}
+								
+								
+								
 
+								//send this if invalid
+								//sendCommand(GameCommand.PLAY_INVALID+" "+"error message",user);
+								//break;
+							}
+							
+							//TODO: sort the cards some time before here...
+							//should only be here if the play was valid
+							sendCommand(GameCommand.PLAY_SUCCESS+"",user);
+							String tosend = GameCommand.PLAY_CARD + " " + user.getName() + " " + played.size();
+							for(Card card : played) {
+								tosend += " " + card.getSuit() + " " + card.getNumber();
+							}
+							sendCommandExclude(tosend,user);
 
 
 

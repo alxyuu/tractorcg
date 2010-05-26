@@ -253,13 +253,27 @@ public class Gameroom extends Chatroom implements Runnable { // do I need a thre
 							
 							if(user == this.lead) {
 								//the player is the first player, check to make sure the play is high
+								boolean isHigh=true;
+								int suits=0;
+								int length=2;
+								List<Card> Tractor2=user.getHand().Tractors(0,length,suits);
+								List<Card> Pairs=user.getHand().Pairs(0,suits);
+								Card Singles=user.getHand().Singles(0,suits);
+								for(Iterator<User> i2 = users.iterator();i2.hasNext();)
+								{
+									User u = i2.next();
+								    if(u != user)
+								    {
+								    	PlayerHand friedchicken = u.getHand();
+								    	List<Card> seven = friedchicken.getCards();
+								    	
+								    }
+								}
 							} else {
 								//not lead, check following suit, playing doubles/tractors/triples/whatever
 								//compare to highest user's play to do 
 							}
-							
-							
-							
+						
 							
 							
 							
@@ -297,4 +311,3 @@ public class Gameroom extends Chatroom implements Runnable { // do I need a thre
 		}
 	}
 }
-

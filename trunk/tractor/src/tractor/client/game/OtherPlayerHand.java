@@ -53,6 +53,9 @@ public class OtherPlayerHand {
 	public void removeCard() {
 		this.cards--;
 	}
+	public void removeCard(int num) {
+		this.cards -= num;
+	}
 
 	/** It plays the card.
 	 * @param played

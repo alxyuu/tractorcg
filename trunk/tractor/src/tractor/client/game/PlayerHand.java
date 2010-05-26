@@ -70,14 +70,15 @@ public class PlayerHand {
 	 * @param card
 	 */
 	public void removeCard(CardButton card) {
-		System.out.println(this.hand.remove(card));
+		card.setAcceptingInput(false);
+		System.out.println("Removing with CardButton reference: "+this.hand.remove(card));
 		updateLocations();
 	}
 	/** It removes a card from the players hand.
 	 * @param card
 	 */
 	public void removeCard(GraphicsCard card) {
-		System.out.println(this.cards.remove(card));
+		System.out.println("Removing with GraphicsCard reference: "+this.cards.remove(card));
 		updateLocations();
 	}
 

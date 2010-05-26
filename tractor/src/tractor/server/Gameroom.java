@@ -251,9 +251,13 @@ public class Gameroom extends Chatroom implements Runnable { // do I need a thre
 							
 							
 							
+							if(user == this.lead) {
+								//the player is the first player, check to make sure the play is high
+							} else {
+								//not lead, check following suit, playing doubles/tractors/triples/whatever
+								//compare to highest user's play to do 
+							}
 							
-							//check validity, compare hands
-							this.highest = user;
 							
 							
 							
@@ -267,6 +271,8 @@ public class Gameroom extends Chatroom implements Runnable { // do I need a thre
 								}
 								this.setLead(highest);
 								sendCommand(GameCommand.CLEAR_TABLE+"");
+								for(Iterator<User> i2 = users.iterator(); i.hasNext();) 
+									i2.next().getHand().setCurrentPlay(null);
 								userIterator = this.users.iterator();
 							}
 							this.currentUser = userIterator.next();

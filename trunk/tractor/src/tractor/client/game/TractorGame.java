@@ -1,7 +1,9 @@
 package tractor.client.game;
 
+import java.util.List;
 import java.awt.geom.Point2D;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.Set;
 
@@ -18,6 +20,8 @@ import org.newdawn.slick.AppGameContainer;
 import tractor.client.Client;
 import tractor.client.handlers.IOFactory;
 import tractor.lib.GameCommand;
+import tractor.lib.MessageFactory;
+import tractor.server.User;
 
 public class TractorGame extends BasicGame {
 
@@ -25,7 +29,7 @@ public class TractorGame extends BasicGame {
 	private HashMap<String,OtherPlayerHand> hands;
 	private int players;
 	private int position;
-	private GameContainer container;
+	private GameContainer gamecontainer;
 	private String name;
 	private PlayerHand hand;
 	private Button startButton;
@@ -36,6 +40,11 @@ public class TractorGame extends BasicGame {
 	private int called_cards;
 	private int state;
 	private int score;
+	private List<GraphicsCard> dipai;
+	private ArrayList<CardButton> selected;
+	private boolean showDipai;
+	private Button playButton;
+	private String errorMessage;
 	//private OtherPlayerHand hand;
     public TractorGame(int position, int players, String name) {
         super("Tractor "+players+"-way");
@@ -45,6 +54,7 @@ public class TractorGame extends BasicGame {
         this.hands = new HashMap<String,OtherPlayerHand>();
         this.isHost = false;
         this.called_cards = 0;
+        this.selected = new ArrayList<CardButton>();
     }
     
     @Override
@@ -56,45 +66,59 @@ public class TractorGame extends BasicGame {
         for(int i=0;i<20;i++) {
         	this.hand.addCard();
         }*/
-        this.container = container;
+        this.gamecontainer = container;
         this.io = Client.getInstance().getIO();
         this.background = new Color(0,150,0);
         this.startButton = new Button(container,GraphicsCard.getCard(GraphicsCard.DIAMONDS,GraphicsCard.ACE).getImage(),GraphicsCard.getCard(GraphicsCard.CLUBS,GraphicsCard.ACE).getImage(),GraphicsCard.getCard(GraphicsCard.HEARTS,GraphicsCard.ACE).getImage(),container.getWidth()/2,container.getHeight()/2);
         this.startButton.addButtonPressedListener(new ButtonPressedListener() {
         	public void buttonPressed() {
-        		io.write(GameCommand.START+"",IOFactory.GAMECMD);
+        		sendCommand(GameCommand.START+"");
         	}
         });
         try {
-	        this.spades = new Button(container,new Image("images/suits/"+GraphicsCard.SPADES+".png"), new Image("images/suits/"+GraphicsCard.SPADES+"s.png"), 600, 380);
+	        this.spades = new Button(container,new Image("images/suits/"+GraphicsCard.SPADES+".png"), new Image("images/suits/"+GraphicsCard.SPADES+"s.png"), 600, 370);
 	        this.spades.addButtonPressedListener(new ButtonPressedListener() {
 	        	public void buttonPressed() {
-	        		io.write(GameCommand.PLAY_CARD+" "+GraphicsCard.SPADES + " " + GraphicsCard.TRUMP_NUMBER + " " + (called_cards+1), IOFactory.GAMECMD);
+	        		sendCommand(GameCommand.PLAY_CARD+" "+GraphicsCard.SPADES + " " + GraphicsCard.TRUMP_NUMBER + " " + (called_cards+1));
 	        	}
 	        });
-	        this.clubs = new Button(container,new Image("images/suits/"+GraphicsCard.CLUBS+".png"), new Image("images/suits/"+GraphicsCard.CLUBS+"s.png"), 631, 380);
+	        this.clubs = new Button(container,new Image("images/suits/"+GraphicsCard.CLUBS+".png"), new Image("images/suits/"+GraphicsCard.CLUBS+"s.png"), 631, 370);
 	        this.clubs.addButtonPressedListener(new ButtonPressedListener() {
 	        	public void buttonPressed() {
-	        		io.write(GameCommand.PLAY_CARD+" "+GraphicsCard.CLUBS + " " + GraphicsCard.TRUMP_NUMBER + " " + (called_cards+1), IOFactory.GAMECMD);
+	        		sendCommand(GameCommand.PLAY_CARD+" "+GraphicsCard.CLUBS + " " + GraphicsCard.TRUMP_NUMBER + " " + (called_cards+1));
 	        	}
 	        });
-	        this.diamonds = new Button(container,new Image("images/suits/"+GraphicsCard.DIAMONDS+".png"), new Image("images/suits/"+GraphicsCard.DIAMONDS+"s.png"), 662, 380);
+	        this.diamonds = new Button(container,new Image("images/suits/"+GraphicsCard.DIAMONDS+".png"), new Image("images/suits/"+GraphicsCard.DIAMONDS+"s.png"), 662, 370);
 	        this.diamonds.addButtonPressedListener(new ButtonPressedListener() {
 	        	public void buttonPressed() {
-	        		io.write(GameCommand.PLAY_CARD+" "+GraphicsCard.DIAMONDS + " " + GraphicsCard.TRUMP_NUMBER + " " + (called_cards+1), IOFactory.GAMECMD);
+	        		sendCommand(GameCommand.PLAY_CARD+" "+GraphicsCard.DIAMONDS + " " + GraphicsCard.TRUMP_NUMBER + " " + (called_cards+1));
 	        	}
 	        });
-	        this.hearts = new Button(container,new Image("images/suits/"+GraphicsCard.HEARTS+".png"), new Image("images/suits/"+GraphicsCard.HEARTS+"s.png"), 693, 380);
+	        this.hearts = new Button(container,new Image("images/suits/"+GraphicsCard.HEARTS+".png"), new Image("images/suits/"+GraphicsCard.HEARTS+"s.png"), 693, 370);
 	        this.hearts.addButtonPressedListener(new ButtonPressedListener() {
 	        	public void buttonPressed() {
-	        		io.write(GameCommand.PLAY_CARD+" "+GraphicsCard.HEARTS + " " + GraphicsCard.TRUMP_NUMBER + " " + (called_cards+1), IOFactory.GAMECMD);
+	        		sendCommand(GameCommand.PLAY_CARD+" "+GraphicsCard.HEARTS + " " + GraphicsCard.TRUMP_NUMBER + " " + (called_cards+1));
 	        	}
 	        });
-	        this.notrump = new Button(container,new Image("images/suits/"+GraphicsCard.TRUMP+".png"), new Image("images/suits/"+GraphicsCard.TRUMP+"s.png"), 724, 380);
+	        this.notrump = new Button(container,new Image("images/suits/"+GraphicsCard.TRUMP+".png"), new Image("images/suits/"+GraphicsCard.TRUMP+"s.png"), 724, 370);
 	        this.notrump.addButtonPressedListener(new ButtonPressedListener() {
 	        	public void buttonPressed() {
 	        		//TODO: differentiate between big and small
-	        		io.write(GameCommand.PLAY_CARD+" "+GraphicsCard.TRUMP + " " + GraphicsCard.SMALL_JOKER + " " + (called_cards), IOFactory.GAMECMD);
+	        		sendCommand(GameCommand.PLAY_CARD+" "+GraphicsCard.TRUMP + " " + GraphicsCard.SMALL_JOKER + " " + (called_cards));
+	        	}
+	        });
+	        this.playButton = new Button(container,new Image("images/play.png"), new Image("images/play_over.png"), container.getWidth()/2-30, 370);
+	        this.playButton.addButtonPressedListener(new ButtonPressedListener() {
+	        	public void buttonPressed() {
+	        		//might need to deselect cards but they sohuld be removed when the server responds anyways, doesn't matter?
+	        		String cmd = GameCommand.PLAY_CARD + " " + selected.size();
+	        		for(Iterator<CardButton> i = selected.iterator(); i.hasNext();) {
+	        			GraphicsCard card = i.next().getCard();
+	        			cmd += " " + card.getSuit() + " " + card.getNumber();
+	        		}
+	        		sendCommand(cmd);
+	        		state = GameCommand.WAITING;
+	        		playButton.hide();
 	        	}
 	        });
         } catch (SlickException e) {
@@ -135,13 +159,13 @@ public class TractorGame extends BasicGame {
     }
     
     public Point2D.Double getCoordinates(double theta) {
-       	double radius = (container.getWidth()/2-150)*(container.getHeight()/2-50)/Math.sqrt(Math.pow((container.getHeight()/2-50)*Math.cos(theta), 2) + Math.pow((container.getWidth()/2-150)*Math.sin(theta), 2));
-    	return new Point2D.Double(container.getWidth()/2+radius*Math.cos(theta), container.getHeight()/2-radius*Math.sin(theta));
+       	double radius = (gamecontainer.getWidth()/2-150)*(gamecontainer.getHeight()/2-50)/Math.sqrt(Math.pow((gamecontainer.getHeight()/2-50)*Math.cos(theta), 2) + Math.pow((gamecontainer.getWidth()/2-150)*Math.sin(theta), 2));
+    	return new Point2D.Double(gamecontainer.getWidth()/2+radius*Math.cos(theta), gamecontainer.getHeight()/2-radius*Math.sin(theta));
     }
     
     public Point2D.Double getTableCoordinates(double theta) {
-       	double radius = (container.getWidth()/2-350)*(container.getHeight()/2-125)/Math.sqrt(Math.pow((container.getHeight()/2-125)*Math.cos(theta), 2) + Math.pow((container.getWidth()/2-350)*Math.sin(theta), 2));
-    	return new Point2D.Double(container.getWidth()/2+radius*Math.cos(theta), container.getHeight()/2-radius*Math.sin(theta));
+       	double radius = (gamecontainer.getWidth()/2-350)*(gamecontainer.getHeight()/2-125)/Math.sqrt(Math.pow((gamecontainer.getHeight()/2-125)*Math.cos(theta), 2) + Math.pow((gamecontainer.getWidth()/2-350)*Math.sin(theta), 2));
+    	return new Point2D.Double(gamecontainer.getWidth()/2+radius*Math.cos(theta), gamecontainer.getHeight()/2-radius*Math.sin(theta));
     }
 
     @Override
@@ -161,7 +185,7 @@ public class TractorGame extends BasicGame {
     			return;
     		}
     		msg = msg.substring(index+1);
-    		String[] message = msg.split(" ");
+    		final String[] message = msg.split(" ");
     		//int primary = GameCommand.get(message[0]);
     		int primary = Integer.parseInt(message[0]);
     		switch(primary) {
@@ -190,15 +214,48 @@ public class TractorGame extends BasicGame {
     			break;
     			case GameCommand.DIPAI:
     			{
-    				//do nothing?
+    				this.callingEnabled = false;
+    				this.spades.hide();
+    				this.clubs.hide();
+    				this.hearts.hide();
+    				this.diamonds.hide();
+    				this.notrump.hide();
     			}
     			break;
+        		case GameCommand.START:
+        		{
+        			//if doesn't have dipai this shouldn't do anything
+        			for(Iterator<CardButton> i = this.selected.iterator(); i.hasNext();) {
+        				this.hand.removeCard(i.next());
+        			}
+        			this.selected.clear();
+        		}
+        		break;
     			default:
     			{
     				//TODO: state not found
     			}
     			break;
     			}
+    		}
+    		break;
+    		case GameCommand.YOUR_TURN:
+    		{
+    			this.playButton.enable();
+    			this.playButton.show();
+    		}
+    		break;
+    		case GameCommand.PLAY_SUCCESS:
+    		{
+    			ArrayList<GraphicsCard> list = new ArrayList<GraphicsCard>();
+    			for(Iterator<CardButton> i = this.selected.iterator(); i.hasNext();) {
+    				CardButton card = i.next();
+    				list.add(card.getCard());
+    				this.hand.removeCard(card);
+    			}
+    			this.hand.playCards(list);
+    			this.selected.clear();
+    			this.state = GameCommand.PLAYING;
     		}
     		break;
     		case GameCommand.JOIN:
@@ -236,33 +293,7 @@ public class TractorGame extends BasicGame {
     			if(message[1].equals(Client.getInstance().getUsername())) {
     				GraphicsCard toadd = GraphicsCard.getCard(message[2],message[3]);
     				this.hand.addCard(container,toadd);
-    				if(toadd.getNumber() == GraphicsCard.TRUMP_NUMBER && this.hand.frequency(toadd) > called_cards || toadd.getSuit() == GraphicsCard.TRUMP && this.hand.frequency(toadd) >= called_cards && this.hand.frequency(toadd) >= 2) {
-    					switch(toadd.getSuit()) {
-    					case GraphicsCard.SPADES:
-    						this.spades.enable();
-    						this.spades.show();
-    						break;
-    					case GraphicsCard.CLUBS:
-    						this.clubs.enable();
-    						this.clubs.show();
-    						break;
-    					case GraphicsCard.DIAMONDS:
-    						this.diamonds.enable();
-    						this.diamonds.show();
-    						break;
-    					case GraphicsCard.HEARTS:
-    						this.hearts.enable();
-    						this.hearts.show();
-    						break;
-    					case GraphicsCard.TRUMP:
-    						this.notrump.enable();
-    						this.notrump.show();
-    						break;
-    					default:
-    						//some shit went wrong
-    						System.out.println("STRANGER DANGER");
-    					}
-    				}
+    				checkCalling(toadd);
     			} else {
     				this.hands.get(message[1]).addCard();
     			}
@@ -282,6 +313,7 @@ public class TractorGame extends BasicGame {
     				} else {
     					this.hands.get(message[1]).playCards(list);
     				}
+    				checkAllCalling();
     			} else if (this.state == GameCommand.PLAYING) {
     				
     			} else {
@@ -302,6 +334,41 @@ public class TractorGame extends BasicGame {
     			}
     		}
     		break;
+    		case GameCommand.CLEAR_TABLE:
+    		{
+    			for(Iterator<OtherPlayerHand> i = hands.values().iterator(); i.hasNext(); ) {
+    				i.next().clearTable();
+    			}
+    			hand.clearTable();
+    		}
+    		break;
+    		case GameCommand.DIPAI: 
+    		{
+    			Thread dpthread = new Thread() {
+    				public void run() {
+    					dipai = Collections.synchronizedList(new ArrayList<GraphicsCard>());
+    					int size = Integer.parseInt(message[1]);
+    					for(int i=0; i<size*2; i+=2) {
+    						dipai.add(GraphicsCard.getCard(message[i+2],message[i+3]));
+    					}
+    					showDipai = true;
+    					try{
+    						Thread.sleep(1000);
+    					} catch (InterruptedException e) {
+    						e.printStackTrace();
+    						return;
+    					}
+    					for(int i=0; i<size; i++) {
+    						hand.addCard(gamecontainer,dipai.get(i));
+    					}
+    					showDipai = false;
+    					playButton.enable();
+    					playButton.show();
+    				}
+    			};
+    			dpthread.start();
+    		}
+    		break;
     		case GameCommand.SET_HOST:
     		{
     			if(message[1].equals(Client.getInstance().getUsername())) {
@@ -313,12 +380,14 @@ public class TractorGame extends BasicGame {
     			}
     		}
     		break;
-    		case GameCommand.CLEAR_TABLE:
+    		case GameCommand.PLAY_INVALID:
     		{
-    			for(Iterator<OtherPlayerHand> i = hands.values().iterator(); i.hasNext(); ) {
-    				i.next().clearTable();
-    			}
-    			hand.clearTable();
+    			this.errorMessage = message[1];
+    			for(int i=2; i<message.length;i++)
+    				errorMessage+=" "+message[i];
+    			this.playButton.enable();
+    			this.playButton.show();
+    			this.state = GameCommand.PLAYING;
     		}
     		break;
     		default:
@@ -340,17 +409,26 @@ public class TractorGame extends BasicGame {
         	i.next().render(g);
         }
         this.startButton.render(container,g);
+        this.playButton.render(container,g);
         if(this.callingEnabled) {
         	g.setColor(Color.black);
-        	g.drawLine(630, 380, 631, 410);
-        	g.drawLine(661, 380, 662, 410);
-        	g.drawLine(692, 380, 693, 410);
-        	g.drawLine(723, 380, 724, 410);
+        	g.drawLine(630, 370, 631, 400);
+        	g.drawLine(661, 370, 662, 400);
+        	g.drawLine(692, 370, 693, 400);
+        	g.drawLine(723, 370, 724, 400);
         	this.spades.render(container,g);
         	this.clubs.render(container,g);
         	this.diamonds.render(container,g);
         	this.hearts.render(container,g);
         	this.notrump.render(container,g);
+        }
+        if(this.showDipai) {
+        	float x = container.getWidth()/2 - (100+this.dipai.size()*20)/2;
+    		float y = container.getHeight()/2 - 74;
+    		for(GraphicsCard card : this.dipai) {
+    			g.drawImage(card.getFullsizeImage(), x, y);
+    			x+=20;
+    		}
         }
         this.hand.render(container,g);
     }
@@ -358,4 +436,55 @@ public class TractorGame extends BasicGame {
     public int getState() {
     	return this.state;
     }
+    
+    public void addSelected(CardButton card) {
+    	this.selected.add(card);
+    }
+    public void removeSelected(CardButton card) {
+    	this.selected.remove(card);
+    }
+    public void checkCalling(GraphicsCard card) {
+    	if(card.getNumber() == GraphicsCard.TRUMP_NUMBER && this.hand.frequency(card) > called_cards || card.getSuit() == GraphicsCard.TRUMP && this.hand.frequency(card) >= called_cards && this.hand.frequency(card) >= 2) {
+			switch(card.getSuit()) {
+			case GraphicsCard.SPADES:
+				this.spades.enable();
+				this.spades.show();
+				break;
+			case GraphicsCard.CLUBS:
+				this.clubs.enable();
+				this.clubs.show();
+				break;
+			case GraphicsCard.DIAMONDS:
+				this.diamonds.enable();
+				this.diamonds.show();
+				break;
+			case GraphicsCard.HEARTS:
+				this.hearts.enable();
+				this.hearts.show();
+				break;
+			case GraphicsCard.TRUMP:
+				this.notrump.enable();
+				this.notrump.show();
+				break;
+			default:
+				//some shit went wrong
+				System.out.println("STRANGER DANGER");
+			}
+		}
+    }
+    
+    public void checkAllCalling() {
+    	this.spades.hide();
+    	this.clubs.hide();
+    	this.diamonds.hide();
+    	this.hearts.hide();
+    	this.notrump.hide();
+    	for(Iterator<GraphicsCard> i = this.hand.getCards().iterator(); i.hasNext(); ) {
+    		checkCalling(i.next());
+    	}
+    }
+    
+    private void sendCommand(String message) {
+		this.io.write(message, IOFactory.GAMECMD);
+	}
 }

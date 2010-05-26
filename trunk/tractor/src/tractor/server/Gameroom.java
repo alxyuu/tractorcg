@@ -21,6 +21,11 @@ public class Gameroom extends Chatroom implements Runnable { // do I need a thre
 	private boolean firstgame;
 	private User caller;
 	private User lead;
+	private int dipaiSize;
+	private List<Card> dipai;
+	private User currentUser;
+	private Iterator<User> userIterator;
+	private User highest;
 	public Gameroom(int players) {
 		super();
 		this.players = players;
@@ -29,6 +34,7 @@ public class Gameroom extends Chatroom implements Runnable { // do I need a thre
 		this.gthread.start();
 		this.state = GameCommand.WAITING;
 		this.firstgame = true;
+		this.dipai = Collections.emptyList();
 	}
 	public void setHost(User user) {
 		this.host = user;
@@ -137,6 +143,7 @@ public class Gameroom extends Chatroom implements Runnable { // do I need a thre
 				if(firstgame && caller != null)
 					setLead(caller);
 				
+				dipaiSize = cards.size();
 				//TODO: flip dipai if no one calls
 				String dipai = " "+cards.size();
 				for(Card card : cards) {
@@ -195,9 +202,10 @@ public class Gameroom extends Chatroom implements Runnable { // do I need a thre
 					break;
 					case GameCommand.PLAY_CARD:
 					{
-						Card played = Card.getCard(message[1],message[2]);
-						int call_number = Integer.parseInt(message[3]);
+						
 						if(this.state == GameCommand.DEALING) { //card being called
+							Card played = Card.getCard(message[1],message[2]);
+							int call_number = Integer.parseInt(message[3]);
 							if(played.getNumber() == this.TRUMP_NUMBER || played.getSuit() == Card.TRUMP) { // make sure the call is valid 
 								//card number for jokers might cause first half to return true, shouldn't matter
 								if( user.getHand().frequency(played) >= call_number && (call_number > this.called_cards || call_number == this.called_cards && played.getSuit() == Card.TRUMP) ) {
@@ -208,12 +216,61 @@ public class Gameroom extends Chatroom implements Runnable { // do I need a thre
 									this.sendCommand(GameCommand.PLAY_CARD + " " + user.getName() + " " + played.getSuit() + " " + call_number);
 								} else {
 									System.out.println("illegal call");
-									System.out.println("cards in hand: "+(user.getHand().frequency(played) >= call_number));
-									System.out.println("enough cards to call: "+(call_number > this.called_cards || call_number == this.called_cards && played.getSuit() == Card.TRUMP));
 								}
 							}
-						} else if(this.state == GameCommand.START) { //normally played
+						} else if(this.state == GameCommand.DIPAI) { // laying down dipai
+							if(user != this.lead) {
+								this.sendCommand(GameCommand.PLAY_INVALID + " playing out of turn", user);
+								break;
+							}
+							if(Integer.parseInt(message[1]) != this.dipaiSize) {
+								this.sendCommand(GameCommand.PLAY_INVALID + " not enough cards", user);
+								break;
+							}
+							this.dipai = Collections.synchronizedList(new ArrayList<Card>());
+							for(int k=0; k<this.dipaiSize*2; k+=2) {
+								this.dipai.add(Card.getCard(message[k+2],message[k+3]));
+							}
+							this.sendUpdateState(GameCommand.START);
+							this.sendCommand(GameCommand.YOUR_TURN+"",lead);
+							this.userIterator = this.users.iterator();
+							this.currentUser = userIterator.next();
+							this.highest = currentUser;
 							
+						} else if(this.state == GameCommand.START) { //normally played
+							if(user != currentUser) {
+								this.sendCommand(GameCommand.PLAY_INVALID + " playing out of turn",user);
+								break;
+							}
+							int numPlayed = Integer.parseInt(message[1]);
+							ArrayList<Card> played = new ArrayList<Card>();
+							for(int k=0;k<numPlayed*2; k+=2) {
+								played.add(Card.getCard(message[k+2],message[k+3]));
+							}
+							
+							
+							
+							
+							
+							//check validity, compare hands
+							this.highest = user;
+							
+							
+							
+							
+							
+							if(!userIterator.hasNext()) { 
+								//add points etc
+								if(currentUser.getHand().getCards().size() == 0) {
+									//game over, update score
+									break;
+								}
+								this.setLead(highest);
+								sendCommand(GameCommand.CLEAR_TABLE+"");
+								userIterator = this.users.iterator();
+							}
+							this.currentUser = userIterator.next();
+							this.sendCommand(GameCommand.YOUR_TURN+"",currentUser);
 						} else {
 							System.out.println("STRANGER DANGER");
 						}

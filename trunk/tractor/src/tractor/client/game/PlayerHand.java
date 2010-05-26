@@ -20,6 +20,7 @@ public class PlayerHand {
 	private Map<CardButton, GraphicsCard> hand;
 	private Collection<GraphicsCard> cards;
 	private List<GraphicsCard> playedcards;
+	private List<GraphicsCard> lasthand;
 	//private String name;
 	
 	PlayerHand(float x, float y, float x2, float y2) {
@@ -31,8 +32,12 @@ public class PlayerHand {
 		this.hand = Collections.synchronizedMap(new TreeMap<CardButton, GraphicsCard>());
 		this.cards = Collections.synchronizedCollection(hand.values());
 		this.playedcards = Collections.emptyList();
+		this.lasthand = Collections.emptyList();
 	}
 	
+	public Collection<GraphicsCard> getCards() {
+		return this.cards;
+	}
 	public int frequency(GraphicsCard card) {
 		return Collections.frequency(this.cards, card);
 	}
@@ -41,6 +46,10 @@ public class PlayerHand {
 		updateLocations();
 	}
 	
+	public void removeCard(CardButton card) {
+		this.hand.remove(card);
+		this.updateLocations();
+	}
 	public void removeCard(GraphicsCard card) {
 		this.cards.remove(card);
 		updateLocations();
@@ -55,6 +64,7 @@ public class PlayerHand {
 	}
 	
 	public void clearTable() {
+		this.lasthand = this.playedcards;
 		this.playedcards.clear();
 	}
 	

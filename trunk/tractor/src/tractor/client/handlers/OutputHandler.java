@@ -7,6 +7,9 @@ import tractor.lib.MessageFactory;
 public class OutputHandler extends ClientHandler {
 
 	PrintWriter out;
+	/** It constructs the output handler.
+	 * @param out
+	 */
 	OutputHandler(PrintWriter out) {
 		super("OutputHandler");
 		this.out = out;

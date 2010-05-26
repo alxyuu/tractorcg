@@ -26,6 +26,9 @@ public class Gameroom extends Chatroom implements Runnable { // do I need a thre
 	private User currentUser;
 	private Iterator<User> userIterator;
 	private User highest;
+	/** It constructs the game room.
+	 * @param players
+	 */
 	public Gameroom(int players) {
 		super();
 		this.players = players;
@@ -36,10 +39,16 @@ public class Gameroom extends Chatroom implements Runnable { // do I need a thre
 		this.firstgame = true;
 		this.dipai = Collections.emptyList();
 	}
+	/** It sets the host of the gameroom.
+	 * @param user
+	 */
 	public void setHost(User user) {
 		this.host = user;
 		sendCommand(GameCommand.SET_HOST + " " + user.getName(),user);
 	}
+	/** It gets the number of players in the game.
+	 * @return
+	 */
 	public int getGameSize() {
 		return this.players;
 	}
@@ -55,19 +64,32 @@ public class Gameroom extends Chatroom implements Runnable { // do I need a thre
 		this.sendCommand(GameCommand.PART + " " + user.getName() + " " + user.getGamePosition());
 		this.sendUpdateState(GameCommand.WAITING);
 	}
+	/** It destroys the game room.
+	 * 
+	 */
 	public void dispose() {
 		//cleanup
 		this.gthread.interrupt();
 	}
 
+	/** It sends the updated state of the game room.
+	 * @param state
+	 */
 	private void sendUpdateState(int state) {
 		this.sendCommand(GameCommand.UPDATE_STATE + " " + state);
 		this.state = state;
 	}
+	/** It sends the updated stated.
+	 * @param state
+	 * @param user
+	 */
 	private void sendUpdateState(int state, User user) {
 		this.sendCommand(GameCommand.UPDATE_STATE + " " + state, user);
 		this.state = state;
 	}
+	/** It sends the message.
+	 * @param message
+	 */
 	private void sendCommand(String message) {
 		for(Iterator<User> i=this.users.iterator(); i.hasNext();) {
 			User u = i.next();
@@ -76,10 +98,18 @@ public class Gameroom extends Chatroom implements Runnable { // do I need a thre
 		}
 	}
 
+	/** It sends the message to a particular user.
+	 * @param message
+	 * @param user
+	 */
 	private void sendCommand(String message, User user) {
 		user.getIO().write(this.getName()+"|"+message, MessageFactory.GAMECMD);
 	}
 
+	/** It sends a message excluding a particular user.
+	 * @param message
+	 * @param user
+	 */
 	private void sendCommandExclude(String message, User user) {
 		for(Iterator<User> i=this.users.iterator(); i.hasNext();) {
 			User u = i.next();
@@ -88,6 +118,9 @@ public class Gameroom extends Chatroom implements Runnable { // do I need a thre
 		}
 	}
 
+	/** It sets who has lead in the game room.
+	 * @param user
+	 */
 	private void setLead(User user) {
 		this.lead = user;
 		int index = this.users.indexOf(user);
@@ -96,6 +129,9 @@ public class Gameroom extends Chatroom implements Runnable { // do I need a thre
 		}
 	}
 
+	/** It updates the stats of the game room.
+	 * 
+	 */
 	private void updateStats() {
 		String stats = GameCommand.SET_STATS + " " + this.TRUMP_NUMBER + " " + 4;
 		for(Iterator<User> i = users.iterator();i.hasNext();) {
@@ -105,6 +141,9 @@ public class Gameroom extends Chatroom implements Runnable { // do I need a thre
 		sendCommand(stats);
 	}
 
+	/** It deals the cards in the game room.
+	 * 
+	 */
 	private void deal() {
 		this.sendUpdateState(GameCommand.DEALING);
 		Thread dealing = new Thread("dealing-"+this.getName()) {

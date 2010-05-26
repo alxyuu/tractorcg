@@ -8,6 +8,7 @@ import tractor.client.game.GraphicsCard;
 import org.newdawn.slick.Graphics;
 import org.newdawn.slick.SlickException;
 
+
 public class OtherPlayerHand {
 
 	private int cards;
@@ -18,6 +19,10 @@ public class OtherPlayerHand {
 	private List<GraphicsCard> playedcards;
 	private int score;
 
+	/** It constructs the other players hand
+	 * @param x
+	 * @param y
+	 */
 	OtherPlayerHand(double x, double y, double x2, double y2) {
 		this.cards = 0;
 		this.name = null;
@@ -28,34 +33,59 @@ public class OtherPlayerHand {
 		this.playedcards = Collections.emptyList();
 	}
 
+	/** It sets the player given the name parameter.
+	 * @param name
+	 */
 	public void setPlayer(String name) {
 		this.name = name;
 	}
 
+	/** It adds cards to the other players hand
+	 * 
+	 */
 	public void addCard() {
 		this.cards++;
 	}
 
+	/** It removes cards from the other players hand
+	 * 
+	 */
 	public void removeCard() {
 		this.cards--;
 	}
 
+	/** It plays the card.
+	 * @param played
+	 */
 	public void playCards(GraphicsCard ... played) {
 		this.playedcards = Collections.synchronizedList(Arrays.asList(played));
 	}
 
+	/** It plays the card.
+	 * @param played
+	 */
 	public void playCards(List<GraphicsCard> played) {
 		this.playedcards = Collections.synchronizedList(played);
 	}
 
+	/** It clears the table.
+	 * 
+	 */
 	public void clearTable() {
 		this.playedcards.clear();
 	}
 
+	/** It clears the other players hand
+	 * 
+	 */
 	public void reset() {
 		this.cards = 0;
 	}
 
+	/** It draws the other players hand
+	 * @param g
+	 * @throws SlickException
+	 */
 	public void render(Graphics g) throws SlickException {
 		if(this.name == null) {
 			//TODO: paint no player stuff
@@ -75,9 +105,15 @@ public class OtherPlayerHand {
 		}
 	}
 
+	/** It sets the score.
+	 * @param score
+	 */
 	public void setScore(int score) {
 		this.score = score;
 	}
+	/** It retrieves the score.
+	 * @return
+	 */
 	public int getScore() {
 		return this.score;
 	}

@@ -15,6 +15,11 @@ public class InputThread extends Thread {
 	private ConcurrentHashMap<User,BufferedReader> users;
 	private final int limit;
 
+	/** It constructs the input thread.
+	 * @param g
+	 * @param n
+	 * @param limit
+	 */
 	InputThread(ThreadGroup g, String n, int limit) {
 		super(g,n);
 		this.limit = limit;

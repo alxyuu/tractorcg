@@ -15,6 +15,11 @@ public class OutputThread extends Thread {
 	private ConcurrentHashMap<User,PrintWriter> users;
 	private final int limit;
 
+	/** It constructs the output thread with the given parameters
+	 * @param g
+	 * @param n
+	 * @param limit
+	 */
 	OutputThread(ThreadGroup g, String n, int limit) {
 		super(g,n);
 		this.limit = limit;

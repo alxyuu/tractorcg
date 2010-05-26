@@ -19,6 +19,13 @@ public class Button extends MouseOverArea {
 	private IOFactory io;
 	private ButtonPressedListener listener;
 
+	/** It constructs the button.
+	 * @param container
+	 * @param normal
+	 * @param mouseover
+	 * @param x
+	 * @param y
+	 */
 	public Button(GUIContext container, Image normal, Image mouseover, int x, int y) {
 		super(container, normal, x, y);
 
@@ -32,6 +39,14 @@ public class Button extends MouseOverArea {
 		this.hide();
 		//this.show();
 	}
+	/** It constructs the button.
+	 * @param container
+	 * @param normalImage
+	 * @param disabledImage
+	 * @param mouseoverImage
+	 * @param x
+	 * @param y
+	 */
 	public Button(GUIContext container, Image normalImage, Image disabledImage, Image mouseoverImage, int x, int y) {
 		super(container, normalImage, x-normalImage.getWidth()/2, y-normalImage.getHeight()/2);
 
@@ -43,25 +58,40 @@ public class Button extends MouseOverArea {
 		this.hide();
 	}
 
+	/** It shows the button.
+	 * 
+	 */
 	public void show() {
 		this.show = true;
 	}
+	/** It hides the button
+	 * 
+	 */
 	public void hide() {
 		this.disable();
 		this.show = false;
 	}
+	/** It enables the use of the button.
+	 * 
+	 */
 	public void enable() {
 		this.enabled = true;
 		this.setNormalImage(normalImage);
 		this.setMouseOverImage(mouseoverImage);
 	}
 
+	/** It disables the use of the button.
+	 * 
+	 */
 	public void disable() {
 		this.enabled = false;
 		this.setNormalImage(disabledImage);
 		this.setMouseOverImage(disabledImage);
 	}
 
+	/** It adds a listener that checks whether the button has been pressed
+	 * @param l
+	 */
 	public void addButtonPressedListener(ButtonPressedListener l) {
 		this.listener = l;
 	}

@@ -56,6 +56,11 @@ public class Card implements Comparable<Card> {
 			return null;
 		}
 	}*/
+	/** It gets the card.
+	 * @param suit
+	 * @param value
+	 * @return
+	 */
 	public static Card getCard(String suit, String value) {
 		try {
 			return cards.get(Integer.parseInt(suit)*Card.CARDS_PER_SUIT+Integer.parseInt(value));
@@ -106,9 +111,15 @@ public class Card implements Comparable<Card> {
 		return this.value;
 	}
 
+	/** it gets the sorted suit.
+	 * @return
+	 */
 	private int getSortingSuit() {
 		return (this.suit == Card.TRUMP) ? Card.TRUMP+1 : (this.suit == Card.TRUMP_SUIT || this.value == Card.TRUMP_NUMBER) ? Card.TRUMP : this.suit;
 	}
+	/** It gets the sorting value of the card.
+	 * @return
+	 */
 	private int getSortingValue() {
 		return (this.value == Card.TRUMP_NUMBER) ? ((this.suit == Card.TRUMP_SUIT) ? Card.SET_TRUMP_NUMBER : Card.SET_TRUMP) : this.value;
 	}

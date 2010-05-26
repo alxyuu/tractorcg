@@ -8,6 +8,9 @@ import tractor.lib.ErroneousMessageException;
 public class InputHandler extends ClientHandler {
 
 	BufferedReader in;
+	/** It constructs the input handler
+	 * @param in
+	 */
 	InputHandler(BufferedReader in) {
 		super("InputHandler");
 		this.in = in;

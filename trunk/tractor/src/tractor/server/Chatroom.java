@@ -25,14 +25,23 @@ public class Chatroom {
 		this.setName(name);
 	}
 
+	/** It sets the name of the chatroom.
+	 * @param name
+	 */
 	protected void setName(String name) {
 		this.name = name;
 	}
 
+	/** It gets the list of users in the chatroom.
+	 * @return
+	 */
 	protected List<User> getUsers() {
 		return this.users;
 	}
 
+	/** It gets the number of users in the chatroom.
+	 * @return
+	 */
 	public int getSize() {
 		return this.users.size();
 	}

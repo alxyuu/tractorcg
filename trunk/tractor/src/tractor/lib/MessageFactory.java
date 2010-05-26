@@ -140,13 +140,16 @@ public class MessageFactory {
 		}
 	}
 
-	/** It updates the message.
+	/** It updates outgoing timer.
 	 * 
 	 */
 	public void renewPong() {
 		this.lastPong = System.currentTimeMillis();
 	}
 
+	/** It updates the incoming timer.
+	 * 
+	 */
 	public void renewPing() {
 		this.lastPing = System.currentTimeMillis();
 	}
@@ -173,6 +176,9 @@ public class MessageFactory {
 		if( type != MessageFactory.KEEPALIVE ) System.out.println("output: "+message+"-end-");
 	}
 
+	/** It writes whether the message factory is timed out.
+	 * @return
+	 */
 	public boolean writeTimeout() {
 		return System.currentTimeMillis() - lastPing > keepalive;
 	}

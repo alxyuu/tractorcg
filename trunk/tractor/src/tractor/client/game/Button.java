@@ -18,31 +18,31 @@ public class Button extends MouseOverArea {
 	private Image mouseoverImage;
 	private IOFactory io;
 	private ButtonPressedListener listener;
-	
+
 	public Button(GUIContext container, Image normal, Image mouseover, int x, int y) {
 		super(container, normal, x, y);
-		
+
 		this.normalImage = normal;
 		this.mouseoverImage = mouseover;
 		this.setNormalImage(normalImage);
 		this.setMouseOverImage(mouseoverImage);
 
 		this.io = Client.getInstance().getIO();
-		
+
 		this.hide();
 		//this.show();
 	}
 	public Button(GUIContext container, Image normalImage, Image disabledImage, Image mouseoverImage, int x, int y) {
 		super(container, normalImage, x-normalImage.getWidth()/2, y-normalImage.getHeight()/2);
-		
+
 		this.normalImage = normalImage;
 		this.disabledImage = disabledImage;
 		this.mouseoverImage = mouseoverImage;
 		this.io = Client.getInstance().getIO();
-		
+
 		this.hide();
 	}
-	
+
 	public void show() {
 		this.show = true;
 	}
@@ -55,13 +55,13 @@ public class Button extends MouseOverArea {
 		this.setNormalImage(normalImage);
 		this.setMouseOverImage(mouseoverImage);
 	}
-	
+
 	public void disable() {
 		this.enabled = false;
 		this.setNormalImage(disabledImage);
 		this.setMouseOverImage(disabledImage);
 	}
-	
+
 	public void addButtonPressedListener(ButtonPressedListener l) {
 		this.listener = l;
 	}

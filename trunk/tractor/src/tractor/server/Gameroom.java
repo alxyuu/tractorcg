@@ -59,7 +59,7 @@ public class Gameroom extends Chatroom implements Runnable { // do I need a thre
 		//cleanup
 		this.gthread.interrupt();
 	}
-	
+
 	private void sendUpdateState(int state) {
 		this.sendCommand(GameCommand.UPDATE_STATE + " " + state);
 		this.state = state;
@@ -75,11 +75,11 @@ public class Gameroom extends Chatroom implements Runnable { // do I need a thre
 			this.sendCommand(message, u);
 		}
 	}
-	
+
 	private void sendCommand(String message, User user) {
 		user.getIO().write(this.getName()+"|"+message, MessageFactory.GAMECMD);
 	}
-	
+
 	private void sendCommandExclude(String message, User user) {
 		for(Iterator<User> i=this.users.iterator(); i.hasNext();) {
 			User u = i.next();
@@ -87,7 +87,7 @@ public class Gameroom extends Chatroom implements Runnable { // do I need a thre
 				this.sendCommand(message, u);
 		}
 	}
-	
+
 	private void setLead(User user) {
 		this.lead = user;
 		int index = this.users.indexOf(user);
@@ -95,7 +95,7 @@ public class Gameroom extends Chatroom implements Runnable { // do I need a thre
 			Collections.rotate(this.users, index);
 		}
 	}
-	
+
 	private void updateStats() {
 		String stats = GameCommand.SET_STATS + " " + this.TRUMP_NUMBER + " " + 4;
 		for(Iterator<User> i = users.iterator();i.hasNext();) {
@@ -104,7 +104,7 @@ public class Gameroom extends Chatroom implements Runnable { // do I need a thre
 		}
 		sendCommand(stats);
 	}
-	
+
 	private void deal() {
 		this.sendUpdateState(GameCommand.DEALING);
 		Thread dealing = new Thread("dealing-"+this.getName()) {
@@ -139,10 +139,10 @@ public class Gameroom extends Chatroom implements Runnable { // do I need a thre
 					e.printStackTrace();
 					return;
 				}
-				
+
 				if(firstgame && caller != null)
 					setLead(caller);
-				
+
 				dipaiSize = cards.size();
 				//TODO: flip dipai if no one calls
 				String dipai = " "+cards.size();
@@ -202,7 +202,7 @@ public class Gameroom extends Chatroom implements Runnable { // do I need a thre
 					break;
 					case GameCommand.PLAY_CARD:
 					{
-						
+
 						if(this.state == GameCommand.DEALING) { //card being called
 							Card played = Card.getCard(message[1],message[2]);
 							int call_number = Integer.parseInt(message[3]);
@@ -236,7 +236,7 @@ public class Gameroom extends Chatroom implements Runnable { // do I need a thre
 							this.userIterator = this.users.iterator();
 							this.currentUser = userIterator.next();
 							this.highest = currentUser;
-							
+
 						} else if(this.state == GameCommand.START) { //normally played
 							if(user != currentUser) {
 								this.sendCommand(GameCommand.PLAY_INVALID + " playing out of turn",user);
@@ -247,10 +247,10 @@ public class Gameroom extends Chatroom implements Runnable { // do I need a thre
 							for(int k=0;k<numPlayed*2; k+=2) {
 								played.add(Card.getCard(message[k+2],message[k+3]));
 							}
-							
-							
-							
-							
+
+
+
+
 							if(user == this.lead) {
 								//the player is the first player, check to make sure the play is high
 								boolean isHigh=true;
@@ -262,22 +262,22 @@ public class Gameroom extends Chatroom implements Runnable { // do I need a thre
 								for(Iterator<User> i2 = users.iterator();i2.hasNext();)
 								{
 									User u = i2.next();
-								    if(u != user)
-								    {
-								    	PlayerHand friedchicken = u.getHand();
-								    	List<Card> seven = friedchicken.getCards();
-								    	
-								    }
+									if(u != user)
+									{
+										PlayerHand friedchicken = u.getHand();
+										List<Card> seven = friedchicken.getCards();
+
+									}
 								}
 							} else {
 								//not lead, check following suit, playing doubles/tractors/triples/whatever
 								//compare to highest user's play
 								//make sure the number of cards are correct
 							}
-						
-							
-							
-							
+
+
+
+
 							if(!userIterator.hasNext()) { 
 								//add points etc
 								if(currentUser.getHand().getCards().size() == 0) {

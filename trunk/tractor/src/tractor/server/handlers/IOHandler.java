@@ -17,7 +17,7 @@ class IOHandler extends ThreadGroup {
 		this.in = new InputThread[50];
 		this.out = new OutputThread[50];
 		this.chat = new ChatThread[50];
-		
+
 
 	}
 

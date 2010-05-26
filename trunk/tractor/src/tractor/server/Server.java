@@ -13,7 +13,7 @@ public class Server {
 
 	private static Server instance;
 	//private final int MAX_USERS = 500;
-	
+
 	/**It returns the instance of the server
 	 * @return
 	 * 
@@ -21,7 +21,7 @@ public class Server {
 	public static Server getInstance() {
 		return Server.instance;
 	}
-	
+
 	public static void main(String ... bobby) {
 		Server host = new Server();
 		host.addHandler(new ConnectionHandler(), "listener");
@@ -30,7 +30,7 @@ public class Server {
 		host.addHandler(new CommandHandler(), "command handler");
 		Card.populateDeck();
 	}
-	
+
 	private ThreadGroup handlers;
 	private final int PORT;
 	private ServerSocket socket;
@@ -58,7 +58,7 @@ public class Server {
 			System.exit(0);
 		}
 	}
-	
+
 	/**It adds a server handler.
 	 * @param handler
 	 * @param name
@@ -84,7 +84,7 @@ public class Server {
 	public ServerSocket getSocket() {
 		return this.socket;
 	}
-	
+
 	/**It returns the various chatrooms on the server.
 	 * @return
 	 * 
@@ -92,7 +92,7 @@ public class Server {
 	public ConcurrentHashMap<String,Chatroom> getChatrooms() {
 		return this.chatrooms;
 	}
-	
+
 	/**It gets the users on the server.
 	 * @return
 	 * 
@@ -100,7 +100,7 @@ public class Server {
 	public ConcurrentHashMap<String,User> getUsers() {
 		return this.users;
 	}
-	
+
 	/**It returns the users waiting to login
 	 * @return
 	 * 

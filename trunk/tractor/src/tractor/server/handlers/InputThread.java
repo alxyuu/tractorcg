@@ -50,7 +50,7 @@ public class InputThread extends Thread {
 					e.printStackTrace();
 				}
 			}
-			
+
 			try {
 				//dynamic sleeping?
 				Thread.sleep(100);
@@ -60,7 +60,7 @@ public class InputThread extends Thread {
 		}
 		System.out.println(this.getName()+" no longer serving users");
 	}
-	
+
 	/** It checks if the input thread is full.
 	 * @return
 	 *
@@ -68,7 +68,7 @@ public class InputThread extends Thread {
 	public boolean isFull() {
 		return this.users.size() == this.limit;
 	}
-	
+
 	/** It adds a user to the input thread.
 	 * @param user
 	 * @throws IOException

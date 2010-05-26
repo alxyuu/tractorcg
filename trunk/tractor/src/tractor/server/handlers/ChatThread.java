@@ -59,7 +59,7 @@ public class ChatThread extends Thread {
 		}
 		System.out.println(this.getName()+" no longer serving users");
 	}
-	
+
 	/** It checks if the chatroom is full based on the capacity.
 	 * @return
 	 *
@@ -67,7 +67,7 @@ public class ChatThread extends Thread {
 	public boolean isFull() {
 		return this.users.size() == this.limit;
 	}
-	
+
 	/** It adds a user to the chat thread.
 	 * @param user
 	 *

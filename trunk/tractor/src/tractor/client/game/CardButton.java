@@ -18,14 +18,14 @@ public class CardButton extends MouseOverArea implements Comparable<CardButton> 
 	}
 	public void mouseReleased(int button, int mx, int my) {
 		if(this.game.getState() != GameCommand.DEALING  && this.game.getState() != GameCommand.WAITING && isMouseOver()) {
-		if(!selected) {
-			this.setLocation(this.getX(),this.getY()-20);
-			this.game.addSelected(this);
-		} else {
-			this.setLocation(this.getX(),this.getY()+20);
-			this.game.removeSelected(this);
-		}
-		this.selected = !this.selected;
+			if(!selected) {
+				this.setLocation(this.getX(),this.getY()-20);
+				this.game.addSelected(this);
+			} else {
+				this.setLocation(this.getX(),this.getY()+20);
+				this.game.removeSelected(this);
+			}
+			this.selected = !this.selected;
 		}
 	}
 	public GraphicsCard getCard() {

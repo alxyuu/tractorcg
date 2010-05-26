@@ -76,7 +76,7 @@ public class CommandHandler extends ServerHandler {
 								//do nothing?
 							}
 						}
-							break;
+						break;
 						case G_CREATE:
 						{
 							if(user.getCurrentGame() == null) {
@@ -108,7 +108,7 @@ public class CommandHandler extends ServerHandler {
 									} else {
 										//TODO: game full error
 									}
-									
+
 								} else {
 									//TODO: game not found error
 								}

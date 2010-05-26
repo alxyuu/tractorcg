@@ -3,7 +3,7 @@ package tractor.lib;
 import java.util.HashMap;
 
 public enum ChatCommand {
-	
+
 	C_JOIN,
 	C_PART,
 	E_ERR,
@@ -11,7 +11,7 @@ public enum ChatCommand {
 	G_HOOK,
 	G_PART,
 	S_QUIT;
-	
+
 	private static HashMap<String,ChatCommand> cset;
 	static {
 		cset = new HashMap<String,ChatCommand>();
@@ -23,7 +23,7 @@ public enum ChatCommand {
 		cset.put("GPART", G_PART);
 		cset.put("QUIT", S_QUIT);
 	}
-	
+
 	/**It returns a command
 	 * @param s
 	 * @return

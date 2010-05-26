@@ -22,7 +22,7 @@ public class PlayerHand {
 	private List<GraphicsCard> playedcards;
 	private List<GraphicsCard> lasthand;
 	//private String name;
-	
+
 	PlayerHand(float x, float y, float x2, float y2) {
 		//this.name = Client.getInstance().getUsername();
 		this.x = x - ( 100 - spacing )/2;
@@ -34,7 +34,7 @@ public class PlayerHand {
 		this.playedcards = Collections.emptyList();
 		this.lasthand = Collections.emptyList();
 	}
-	
+
 	public Collection<GraphicsCard> getCards() {
 		return this.cards;
 	}
@@ -45,7 +45,7 @@ public class PlayerHand {
 		this.hand.put(new CardButton(container,card,0,0,spacing,148),card);
 		updateLocations();
 	}
-	
+
 	public void removeCard(CardButton card) {
 		this.hand.remove(card);
 		this.updateLocations();
@@ -54,20 +54,20 @@ public class PlayerHand {
 		this.cards.remove(card);
 		updateLocations();
 	}
-	
+
 	public void playCards(GraphicsCard ... played) {
 		this.playedcards = Collections.synchronizedList(Arrays.asList(played));
 	}
-	
+
 	public void playCards(List<GraphicsCard> played) {
 		this.playedcards = Collections.synchronizedList(played);
 	}
-	
+
 	public void clearTable() {
 		this.lasthand = this.playedcards;
 		this.playedcards.clear();
 	}
-	
+
 	private void updateLocations() {
 		float start = this.x - (spacing * this.cards.size())/2;
 		CardButton card = null;
@@ -93,6 +93,6 @@ public class PlayerHand {
 			start+=spacing;
 		}
 	}
-	
-	
+
+
 }

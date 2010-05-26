@@ -13,9 +13,11 @@ public class GameCommand {
 	public final static int PART = 2;
 	public final static int SET_HOST = 3;
 	public final static int PLAY_CARD = 4;
-	public final static int THIS_TURN = 5;
+	public final static int YOUR_TURN = 5;
 	public final static int CLEAR_TABLE = 6;
 	public final static int SET_STATS = 7;
+	public final static int PLAY_INVALID = 8;
+	public final static int PLAY_SUCCESS = 9;
 	
 	
 	

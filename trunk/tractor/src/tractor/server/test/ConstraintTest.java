@@ -103,8 +103,7 @@ public class ConstraintTest {
 				suit = ( card.getNumber() == this.TRUMP_NUMBER ) ? Card.TRUMP : card.getSuit();
 			}
 			
-			Trick trick = new Trick();
-			//calculate and add plays to the trick
+			Trick trick = calculateTrick(played);
 			
 			//check if high only if there's more than one play
 			if(trick.countPlays() >= 1) {
@@ -157,6 +156,12 @@ public class ConstraintTest {
 		}
 		
 		System.out.println("congratulations all tests passed");
+	}
+	
+	public Trick calculateTrick(List<Card> played) {
+		Trick trick = new Trick();
+		//calculate stuffs
+		return trick;
 	}
 }
 

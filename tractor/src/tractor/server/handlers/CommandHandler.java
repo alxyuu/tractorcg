@@ -87,6 +87,7 @@ public class CommandHandler extends ServerHandler {
 								user.setCurrentGame(room);
 								user.setGamePosition(1);
 								user.addChatroom(room);
+								room.start();
 								io.write("GHOOK " + room.getName() + " 1 " + room.getGameSize(), MessageFactory.CHATCMD);
 							} else {
 								//TODO: already in game, error handler

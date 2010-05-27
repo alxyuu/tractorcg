@@ -3,6 +3,7 @@ package tractor.server;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
+import java.util.Comparator;
 import java.util.Iterator;
 import java.util.List;
 
@@ -40,53 +41,31 @@ public class PlayerHand {
 		return this.cards.contains(card);
 	}
 	
+	public boolean contains(Collection<Card> card) {
+		return this.cards.containsAll(card);
+	}
+	
 	public Iterator<Card> iterator() {
 		return this.cards.iterator();
 	}
 	
+	public void sort(Comparator<Card> comparator) {
+		Collections.sort(this.cards,comparator);
+	}
 	/** It returns the Player's cards.
 	 * @return
 	 */
 	public List<Card> getCards() {
 		return this.cards;
 	}
+	
 	/** It adds a card to the hand.
 	 * @param card
 	 */
 	public void addCard(Card card) {
 		this.cards.add(card);
 	}
-	/** it returns the singles in the players hand.
-	 * @param a
-	 * @param s
-	 * @return
-	 */
-	public Card Singles(int a,int s)
-	{
-
-		return this.cards.get(0);
-	}
-	/** It returns the pairs in the players hand.
-	 * @param a
-	 * @param s
-	 * @return
-	 */
-	public List<Card> Pairs(int a,int s)
-	{
-
-		return this.cards;
-	}
-	/** It returns the tractors in the players hand.
-	 * @param a
-	 * @param l
-	 * @param s
-	 * @return
-	 */
-	public List<Card> Tractors(int a,int l,int s)
-	{
-
-		return this.cards;
-	}
+	
 	/** It removes the card from the players hand.
 	 * @param card
 	 */

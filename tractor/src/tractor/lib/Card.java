@@ -2,6 +2,8 @@ package tractor.lib;
 
 import java.util.ArrayList;
 
+import tractor.client.game.GraphicsCard;
+
 public class Card implements Comparable<Card> {
 
 	protected static final ArrayList<Card> cards;
@@ -131,7 +133,9 @@ public class Card implements Comparable<Card> {
 	 * @return
 	 */
 	private int getSortingValue() {
-		return (this.value == Card.TRUMP_NUMBER) ? ((this.suit == Card.TRUMP_SUIT) ? Card.SET_TRUMP_NUMBER : Card.SET_TRUMP) : this.value;
+		//return (this.value == Card.TRUMP_NUMBER) ? ((this.suit == Card.TRUMP_SUIT) ? Card.SET_TRUMP_NUMBER : Card.SET_TRUMP) : this.value;
+		//set trump sorting was taken care of in getSortingSuit, I think
+		return this.value;
 	}
 
 	public int compareTo(Card card) {
@@ -144,7 +148,74 @@ public class Card implements Comparable<Card> {
 	}
 
 	public String toString() {
-		return this.suit + " " + this.value;
+		String out = "";
+		switch(this.value) {
+		case GraphicsCard.TWO:
+			if(this.suit == GraphicsCard.TRUMP)
+				out += "small joker";
+			else
+				out += "two";
+			break;
+		case GraphicsCard.THREE:
+			if(this.suit == GraphicsCard.TRUMP)
+				out += "big joker";
+			else
+				out += "three";
+			break;
+		case GraphicsCard.FOUR:
+			out += "four";
+			break;
+		case GraphicsCard.FIVE:
+			out += "five";
+			break;
+		case GraphicsCard.SIX:
+			out += "six";
+			break;
+		case GraphicsCard.SEVEN:
+			out += "seven";
+			break;
+		case GraphicsCard.EIGHT:
+			out+= "eight";
+			break;
+		case GraphicsCard.NINE:
+			out+= "nine";
+			break;
+		case GraphicsCard.TEN:
+			out += "ten";
+			break;
+		case GraphicsCard.JACK:
+			out += "jack";
+			break;
+		case GraphicsCard.QUEEN:
+			out += "queen";
+			break;
+		case GraphicsCard.KING:
+			out += "king";
+			break;
+		case GraphicsCard.ACE:
+			out += "ace";
+			break;
+		}
+		out += " of ";
+		switch(this.suit) {
+		case GraphicsCard.SPADES:
+			out+="spades";
+			break;
+		case GraphicsCard.CLUBS:
+			out+="clubs";
+			break;
+		case GraphicsCard.DIAMONDS:
+			out+="diamonds";
+			break;
+		case GraphicsCard.HEARTS:
+			out+="hearts";
+			break;
+		case GraphicsCard.TRUMP:
+			out+="trump";
+			break;
+		}
+		return out;
+
 	}
 
 	/**It gets the suit of the card

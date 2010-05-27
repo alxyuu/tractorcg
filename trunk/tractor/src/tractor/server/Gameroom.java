@@ -42,8 +42,6 @@ public class Gameroom extends Chatroom implements Runnable { // do I need a thre
 		super();
 		this.players = players;
 		this.setName("@"+this.hashCode());
-		this.gthread = new Thread(this,this.getName());
-		this.gthread.start();
 		this.state = GameCommand.WAITING;
 		this.firstgame = true;
 		this.dipai = Collections.emptyList();
@@ -141,6 +139,11 @@ public class Gameroom extends Chatroom implements Runnable { // do I need a thre
 		};
 	}
 	
+	public void start() {
+		this.gthread = new Thread(this,this.getName());
+		this.gthread.start();
+	}
+
 	/** It sets the host of the gameroom.
 	 * @param user
 	 */
@@ -266,7 +269,7 @@ public class Gameroom extends Chatroom implements Runnable { // do I need a thre
 						User user = i.next();
 						Card todeal = cards.remove(0);
 						user.getHand().addCard(todeal);
-						sendCommand(GameCommand.DEALING + " " + user.getName() + " " + todeal, user);
+						sendCommand(GameCommand.DEALING + " " + user.getName() + " " + todeal.getSuit() + " " + todeal.getNumber(), user);
 						sendCommandExclude(GameCommand.DEALING + " " + user.getName(), user);
 						try {
 							Thread.sleep(100);
@@ -296,7 +299,7 @@ public class Gameroom extends Chatroom implements Runnable { // do I need a thre
 				}
 				sendCommand(GameCommand.DIPAI + dipai, lead);
 				sendUpdateState(GameCommand.DIPAI);
-				sendCommand(GameCommand.CLEAR_TABLE+"");
+				sendCommand(GameCommand.CLEAR_TABLE+" 0");
 			}
 		};
 		dealing.start();
@@ -630,6 +633,7 @@ public class Gameroom extends Chatroom implements Runnable { // do I need a thre
 						break;*/
 					case GameCommand.JOIN: 
 					{
+						System.out.println("join");
 						this.sendCommandExclude(GameCommand.JOIN + " " + user.getGamePosition() + " " + user.getName(), user);
 						for(Iterator<User> i2 = users.iterator();i2.hasNext();) {
 							User u = i2.next();
@@ -765,7 +769,7 @@ public class Gameroom extends Chatroom implements Runnable { // do I need a thre
 								System.out.println(trick);
 
 								//check if high only if there's more than one play
-								if(trick.countPlays() >= 1) {
+								if(trick.countPlays() > 1) {
 
 									//just check the first in each play, since they're all sorted
 									if(trick.countSingles() > 0) {
@@ -947,7 +951,7 @@ public class Gameroom extends Chatroom implements Runnable { // do I need a thre
 								this.currentPoints = 0;
 								for(Iterator<User> i2 = users.iterator(); i.hasNext();) 
 									i2.next().getHand().setCurrentPlay(null);
-								this.sendCommand(GameCommand.CLEAR_TABLE+"");
+								this.sendCommand(GameCommand.CLEAR_TABLE+" "+gamePoints);
 								this.setLead(highest);
 								this.userIterator = this.users.iterator();
 								

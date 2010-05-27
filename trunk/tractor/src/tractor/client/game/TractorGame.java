@@ -45,6 +45,7 @@ public class TractorGame extends BasicGame {
 	private boolean showDipai;
 	private Button playButton;
 	private String errorMessage;
+	private int attackingScore;
 	//private OtherPlayerHand hand;
 	/** It constructs the tractor game.
 	 * @param position
@@ -371,6 +372,9 @@ public class TractorGame extends BasicGame {
 					i.next().clearTable();
 				}
 				hand.clearTable();
+				if(message.length > 1) {
+					this.attackingScore = Integer.parseInt(message[1]);
+				}
 			}
 			break;
 			case GameCommand.DIPAI: 

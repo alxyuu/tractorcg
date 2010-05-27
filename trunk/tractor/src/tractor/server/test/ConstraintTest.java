@@ -39,15 +39,30 @@ public class ConstraintTest {
 		 */
 		PlayerHand hand1 = users.get(0).getHand();
 		hand1.addCard(Card.getCard(Card.SPADES, Card.ACE));
+		hand1.addCard(Card.getCard(Card.SPADES, Card.ACE));
+		hand1.addCard(Card.getCard(Card.SPADES, Card.KING));
+		hand1.addCard(Card.getCard(Card.SPADES, Card.KING));
 		
 		PlayerHand hand2 = users.get(1).getHand();
 		//add cards
+		hand2.addCard(Card.getCard(Card.SPADES, Card.SMALL_JOKER));
+		hand2.addCard(Card.getCard(Card.SPADES, Card.SMALL_JOKER));
+		hand2.addCard(Card.getCard(Card.SPADES, Card.JACK));
+		hand2.addCard(Card.getCard(Card.SPADES, Card.JACK));
 		
 		PlayerHand hand3 = users.get(2).getHand();
 		//add cards
+		hand3.addCard(Card.getCard(Card.SPADES, Card.SIX));
+		hand3.addCard(Card.getCard(Card.SPADES, Card.SIX));
+		hand3.addCard(Card.getCard(Card.SPADES, Card.TEN));
+		hand3.addCard(Card.getCard(Card.SPADES, Card.TEN));
 		
 		PlayerHand hand4 = users.get(3).getHand();
 		//add cards
+		hand1.addCard(Card.getCard(Card.DIAMONDS, Card.THREE));
+		hand1.addCard(Card.getCard(Card.SPADES, Card.FOUR));
+		hand1.addCard(Card.getCard(Card.SPADES, Card.FIVE));
+		hand1.addCard(Card.getCard(Card.SPADES, Card.FIVE));
 	}
 	
 	public void test() {
@@ -59,7 +74,13 @@ public class ConstraintTest {
 		this.TRUMP_NUMBER = Card.JACK;
 		
 		User user = users.get(0);
-
+		Iterator <Card>it=user.getHand().iterator();
+		while(it.hasNext())
+		{
+			Card c=it.next();
+			user.getHand().frequency(c);
+		}
+		
 		ArrayList<Card> played = new ArrayList<Card>();
 		played.add(Card.getCard(Card.SPADES,Card.ACE));
 		//add cards
@@ -119,5 +140,23 @@ public class ConstraintTest {
 		}
 		
 		System.out.println("congratulations all tests passed");
+	}
+}
+
+public class Double()
+{
+	int number;
+	Card c;
+	public Double(Card card)
+	{
+		Card c = new Card(card.getSuit(),card.getNumber())
+	}
+	public int getSuit()
+	{
+		return c.getSuit();
+	}
+	public int getNumber()
+	{
+		return c.getNumber();
 	}
 }

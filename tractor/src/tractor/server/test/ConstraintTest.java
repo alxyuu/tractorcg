@@ -78,7 +78,10 @@ public class ConstraintTest {
 		User user = users.get(0);
 		
 		ArrayList<Card> played = new ArrayList<Card>();
-		played.add(Card.getCard(Card.SPADES,Card.ACE));
+		played.add(Card.getCard(Card.SPADES, Card.ACE));
+		played.add(Card.getCard(Card.SPADES, Card.ACE));
+		played.add(Card.getCard(Card.SPADES, Card.KING));
+		played.add(Card.getCard(Card.SPADES, Card.KING));
 		//add cards
 		
 		
@@ -177,7 +180,7 @@ public class ConstraintTest {
 			}
 			else if(current.getSuit()!=Card.TRUMP&&current.getNumber()!=TRUMP_NUMBER) //if not special case
 			{
-				if(current.getNumber()==previous.getNumber()+1) //if next card is one higher than previous card add
+				 if(current.getNumber()==previous.getNumber()+1 || current.getNumber()==previous.getNumber()+2 && this.TRUMP_NUMBER == previous.getNumber()+1 ) //if next card is one higher than previous card or two higher and the one higher is trump number add
 				{
 					if(previousCards.size()==1) //if only one other card held then its just a single so get rid of the old card and add the new one
 					{
@@ -195,6 +198,7 @@ public class ConstraintTest {
 						{
 							trick.addSingle(twoPrevious);
 							previousCards.clear();
+							previousCards.add(current);
 							twoPrevious=null;
 							previous=current;
 							
@@ -203,6 +207,7 @@ public class ConstraintTest {
 						{
 							trick.addPair(new Pair(twoPrevious));
 							previousCards.clear();
+							previousCards.add(current);
 							twoPrevious=null;
 							previous=current;
 						}
@@ -210,29 +215,53 @@ public class ConstraintTest {
 						{
 							trick.addTriple(new Triple(twoPrevious));
 							previousCards.clear();
+							previousCards.add(current);
 							twoPrevious=null;
 							previous=current;
 						}
 						else //otherwise if theres more its a tractor
 						{
-							//INCOMPLETE: I want to somehow recursion this part
-							//but i dont know how since its basically doing the whole calc trick thing over again
-							//to find the parameters of the tractor
-							//trick.addTractor()
-							
-							//previousCards.clear();
-							//twoPrevious=null;
-							//previous=current;
+							int pairCount=0;
+							int tripleCount=0;
+							Iterator<Card> it2=previousCards.iterator();
+							Card first=it2.next();
+							Card before=first;
+							Card current2=first;
+							while(it2.hasNext())
+							{
+								it2.next();
+								current2=it2.next(); //skips one since we know its a tractor
+								if(before==current2)     //if third card equals first then triple
+								{
+									tripleCount++;
+									if(it2.hasNext())
+									{
+										before=it2.next();
+									}
+								}
+								else				//third and first different
+								{
+									pairCount++;
+									before=current2;
+								}
+							}
+							trick.addTractor(new Tractor(pairCount, tripleCount, first.getNumber(), current2.getNumber()));
+							previousCards.clear();
+							previousCards.add(current);
+							twoPrevious=null;
+							previous=current;
 						}
 					}
 				}
 				else //no tractor/pairs/triples
 				{
-					trick.addSingle(current);
+					//why? there could be a pair after
+					//trick.addSingle(current);
 					if(previousCards.size()==1) //if there's only one other card then add it as a single
 					{
 						trick.addSingle(previous);
 						previousCards.clear();
+						previousCards.add(current);
 						previous=current;
 						
 					}
@@ -240,12 +269,14 @@ public class ConstraintTest {
 					{
 						trick.addPair(new Pair(previous));
 						previousCards.clear();
+						previousCards.add(current);
 						previous=current;
 					}
 					else if(previousCards.size()==3) //if there are 3 left then its a triple
 					{
 						trick.addTriple(new Triple(previous));
 						previousCards.clear();
+						previousCards.add(current);
 						previous=current;
 					}
 					else //otherwise if theres more its a tractor
@@ -276,6 +307,7 @@ public class ConstraintTest {
 						}
 						trick.addTractor(new Tractor(pairCount, tripleCount, first.getNumber(), current2.getNumber()));
 						previousCards.clear();
+						previousCards.add(current);
 						twoPrevious=null;
 						previous=current;
 					}
@@ -285,6 +317,55 @@ public class ConstraintTest {
 			else //INCOMPLETE: idk how to check whether its one bigger (like small vs big or trumpnum versus goodtrumpnum
 			{
 				
+			}
+			
+			//take care of the last set
+			if(previousCards.size()==0) {
+				System.out.println("some bad shit happened");
+			}
+			else if(previousCards.size()==1) //if there's only one other card then add it as a single
+			{
+				trick.addSingle(previous);
+				previousCards.clear();
+			}
+			else if(previousCards.size()==2) //if there was two add as pair
+			{
+				trick.addPair(new Pair(previous));
+				previousCards.clear();
+			}
+			else if(previousCards.size()==3) //if there are 3 left then its a triple
+			{
+				trick.addTriple(new Triple(previous));
+				previousCards.clear();
+			}
+			else //otherwise if theres more its a tractor
+			{
+				int pairCount=0;
+				int tripleCount=0;
+				Iterator<Card> it2=previousCards.iterator();
+				Card first=it2.next();
+				Card before=first;
+				Card current2=first;
+				while(it2.hasNext())
+				{
+					it2.next();
+					current2=it2.next(); //skips one since we know its a tractor
+					if(before==current2)     //if third card equals first then triple
+					{
+						tripleCount++;
+						if(it2.hasNext())
+						{
+							before=it2.next();
+						}
+					}
+					else				//third and first different
+					{
+						pairCount++;
+						before=current2;
+					}
+				}
+				trick.addTractor(new Tractor(pairCount, tripleCount, first.getNumber(), current2.getNumber()));
+				previousCards.clear();
 			}
 			
 		}

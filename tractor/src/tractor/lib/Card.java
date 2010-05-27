@@ -115,8 +115,18 @@ public class Card implements Comparable<Card> {
 	 * @return
 	 */
 	private int getSortingSuit() {
-		return (this.suit == Card.TRUMP) ? Card.TRUMP+1 : (this.suit == Card.TRUMP_SUIT || this.value == Card.TRUMP_NUMBER) ? Card.TRUMP : this.suit;
+		if (this.suit == Card.TRUMP)
+			return Card.TRUMP+Card.TRUMP+1;
+		else if(this.suit == Card.TRUMP_SUIT && this.value == Card.TRUMP_NUMBER)
+			return Card.TRUMP+Card.TRUMP;
+		else if(this.value == Card.TRUMP_NUMBER)
+			return Card.TRUMP+this.suit;
+		else if(this.suit == Card.TRUMP_SUIT)
+			return Card.TRUMP;
+		else
+			return this.suit;
 	}
+	
 	/** It gets the sorting value of the card.
 	 * @return
 	 */

@@ -5,7 +5,7 @@ import java.net.Socket;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.util.Iterator;
-import java.util.Queue;
+import java.util.List;
 import java.util.Vector;
 
 import tractor.lib.MessageFactory;
@@ -35,6 +35,7 @@ public class User {
 	private int gameposition;
 	private int gamescore;
 	private PlayerHand hand;
+	private List<User> team;
 
 	/** Constructor of the User class that initializes the attributes
 	 * @param socket
@@ -105,6 +106,14 @@ public class User {
 
 	public void newHand() {
 		this.hand = new PlayerHand();
+	}
+	
+	public List<User> getTeam() {
+		return this.team;
+	}
+	
+	public void setTeam(List<User> team) {
+		this.team = team;
 	}
 
 	/**It removes the user from the chatroom.

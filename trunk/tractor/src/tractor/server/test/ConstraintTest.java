@@ -250,14 +250,34 @@ public class ConstraintTest {
 					}
 					else //otherwise if theres more its a tractor
 					{
-						//INCOMPLETE: I want to somehow recursion this part
-						//but i dont know how since its basically doing the whole calc trick thing over again
-						//to find the parameters of the tractor
-						//trick.addTractor()
-						
-						//previousCards.clear();
-						//twoPrevious=null;
-						//previous=current;
+						int pairCount=0;
+						int tripleCount=0;
+						Iterator<Card> it2=previousCards.iterator();
+						Card first=it2.next();
+						Card before=first;
+						Card current2=first;
+						while(it2.hasNext())
+						{
+							it2.next();
+							current2=it2.next(); //skips one since we know its a tractor
+							if(before==current2)     //if third card equals first then triple
+							{
+								tripleCount++;
+								if(it2.hasNext())
+								{
+									before=it2.next();
+								}
+							}
+							else				//third and first different
+							{
+								pairCount++;
+								before=current2;
+							}
+						}
+						trick.addTractor(new Tractor(pairCount, tripleCount, first.getNumber(), current2.getNumber()));
+						previousCards.clear();
+						twoPrevious=null;
+						previous=current;
 					}
 					
 				}

@@ -45,8 +45,8 @@ public class ConstraintTest {
 		
 		PlayerHand hand2 = users.get(1).getHand();
 		//add cards
-		hand2.addCard(Card.getCard(Card.SPADES, Card.SMALL_JOKER));
-		hand2.addCard(Card.getCard(Card.SPADES, Card.SMALL_JOKER));
+		hand2.addCard(Card.getCard(Card.TRUMP, Card.SMALL_JOKER));
+		hand2.addCard(Card.getCard(Card.TRUMP, Card.SMALL_JOKER));
 		hand2.addCard(Card.getCard(Card.SPADES, Card.JACK));
 		hand2.addCard(Card.getCard(Card.SPADES, Card.JACK));
 		
@@ -74,12 +74,6 @@ public class ConstraintTest {
 		this.TRUMP_NUMBER = Card.JACK;
 		
 		User user = users.get(0);
-		Iterator <Card>it=user.getHand().iterator();
-		while(it.hasNext())
-		{
-			Card c=it.next();
-			user.getHand().frequency(c);
-		}
 		
 		ArrayList<Card> played = new ArrayList<Card>();
 		played.add(Card.getCard(Card.SPADES,Card.ACE));
@@ -143,13 +137,13 @@ public class ConstraintTest {
 	}
 }
 
-public class Double()
+class Double
 {
 	int number;
 	Card c;
-	public Double(Card card)
+	Double(Card card)
 	{
-		Card c = new Card(card.getSuit(),card.getNumber())
+		this.c = card;
 	}
 	public int getSuit()
 	{

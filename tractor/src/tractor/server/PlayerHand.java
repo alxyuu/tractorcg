@@ -3,6 +3,7 @@ package tractor.server;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
+import java.util.Iterator;
 import java.util.List;
 
 import tractor.lib.Card;
@@ -15,6 +16,11 @@ public class PlayerHand {
 
 	public PlayerHand() {
 		this.cards = Collections.synchronizedList(new ArrayList<Card>());
+		this.currentPlay = Collections.emptyList();
+	}
+	
+	public PlayerHand(PlayerHand hand) {
+		this.cards = Collections.synchronizedList(new ArrayList<Card>(hand.getCards()));
 		this.currentPlay = Collections.emptyList();
 	}
 
@@ -33,6 +39,11 @@ public class PlayerHand {
 	public boolean contains(Card card) {
 		return this.cards.contains(card);
 	}
+	
+	public Iterator<Card> iterator() {
+		return this.cards.iterator();
+	}
+	
 	/** It returns the Player's cards.
 	 * @return
 	 */

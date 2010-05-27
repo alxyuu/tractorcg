@@ -26,6 +26,7 @@ public class Gameroom extends Chatroom implements Runnable { // do I need a thre
 	private User currentUser;
 	private Iterator<User> userIterator;
 	private User highest;
+	private int currentSuit;
 	/** It constructs the game room.
 	 * @param players
 	 */
@@ -206,7 +207,7 @@ public class Gameroom extends Chatroom implements Runnable { // do I need a thre
 					String[] message = io.getNextMessage(MessageFactory.GAMECMD).split(" ");
 					//int primary = GameCommand.get(message[0]);
 					int primary = Integer.parseInt(message[0]);
-					switch(primary) {
+					CommandSwitch: switch(primary) {
 					/*case GameCommand.NULL:
 						//TODO: command not found error
 						break;*/
@@ -290,13 +291,34 @@ public class Gameroom extends Chatroom implements Runnable { // do I need a thre
 							for(int k=0;k<numPlayed*2; k+=2) {
 								played.add(Card.getCard(message[k+2],message[k+3]));
 							}
-
+							if(played.size() == 0) {
+								sendCommand(GameCommand.PLAY_INVALID+" no cards played!",user);
+								break;
+							}
+							Collections.sort(played);
+								
 
 
 
 							if(user == this.lead) {
 								//the player is the first player, check to make sure the play is high
-								boolean isHigh=true;
+								
+								Iterator<Card> it = played.iterator();
+								Card card = it.next();
+								int suit = (card.getNumber() == this.TRUMP_NUMBER) ? Card.TRUMP : card.getSuit();
+								while(it.hasNext()) {
+									card = it.next();
+									//if it's not the same suit and both this and the previous suit aren't trump
+									if(!(suit == card.getSuit() || (card.getSuit() == this.TRUMP_SUIT || card.getSuit() == Card.TRUMP || card.getNumber() == this.TRUMP_NUMBER) && (suit == this.TRUMP_SUIT || suit == Card.TRUMP))) {
+										System.out.println("must play same suit");
+										return;
+									}
+									suit = ( card.getNumber() == this.TRUMP_NUMBER ) ? Card.TRUMP : card.getSuit();
+								}
+								this.currentSuit = suit;
+								
+								
+								/*boolean isHigh=true;
 								int suits=0;
 								int length=2;
 								List<Card> Tractor2=user.getHand().Tractors(0,length,suits);
@@ -311,7 +333,7 @@ public class Gameroom extends Chatroom implements Runnable { // do I need a thre
 										List<Card> seven = friedchicken.getCards();
 
 									}
-								}
+								}*/
 								
 								
 								
@@ -325,14 +347,13 @@ public class Gameroom extends Chatroom implements Runnable { // do I need a thre
 								
 								
 								
-
 								//send this if invalid
 								//sendCommand(GameCommand.PLAY_INVALID+" "+"error message",user);
 								//break;
 							}
 							
-							//TODO: sort the cards some time before here...
 							//should only be here if the play was valid
+							user.getHand().removeAllCards(played);
 							sendCommand(GameCommand.PLAY_SUCCESS+"",user);
 							String tosend = GameCommand.PLAY_CARD + " " + user.getName() + " " + played.size();
 							for(Card card : played) {
@@ -348,17 +369,17 @@ public class Gameroom extends Chatroom implements Runnable { // do I need a thre
 									//game over, update score
 									break;
 								}
-								this.setLead(highest);
 								try {
 									Thread.sleep(1000);
 								} catch (InterruptedException e) {
 									// TODO Auto-generated catch block
 									e.printStackTrace();
 								}
-								sendCommand(GameCommand.CLEAR_TABLE+"");
 								for(Iterator<User> i2 = users.iterator(); i.hasNext();) 
 									i2.next().getHand().setCurrentPlay(null);
-								userIterator = this.users.iterator();
+								this.sendCommand(GameCommand.CLEAR_TABLE+"");
+								this.setLead(highest);
+								this.userIterator = this.users.iterator();
 							}
 							this.currentUser = userIterator.next();
 							this.sendCommand(GameCommand.YOUR_TURN+"",currentUser);

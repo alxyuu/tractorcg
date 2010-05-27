@@ -1,6 +1,7 @@
 package tractor.server;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
 
@@ -12,7 +13,7 @@ public class PlayerHand {
 	private List<Card> currentPlay;
 	//private String name;
 
-	PlayerHand() {
+	public PlayerHand() {
 		this.cards = Collections.synchronizedList(new ArrayList<Card>());
 		this.currentPlay = Collections.emptyList();
 	}
@@ -43,7 +44,6 @@ public class PlayerHand {
 	 */
 	public void addCard(Card card) {
 		this.cards.add(card);
-		//Collections.sort(this.cards);
 	}
 	/** it returns the singles in the players hand.
 	 * @param a
@@ -81,6 +81,10 @@ public class PlayerHand {
 	 */
 	public void removeCard(Card card) {
 		this.cards.remove(card);
+	}
+	
+	public void removeAllCards(Collection<Card> cards) {
+		this.cards.removeAll(cards);
 	}
 
 	/** It sets the current play.

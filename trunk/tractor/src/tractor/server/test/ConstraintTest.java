@@ -161,6 +161,113 @@ public class ConstraintTest {
 	public Trick calculateTrick(List<Card> played) {
 		Trick trick = new Trick();
 		//calculate stuffs
+		Iterator<Card> it=played.iterator();
+		Card previous=it.next();
+		ArrayList<Card> previousCards=new ArrayList<Card>();
+		previousCards.add(previous);
+		Card twoPrevious=null;
+		while(it.hasNext())
+		{
+			Card current=it.next();
+			if(current==previous) //if they are equal add to list for possible pair/triple/tractor
+			{
+				previousCards.add(current);
+				twoPrevious=previous;
+				previous=current;
+			}
+			else if(current.getSuit()!=Card.TRUMP&&current.getNumber()!=TRUMP_NUMBER) //if not special case
+			{
+				if(current.getNumber()==previous.getNumber()+1) //if next card is one higher than previous card add
+				{
+					if(previousCards.size()==1) //if only one other card held then its just a single so get rid of the old card and add the new one
+					{
+						trick.addSingle(previous);
+						previousCards.clear();
+						previousCards.add(current);
+						twoPrevious=null;
+						previous=current;
+					}
+					else if(twoPrevious!=previous) //if the last two cards aren't equal then the there is no tractor possibility so remove previous
+					{
+						trick.addSingle(previous);
+						previousCards.remove(previousCards.size()-1);
+						if(previousCards.size()==1) //if there's only one other card then add it as a single
+						{
+							trick.addSingle(twoPrevious);
+							previousCards.clear();
+							twoPrevious=null;
+							previous=current;
+							
+						}
+						else if(previousCards.size()==2) //if there was two add as pair
+						{
+							trick.addPair(new Pair(twoPrevious));
+							previousCards.clear();
+							twoPrevious=null;
+							previous=current;
+						}
+						else if(previousCards.size()==3) //if there are 3 left then its a triple
+						{
+							trick.addTriple(new Triple(twoPrevious));
+							previousCards.clear();
+							twoPrevious=null;
+							previous=current;
+						}
+						else //otherwise if theres more its a tractor
+						{
+							//INCOMPLETE: I want to somehow recursion this part
+							//but i dont know how since its basically doing the whole calc trick thing over again
+							//to find the parameters of the tractor
+							//trick.addTractor()
+							
+							//previousCards.clear();
+							//twoPrevious=null;
+							//previous=current;
+						}
+					}
+				}
+				else //no tractor/pairs/triples
+				{
+					trick.addSingle(current);
+					if(previousCards.size()==1) //if there's only one other card then add it as a single
+					{
+						trick.addSingle(previous);
+						previousCards.clear();
+						previous=current;
+						
+					}
+					else if(previousCards.size()==2) //if there was two add as pair
+					{
+						trick.addPair(new Pair(previous));
+						previousCards.clear();
+						previous=current;
+					}
+					else if(previousCards.size()==3) //if there are 3 left then its a triple
+					{
+						trick.addTriple(new Triple(previous));
+						previousCards.clear();
+						previous=current;
+					}
+					else //otherwise if theres more its a tractor
+					{
+						//INCOMPLETE: I want to somehow recursion this part
+						//but i dont know how since its basically doing the whole calc trick thing over again
+						//to find the parameters of the tractor
+						//trick.addTractor()
+						
+						//previousCards.clear();
+						//twoPrevious=null;
+						//previous=current;
+					}
+					
+				}
+			}
+			else //INCOMPLETE: idk how to check whether its one bigger (like small vs big or trumpnum versus goodtrumpnum
+			{
+				
+			}
+			
+		}
 		return trick;
 	}
 }

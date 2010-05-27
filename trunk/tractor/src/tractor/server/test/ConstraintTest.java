@@ -106,8 +106,8 @@ public class ConstraintTest {
 			}*/
 			
 			
-			
-
+			//assume lead is always high until beaten by someone else
+			this.highest = user;
 		} else {
 			//not lead, check following suit, playing doubles/tractors/triples/whatever
 			//compare to highest user's play
@@ -117,5 +117,7 @@ public class ConstraintTest {
 			
 
 		}
+		
+		System.out.println("congratulations all tests passed");
 	}
 }

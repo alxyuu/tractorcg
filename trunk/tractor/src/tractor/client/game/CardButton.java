@@ -47,4 +47,7 @@ public class CardButton extends MouseOverArea implements Comparable<CardButton> 
 		int compare = this.card.compareTo(cb.card);
 		return (compare == 0) ? ( (this==cb) ? 0 : -1 ): compare;
 	}
+	public String toString() {
+		return card.toString() + " at "+this.getX()+","+this.getY();
+	}
 }

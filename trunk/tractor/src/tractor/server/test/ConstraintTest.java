@@ -36,11 +36,11 @@ public class ConstraintTest {
 			 */
 			private int getSortingSuit(Card card) {
 				if (card.getSuit() == Card.TRUMP)
-					return Card.TRUMP+Card.TRUMP+1;
+					return Card.TRUMP+Card.TRUMP+2;
 				else if(card.getSuit() == TRUMP_SUIT && card.getNumber() == TRUMP_NUMBER)
-					return Card.TRUMP+Card.TRUMP;
+					return Card.TRUMP+Card.TRUMP+1;
 				else if(card.getNumber() == TRUMP_NUMBER)
-					return Card.TRUMP+card.getSuit();
+					return Card.TRUMP+card.getSuit()+1;
 				else if(card.getSuit() == TRUMP_SUIT)
 					return Card.TRUMP;
 				else

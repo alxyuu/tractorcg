@@ -7,6 +7,7 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.Iterator;
 import java.util.ListIterator;
+import java.util.concurrent.CopyOnWriteArrayList;
 
 import tractor.lib.Card;
 import tractor.lib.GameCommand;
@@ -39,7 +40,7 @@ public class Gameroom extends Chatroom implements Runnable { // do I need a thre
 	 * @param players
 	 */
 	public Gameroom(int players) {
-		super();
+		this.users = new CopyOnWriteArrayList<User>();
 		this.players = players;
 		this.setName("@"+this.hashCode());
 		this.state = GameCommand.WAITING;
@@ -54,11 +55,11 @@ public class Gameroom extends Chatroom implements Runnable { // do I need a thre
 			 */
 			private int getSortingSuit(Card card) {
 				if (card.getSuit() == Card.TRUMP)
-					return Card.TRUMP+Card.TRUMP+1;
+					return Card.TRUMP+Card.TRUMP+2;
 				else if(card.getSuit() == TRUMP_SUIT && card.getNumber() == TRUMP_NUMBER)
-					return Card.TRUMP+Card.TRUMP;
+					return Card.TRUMP+Card.TRUMP+1;
 				else if(card.getNumber() == TRUMP_NUMBER)
-					return Card.TRUMP+card.getSuit();
+					return Card.TRUMP+card.getSuit()+1;
 				else if(card.getSuit() == TRUMP_SUIT)
 					return Card.TRUMP;
 				else
@@ -231,9 +232,14 @@ public class Gameroom extends Chatroom implements Runnable { // do I need a thre
 	private void setLead(User user) {
 		this.lead = user;
 		int index = this.users.indexOf(user);
+		System.out.println("trying to give lead to "+user.getName());
+		System.out.println(this.users);
+		System.out.println("rotating by "+index);
 		if(index > 0) { // -1 = not found ruh roh, 0 = number 1 don't do anyone
-			Collections.rotate(this.users, index);
+			Collections.rotate(this.users, 0-index);
 		}
+		System.out.println(this.users);
+		System.out.println(this.users.get(0).getName() + "," + this.lead + " has lead");
 	}
 
 	/** It updates the stats of the game room.
@@ -748,6 +754,7 @@ public class Gameroom extends Chatroom implements Runnable { // do I need a thre
 							if(user == this.lead) {
 								//the player is the first player, check to make sure the play is high
 
+								System.out.println("LEAD VERIFICATION");
 								Iterator<Card> it = played.iterator();
 								Card card = it.next();
 								int suit = (card.getNumber() == this.TRUMP_NUMBER || card.getSuit() == this.TRUMP_SUIT) ? Card.TRUMP : card.getSuit();
@@ -905,6 +912,7 @@ public class Gameroom extends Chatroom implements Runnable { // do I need a thre
 								//don't set suit until after the play has been verified as high
 								this.currentSuit = suit;
 							} else {
+								System.out.println("FOLLOWER VERIFICATION");
 								//not lead, check following suit, playing doubles/tractors/triples/whatever
 								//compare to highest user's play
 								//make sure the number of cards are correct

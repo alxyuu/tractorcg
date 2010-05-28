@@ -110,7 +110,7 @@ public class TractorGame extends BasicGame {
 			this.notrump.addButtonPressedListener(new ButtonPressedListener() {
 				public void buttonPressed() {
 					//TODO: differentiate between big and small
-					sendCommand(GameCommand.PLAY_CARD+" "+GraphicsCard.TRUMP + " " + GraphicsCard.SMALL_JOKER + " " + (called_cards));
+					sendCommand(GameCommand.PLAY_CARD+" "+GraphicsCard.TRUMP + " " + GraphicsCard.SMALL_JOKER + " " + (Math.max(called_cards,2)));
 				}
 			});
 			this.playButton = new Button(container,new Image("images/play.png"), new Image("images/play_over.png"), container.getWidth()/2-30, 370);
@@ -273,6 +273,7 @@ public class TractorGame extends BasicGame {
 				}
 				this.hand.playCards(list);
 				this.selected.clear();
+				System.out.println("selected cards removed: "+this.selected);
 				this.state = GameCommand.PLAYING;
 			}
 			break;
@@ -327,7 +328,7 @@ public class TractorGame extends BasicGame {
 					}
 
 					// I'm so cool
-					hand.sort(Integer.parseInt(message[2]));
+					hand.sort(Integer.parseInt(message[2]),GraphicsCard.TRUMP_NUMBER);
 					
 					if(message[1].equals(Client.getInstance().getUsername())) {
 						this.hand.playCards(list);
@@ -355,7 +356,7 @@ public class TractorGame extends BasicGame {
 			break;
 			case GameCommand.SET_STATS: 
 			{
-				GraphicsCard.TRUMP_NUMBER = Integer.parseInt(message[1]);
+				this.hand.sort(GraphicsCard.TRUMP_SUIT,Integer.parseInt(message[1]));
 				int players = Integer.parseInt(message[2]);
 				for( int i = 0; i < players*2; i+=2 ) {
 					if(message[i+3].equals(Client.getInstance().getUsername())) {
@@ -531,8 +532,10 @@ public class TractorGame extends BasicGame {
 		this.diamonds.hide();
 		this.hearts.hide();
 		this.notrump.hide();
-		for(Iterator<GraphicsCard> i = this.hand.getCards().iterator(); i.hasNext(); ) {
-			checkCalling(i.next());
+		synchronized(this.hand) {
+			for(Iterator<GraphicsCard> i = this.hand.getCards().iterator(); i.hasNext(); ) {
+				checkCalling(i.next());
+			}
 		}
 	}
 

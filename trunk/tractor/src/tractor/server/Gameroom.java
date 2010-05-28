@@ -232,14 +232,9 @@ public class Gameroom extends Chatroom implements Runnable { // do I need a thre
 	private void setLead(User user) {
 		this.lead = user;
 		int index = this.users.indexOf(user);
-		System.out.println("trying to give lead to "+user.getName());
-		System.out.println(this.users);
-		System.out.println("rotating by "+index);
 		if(index > 0) { // -1 = not found ruh roh, 0 = number 1 don't do anyone
 			Collections.rotate(this.users, 0-index);
 		}
-		System.out.println(this.users);
-		System.out.println(this.users.get(0).getName() + "," + this.lead + " has lead");
 	}
 
 	/** It updates the stats of the game room.
@@ -705,6 +700,7 @@ public class Gameroom extends Chatroom implements Runnable { // do I need a thre
 							for(Iterator<User> i2 = users.iterator();i2.hasNext();)
 							{
 								i2.next().getHand().sort(cardComparator);
+								System.out.println(i2.next().getHand().getCards());
 							}
 							
 							
@@ -742,6 +738,7 @@ public class Gameroom extends Chatroom implements Runnable { // do I need a thre
 								sendCommand(GameCommand.PLAY_INVALID+" no cards played!",user);
 								break;
 							}
+							System.out.println(user.getHand().getCards());
 							if(!user.getHand().contains(played)) {
 								sendCommand(GameCommand.PLAY_INVALID+" cheating the system, cards not in your hand!",user);
 								break;

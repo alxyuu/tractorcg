@@ -118,11 +118,11 @@ public class Card implements Comparable<Card> {
 	 */
 	private int getSortingSuit() {
 		if (this.suit == Card.TRUMP)
-			return Card.TRUMP+Card.TRUMP+1;
+			return Card.TRUMP+Card.TRUMP+2;
 		else if(this.suit == Card.TRUMP_SUIT && this.value == Card.TRUMP_NUMBER)
-			return Card.TRUMP+Card.TRUMP;
+			return Card.TRUMP+Card.TRUMP+1;
 		else if(this.value == Card.TRUMP_NUMBER)
-			return Card.TRUMP+this.suit;
+			return Card.TRUMP+this.suit+1;
 		else if(this.suit == Card.TRUMP_SUIT)
 			return Card.TRUMP;
 		else

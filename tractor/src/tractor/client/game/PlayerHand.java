@@ -8,7 +8,7 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.TreeMap;
-import java.util.concurrent.locks.ReentrantReadWriteLock;
+import java.util.concurrent.ConcurrentSkipListMap;
 
 import tractor.client.game.GraphicsCard;
 import org.newdawn.slick.Graphics;
@@ -23,7 +23,6 @@ public class PlayerHand {
 	private Collection<GraphicsCard> cards;
 	private List<GraphicsCard> playedcards;
 	private List<GraphicsCard> lasthand;
-	private ReentrantReadWriteLock handlock;
 	//private String name;
 
 	/** It constructs the player hand.
@@ -38,7 +37,7 @@ public class PlayerHand {
 		this.y = y - 74;
 		this.x2 = x2 - ( 100 - spacing )/2;
 		this.y2 = y2 - 74;
-		this.hand = Collections.synchronizedSortedMap(new TreeMap<CardButton, GraphicsCard>());
+		this.hand = new ConcurrentSkipListMap<CardButton, GraphicsCard>();
 		this.cards = hand.values();
 		this.playedcards = Collections.emptyList();
 		this.lasthand = Collections.emptyList();
@@ -55,25 +54,35 @@ public class PlayerHand {
 	 * @return
 	 */
 	public int frequency(GraphicsCard card) {
-		return Collections.frequency(this.cards, card);
+		synchronized(this) {
+			return Collections.frequency(this.cards, card);
+		}
 	}
 	/** It adds a card to the players hand.
 	 * @param container
 	 * @param card
 	 */
 	public void addCard(GUIContext container, GraphicsCard card) {
-		this.hand.put(new CardButton(container,card,0,(int)y,spacing,148),card);
-		updateLocations();
+		synchronized(this) {
+			this.hand.put(new CardButton(container,card,0,(int)y,spacing,148),card);
+			updateLocations();
+		}
 	}
 
 	/** It removes a card from the players hand.
 	 * @param card
 	 */
 	public void removeCard(CardButton card) {
-		card.setAcceptingInput(false);
-		System.out.println("Removing with CardButton reference: "+this.hand.remove(card));
-		//dispose of cardbutton?
-		updateLocations();
+		synchronized(this) {
+			card.setAcceptingInput(false);
+			if(this.hand.get(card)==null) {
+				System.out.println("UH OH HOTDOG "+this.hand.containsKey(card));
+			}
+			System.out.println("Removing with CardButton reference: "+this.hand.remove(card));
+			//System.out.println(this.hand.toString().replace(", ",",\n"));
+			//dispose of cardbutton?
+			updateLocations();
+		}
 	}
 
 	/** It plays the card.
@@ -101,7 +110,7 @@ public class PlayerHand {
 	/** It sorts the players hand based on the trump suit.
 	 * @param trumpsuit
 	 */
-	public void sort(int trumpsuit) {
+	public void sort(int trumpsuit, int trumpnumber) {
 		synchronized(this) {
 			//REMOVE EVERYTHING AND READD TO SORT LOL
 			HashMap<CardButton,GraphicsCard> temp = new HashMap<CardButton,GraphicsCard>();
@@ -112,6 +121,7 @@ public class PlayerHand {
 				fail.remove();
 			}
 			GraphicsCard.TRUMP_SUIT = trumpsuit;
+			GraphicsCard.TRUMP_NUMBER = trumpnumber;
 			fail = temp.keySet().iterator();
 			while( fail.hasNext() ) {
 				CardButton cb = fail.next();
@@ -125,11 +135,13 @@ public class PlayerHand {
 	/** It updates the location of the players hand.
 	 * 
 	 */
-	private void updateLocations() {
-		synchronized(this) {
-			float start = this.x - (spacing * this.cards.size())/2;
-			CardButton card = null;
-			for(Iterator<CardButton> i = hand.keySet().iterator(); true; ){
+	/*private void updateLocations() {
+		//never called from unsynchronzied block so no need to sync
+		float start = this.x - (spacing * this.cards.size())/2;
+		CardButton card = null;
+		Iterator<CardButton> i = hand.keySet().iterator();
+		if(i.hasNext()) {
+			while( true ){
 				card = i.next();
 				card.setX(start);
 				if(i.hasNext()) {
@@ -139,7 +151,35 @@ public class PlayerHand {
 					card.setSize(100,148);
 					break;
 				}
-			}		
+			}
+		}
+	}*/
+	private void updateLocations() {
+		//never called from unsynchronzied block so no need to sync
+		float start = this.x - (spacing * this.cards.size())/2;
+		CardButton card = null;
+		CardButton previous = null;
+		Iterator<CardButton> i = hand.keySet().iterator();
+		if(i.hasNext()) {
+			while( true ){
+				card = i.next();
+				card.setX(start);
+				if(card.isAcceptingInput()) {
+					if(i.hasNext()) {
+						card.setSize(spacing,148);
+						start+=spacing;
+					} else {
+						card.setSize(100,148);
+						break;
+					}
+					previous = card;
+				} else {
+					if(!i.hasNext()) {
+						previous.setSize(100,148);
+						break;
+					}
+				}
+			}
 		}
 	}
 	/** It draws the hand.
@@ -150,7 +190,9 @@ public class PlayerHand {
 	public void render(GUIContext container, Graphics g) throws SlickException {
 		synchronized(this) {
 			for(Iterator<CardButton> i = hand.keySet().iterator(); i.hasNext(); ) {
-				i.next().render(container, g);
+				CardButton cb = i.next();
+				if(cb.isAcceptingInput())
+					cb.render(container, g);
 			}
 		}
 		float start = this.x2 - (spacing * this.playedcards.size())/2;

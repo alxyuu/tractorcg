@@ -21,7 +21,7 @@ public class Client {
 	private static Client instance;
 	//do something with this...
 	//support hostnames?
-	public final static String ip = "192.168.1.7";
+	public final static String ip = "192.168.1.2";
 	//public final static String ip = "192.168.0.3";
 	public final static int NULL = 0;
 	public final static int port = 443;

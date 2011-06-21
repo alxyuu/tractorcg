@@ -297,6 +297,7 @@ public class Gameroom extends Chatroom implements Runnable { // do I need a thre
 				String dipai = " "+cards.size();
 				for(Card card : cards) {
 					dipai += " "+card.getSuit()+" "+card.getNumber();
+					lead.getHand().addCard(card);
 				}
 				sendCommand(GameCommand.DIPAI + dipai, lead);
 				sendUpdateState(GameCommand.DIPAI);
@@ -692,18 +693,24 @@ public class Gameroom extends Chatroom implements Runnable { // do I need a thre
 								break;
 							}
 							this.dipai = Collections.synchronizedList(new ArrayList<Card>());
+							//System.out.println(Arrays.toString(message));
 							for(int k=0; k<this.dipaiSize*2; k+=2) {
-								this.dipai.add(Card.getCard(message[k+2],message[k+3]));
+								Card dpcard = Card.getCard(message[k+2],message[k+3]);
+								this.dipai.add(dpcard);
+								user.getHand().removeCard(dpcard);
 							}
+							//System.out.println(this.dipai);
 							
 							//sort dem cards
 							for(Iterator<User> i2 = users.iterator();i2.hasNext();)
 							{
-								i2.next().getHand().sort(cardComparator);
-								System.out.println(i2.next().getHand().getCards());
+								User temp = i2.next();
+								temp.getHand().sort(cardComparator);
+								System.out.println(temp.getHand().getCards());
 							}
 							
 							
+							//manually set teams for now, modify for find a friend later
 							this.team1.clear();
 							this.team2.clear();
 							this.team1.add(users.get(0));

@@ -352,27 +352,14 @@ public class Gameroom extends Chatroom implements Runnable { // do I need a thre
 						if(previousCards.size()==1) //if there's only one other card then add it as a single
 						{
 							trick.addSingle(twoPrevious);
-							previousCards.clear();
-							previousCards.add(current);
-							twoPrevious=null;
-							previous=current;
-
 						}
 						else if(previousCards.size()==2) //if there was two add as pair
 						{
 							trick.addPair(twoPrevious);
-							previousCards.clear();
-							previousCards.add(current);
-							twoPrevious=null;
-							previous=current;
 						}
 						else if(previousCards.size()==3) //if there are 3 left then its a triple
 						{
 							trick.addTriple(twoPrevious);
-							previousCards.clear();
-							previousCards.add(current);
-							twoPrevious=null;
-							previous=current;
 						}
 						else //otherwise if theres more its a tractor
 						{
@@ -411,11 +398,12 @@ public class Gameroom extends Chatroom implements Runnable { // do I need a thre
 							}
 
 							trick.addTractor(new Tractor(pairCount, tripleCount, first.getNumber(), first.getSuit(), Math.abs(cardComparator.gameCompare(first,current2))+1));
-							previousCards.clear();
-							previousCards.add(current);
-							twoPrevious=null;
-							previous=current;
+
 						}
+						previousCards.clear();
+						previousCards.add(current);
+						twoPrevious=null;
+						previous=current;
 					}
 					else {
 						previousCards.add(current);

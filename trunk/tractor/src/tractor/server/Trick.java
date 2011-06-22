@@ -4,6 +4,7 @@ import java.util.LinkedList;
 import java.util.List;
 
 import tractor.lib.Card;
+import tractor.server.Tractor;
 
 public class Trick {
 	private List<Card> singles;
@@ -71,7 +72,7 @@ public class Trick {
 	public int countCards() {
 		int cards = this.countSingles() + this.countPairs()*2 + this.countTriples()*3;
 		for(Tractor tractor : this.tractors) {
-			cards += tractor.countPairs()*2 + tractor.countTriples()*3;
+			cards += tractor.getType()*tractor.getLength();
 		}
 		return cards;
 	}
@@ -82,28 +83,3 @@ public class Trick {
 
 }
 
-class Tractor {
-	int pairs;
-	int triples;
-	int start;
-	int end;
-	private int length;
-	private int suit;
-	Tractor(int pairs, int triples, int start, int suit, int length) {
-		this.pairs = pairs;
-		this.triples = triples;
-		this.start = start;
-		this.suit = suit;
-		this.length = length;
-	}
-	public int countPairs() {
-		return this.pairs;
-	}
-	public int countTriples() {
-		return this.triples;
-	}
-	public String toString()
-	{
-		return "tractor starting at "+Card.getCard(suit,start)+" of length "+length+" :: "+pairs+" pairs and "+triples+" triples";
-	}
-}

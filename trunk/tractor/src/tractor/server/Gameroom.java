@@ -1,9 +1,7 @@
 package tractor.server;
 
-import java.util.Comparator;
 import java.util.List;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collections;
 import java.util.Iterator;
 import java.util.ListIterator;
@@ -361,43 +359,64 @@ public class Gameroom extends Chatroom implements Runnable { // do I need a thre
 						{
 							trick.addTriple(twoPrevious);
 						}
-						else //otherwise if theres more its a tractor
+						else //otherwise if theres more check for tractor
 						{
-							int pairCount=0;
-							int tripleCount=0;
+							//minimum of 4 cards
 							Iterator<Card> it2=previousCards.iterator();
 							Card first=it2.next();
-							it2.next(); // skip one because we know it's a tractor
+							it2.next(); // skip one because we know for sure there's a pair
 							Card before=first;
-							Card current2=first;
-							while(true)
-							{
-								current2=it2.next();
-								if(before==current2)     //if third card equals first then triple
-								{
-									tripleCount++;
-									if(it2.hasNext())
-									{
-										before=it2.next();
-										it2.next();
-										continue;
+							Card current2=it2.next();
+							if (before==current2) { // should be a triple tractor
+								/*if(previousCards.size() % 3 != 0) { //must be multiple of 3
+									//process as pairs+triples
+								}*/
+								before = it2.next();
+								while(it2.hasNext()) {
+									it2.next();
+									if(!it2.hasNext()) {
+										//process as pairs+triples
+										this.tractor_break(trick,previousCards);
 									} else {
-										break;
+										current2 = it2.next();
+										if(current2 != before) {
+											//process as pairs+triples
+											this.tractor_break(trick,previousCards);
+										}
+										if(it2.hasNext()) {
+											before = it2.next();
+										} else {
+											break;
+										}
 									}
 								}
-								else				//third and first different
-								{
-									pairCount++;
-									before=current2;
-								}
-								it2.next();
-								if(!it2.hasNext()) {
-									pairCount++;
-									break;
+								trick.addTractor(new Tractor(3, first.getNumber(), first.getSuit(), Math.abs(cardComparator.gameCompare(first,current2))+1));
+							} else { // should be a pair tractor
+								/*if(previousCards.size() % 2 != 0) {
+									//process as pairs+triples
+								}*/
+								before = current2;
+								while(true) {
+									if(it2.hasNext()) 
+									{
+										current2 = it2.next();
+										if(current2!=before) {
+											//process as pairs+triples
+											this.tractor_break(trick,previousCards);
+										}
+										if(it2.hasNext()) {
+											before = it2.next();
+										} else {
+											break;
+										}
+									} else {
+										//process as pairs+triples
+										this.tractor_break(trick,previousCards);
+									}
 								}
 							}
 
-							trick.addTractor(new Tractor(pairCount, tripleCount, first.getNumber(), first.getSuit(), Math.abs(cardComparator.gameCompare(first,current2))+1));
+							
 
 						}
 						previousCards.clear();
@@ -418,68 +437,75 @@ public class Gameroom extends Chatroom implements Runnable { // do I need a thre
 					//trick.addSingle(current);
 					if(previousCards.size()==1) //if there's only one other card then add it as a single
 					{
-						trick.addSingle(previous);
-						previousCards.clear();
-						previousCards.add(current);
-						previous=current;
-
+						trick.addSingle(twoPrevious);
 					}
 					else if(previousCards.size()==2) //if there was two add as pair
 					{
-						trick.addPair(previous);
-						previousCards.clear();
-						previousCards.add(current);
-						previous=current;
+						trick.addPair(twoPrevious);
 					}
 					else if(previousCards.size()==3) //if there are 3 left then its a triple
 					{
-						trick.addTriple(previous);
-						previousCards.clear();
-						previousCards.add(current);
-						previous=current;
+						trick.addTriple(twoPrevious);
 					}
-					else //otherwise if theres more its a tractor
+					else //otherwise if theres more check for tractor
 					{
-						int pairCount=0;
-						int tripleCount=0;
+						//minimum of 4 cards
 						Iterator<Card> it2=previousCards.iterator();
 						Card first=it2.next();
-						it2.next(); // skip one because we know it's a tractor
+						it2.next(); // skip one because we know for sure there's a pair
 						Card before=first;
-						Card current2=first;
-						while(true)
-						{
-							current2=it2.next();
-							if(before==current2)     //if third card equals first then triple
-							{
-								tripleCount++;
-								if(it2.hasNext())
-								{
-									before=it2.next();
-									it2.next();
-									continue;
+						Card current2=it2.next();
+						if (before==current2) { // should be a triple tractor
+							/*if(previousCards.size() % 3 != 0) { //must be multiple of 3
+								//process as pairs+triples
+							}*/
+							before = it2.next();
+							while(it2.hasNext()) {
+								it2.next();
+								if(!it2.hasNext()) {
+									//process as pairs+triples
+									this.tractor_break(trick,previousCards);
+								} else {
+									current2 = it2.next();
+									if(current2 != before) {
+										//process as pairs+triples
+										this.tractor_break(trick,previousCards);
+									}
+									if(it2.hasNext()) {
+										before = it2.next();
+									} else {
+										break;
+									}
+								}
+							}
+							trick.addTractor(new Tractor(3, first.getNumber(), first.getSuit(), Math.abs(cardComparator.gameCompare(first,current2))+1));
+						} else { // should be a pair tractor
+							/*if(previousCards.size() % 2 != 0) {
+								//process as pairs+triples
+							}*/
+							before = current2;
+							while(it2.hasNext()) {
+								current2 = it2.next();
+								if(current2!=before) {
+									//process as pairs+triples
+									this.tractor_break(trick,previousCards);
+								}
+								if(it2.hasNext()) {
+									before = it2.next();
 								} else {
 									break;
 								}
 							}
-							else				//third and first different
-							{
-								pairCount++;
-								before=current2;
-							}
-							it2.next();
-							if(!it2.hasNext()) {
-								pairCount++;
-								break;
-							}
+							trick.addTractor(new Tractor(3, first.getNumber(), first.getSuit(), Math.abs(cardComparator.gameCompare(first,current2))+1));
 						}
-						trick.addTractor(new Tractor(pairCount, tripleCount, first.getNumber(), first.getSuit(),Math.abs(cardComparator.gameCompare(first,current2))+1));
-						previousCards.clear();
-						previousCards.add(current);
-						twoPrevious=null;
-						previous=current;
-					}
 
+						
+
+					}
+					previousCards.clear();
+					previousCards.add(current);
+					twoPrevious=null;
+					previous=current;
 				}
 			}
 
@@ -513,44 +539,60 @@ public class Gameroom extends Chatroom implements Runnable { // do I need a thre
 				trick.addTriple(twoPrevious);
 				previousCards.clear();
 			}
-			else //otherwise if theres more its a tractor
+			else //otherwise if theres more check for tractor
 			{
-				int pairCount=0;
-				int tripleCount=0;
+				//minimum of 4 cards
 				Iterator<Card> it2=previousCards.iterator();
 				Card first=it2.next();
-				it2.next(); // skip one because we know it's a tractor
+				it2.next(); // skip one because we know for sure there's a pair
 				Card before=first;
-				Card current2=first;
-				while(true)
-				{
-					current2=it2.next();
-					if(before==current2)     //if third card equals first then triple
-					{
-						tripleCount++;
-						if(it2.hasNext())
-						{
-							before=it2.next();
-							it2.next();
-							continue;
+				Card current2=it2.next();
+				if (before==current2) { // should be a triple tractor
+					/*if(previousCards.size() % 3 != 0) { //must be multiple of 3
+						//process as pairs+triples
+					}*/
+					before = it2.next();
+					while(it2.hasNext()) {
+						it2.next();
+						if(!it2.hasNext()) {
+							//process as pairs+triples
+							this.tractor_break(trick,previousCards);
+						} else {
+							current2 = it2.next();
+							if(current2 != before) {
+								//process as pairs+triples
+								this.tractor_break(trick,previousCards);
+							}
+							if(it2.hasNext()) {
+								before = it2.next();
+							} else {
+								break;
+							}
+						}
+					}
+					trick.addTractor(new Tractor(3, first.getNumber(), first.getSuit(), Math.abs(cardComparator.gameCompare(first,current2))+1));
+				} else { // should be a pair tractor
+					/*if(previousCards.size() % 2 != 0) {
+						//process as pairs+triples
+					}*/
+					before = current2;
+					while(it2.hasNext()) {
+						current2 = it2.next();
+						if(current2!=before) {
+							//process as pairs+triples
+							this.tractor_break(trick,previousCards);
+						}
+						if(it2.hasNext()) {
+							before = it2.next();
 						} else {
 							break;
 						}
 					}
-					else				//third and first different
-					{
-						pairCount++;
-						before=current2;
-					}
-					it2.next();
-					if(!it2.hasNext()) {
-						pairCount++;
-						break;
-					}
+					trick.addTractor(new Tractor(2, first.getNumber(), first.getSuit(), Math.abs(cardComparator.gameCompare(first,current2))+1));
 				}
 
-				trick.addTractor(new Tractor(pairCount, tripleCount, first.getNumber(), first.getSuit(), Math.abs(cardComparator.gameCompare(first,current2))+1));
 				previousCards.clear();
+
 			}
 		}
 		else {
@@ -564,48 +606,81 @@ public class Gameroom extends Chatroom implements Runnable { // do I need a thre
 				trick.addTriple(twoPrevious);
 				previousCards.clear();
 			}
-			else //otherwise if theres more its a tractor
+			else //otherwise if theres more check for tractor
 			{
-				int pairCount=0;
-				int tripleCount=0;
+				//minimum of 4 cards
 				Iterator<Card> it2=previousCards.iterator();
 				Card first=it2.next();
-				it2.next(); // skip one because we know it's a tractor
+				it2.next(); // skip one because we know for sure there's a pair
 				Card before=first;
-				Card current2=first;
-				while(true)
-				{
-					current2=it2.next();
-					if(before==current2)     //if third card equals first then triple
-					{
-						tripleCount++;
-						if(it2.hasNext())
-						{
-							before=it2.next();
-							it2.next();
-							continue;
+				Card current2=it2.next();
+				if (before==current2) { // should be a triple tractor
+					/*if(previousCards.size() % 3 != 0) { //must be multiple of 3
+						//process as pairs+triples
+					}*/
+					before = it2.next();
+					while(it2.hasNext()) {
+						it2.next();
+						if(!it2.hasNext()) {
+							//process as pairs+triples
+							this.tractor_break(trick,previousCards);
+						} else {
+							current2 = it2.next();
+							if(current2 != before) {
+								//process as pairs+triples
+								this.tractor_break(trick,previousCards);
+							}
+							if(it2.hasNext()) {
+								before = it2.next();
+							} else {
+								break;
+							}
+						}
+					}
+					trick.addTractor(new Tractor(3, first.getNumber(), first.getSuit(), Math.abs(cardComparator.gameCompare(first,current2))+1));
+				} else { // should be a pair tractor
+					/*if(previousCards.size() % 2 != 0) {
+						//process as pairs+triples
+					}*/
+					before = current2;
+					while(it2.hasNext()) {
+						current2 = it2.next();
+						if(current2!=before) {
+							//process as pairs+triples
+							this.tractor_break(trick,previousCards);
+						}
+						if(it2.hasNext()) {
+							before = it2.next();
 						} else {
 							break;
 						}
 					}
-					else				//third and first different
-					{
-						pairCount++;
-						before=current2;
-					}
-					it2.next();
-					if(!it2.hasNext()) {
-						pairCount++;
-						break;
-					}
+					trick.addTractor(new Tractor(2, first.getNumber(), first.getSuit(), Math.abs(cardComparator.gameCompare(first,current2))+1));
 				}
 
-				trick.addTractor(new Tractor(pairCount, tripleCount, first.getNumber(), first.getSuit(), Math.abs(cardComparator.gameCompare(first,current2))+1));
 				previousCards.clear();
 			}
 		}
 		
 		return trick;
+	}
+	
+	private void tractor_break(Trick trick, ArrayList<Card> cards) {
+		Iterator<Card> it = cards.iterator();
+		Card card = it.next();
+		while(it.hasNext()) {
+			int numCards = 1;
+			Card next;
+			for(next = it.next(); it.hasNext() && next==card; numCards++);
+			if(numCards == 2) {
+				trick.addPair(card);
+			} else if (numCards == 3) {
+				trick.addTriple(card);
+			} else {
+				System.out.println("ERROR "+numCards+" cards of "+card);
+			}
+			card=next;
+		}
 	}
 	
 	public void run() {
@@ -722,7 +797,7 @@ public class Gameroom extends Chatroom implements Runnable { // do I need a thre
 						} else if(this.state == GameCommand.PLAYING) { //normally played
 							if(user != currentUser) {
 								this.sendCommand(GameCommand.PLAY_INVALID + " playing out of turn",user);
-								break;
+								break CommandSwitch;
 							}
 							int numPlayed = Integer.parseInt(message[1]);
 							ArrayList<Card> played = new ArrayList<Card>();
@@ -731,12 +806,12 @@ public class Gameroom extends Chatroom implements Runnable { // do I need a thre
 							}
 							if(played.size() == 0) {
 								sendCommand(GameCommand.PLAY_INVALID+" no cards played!",user);
-								break;
+								break CommandSwitch;
 							}
 							System.out.println(user.getHand().getCards());
 							if(!user.getHand().contains(played)) {
 								sendCommand(GameCommand.PLAY_INVALID+" cheating the system, cards not in your hand!",user);
-								break;
+								break CommandSwitch;
 							}
 							Collections.sort(played,cardComparator);
 								
@@ -924,6 +999,7 @@ public class Gameroom extends Chatroom implements Runnable { // do I need a thre
 							//should only be here if the play was valid
 							this.addPoints(played);
 							user.getHand().removeAllCards(played);
+							System.out.println("removing cards from "+user.getName()+"'s hand: "+played);
 							sendCommand(GameCommand.PLAY_SUCCESS+"",user);
 							String tosend = GameCommand.PLAY_CARD + " " + user.getName() + " " + played.size();
 							for(Card card : played) {
@@ -934,9 +1010,9 @@ public class Gameroom extends Chatroom implements Runnable { // do I need a thre
 
 
 							if(!userIterator.hasNext()) { 
-								//add points etc
+								//TODO: add points etc
 								if(currentUser.getHand().getCards().size() == 0) {
-									//game over, update score
+									//TODO: game over, update score
 									break;
 								}
 								try {

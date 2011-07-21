@@ -70,6 +70,32 @@ public class Card implements Comparable<Card> {
 			return null;
 		}
 	}
+	
+	/*public static Card getNextCard(String suit, String value) {
+		return Card.getNextCard(Card.getCard(suit,value));
+	}
+	
+	public static Card getNextCard(Card card) {
+		if(card.getSuit() != Card.TRUMP_SUIT) {
+			if(card.getNumber() == Card.ACE) {
+				return null;
+			}
+			if(card.getSuit() == Card.TRUMP) {
+				if(card.getNumber() == Card.BIG_JOKER) { 
+					return null;
+				} else { //should be small joker for sure...
+					return Card.getCard(Card.TRUMP, Card.BIG_JOKER);
+				}
+			}
+			return Card.getCard(card.getSuit(), card.getNumber()+1);
+		} else {
+			if(card.getNumber() == Card.TRUMP_NUMBER)
+				return Card.getCard(Card.TRUMP, Card.SMALL_JOKER);
+			else if(card.getNumber() )
+			else
+				return Card.getCard(card.getSuit(), card.getNumber()+1);
+		}
+	}*/
 
 	/**It returns the deck
 	 * @return

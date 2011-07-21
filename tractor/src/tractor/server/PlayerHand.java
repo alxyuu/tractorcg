@@ -13,6 +13,8 @@ public class PlayerHand {
 
 	private List<Card> cards;
 	private List<Card> currentPlay;
+	private List<Card> pairs,triples;
+	private List<Tractor> tractors;
 	//private String name;
 
 	public PlayerHand() {
@@ -23,6 +25,12 @@ public class PlayerHand {
 	public PlayerHand(PlayerHand hand) {
 		this.cards = Collections.synchronizedList(new ArrayList<Card>(hand.getCards()));
 		this.currentPlay = Collections.emptyList();
+	}
+	
+	public void init(List<Card> pairs, List<Card> triples, List<Tractor> tractors) {
+		this.pairs = pairs;
+		this.triples = triples;
+		this.tractors = tractors;
 	}
 
 	/**It gives the frequency that the card appears in the players hand.
@@ -93,5 +101,9 @@ public class PlayerHand {
 	 */
 	public List<Card> getCurrentPlay() {
 		return this.currentPlay;
+	}
+	
+	public String toString() {
+		return "Cards: " + cards.toString() + "\nPairs: " + pairs.toString() + "\nTriples: " + triples.toString() + "\nTractors: " + tractors.toString();
 	}
 }

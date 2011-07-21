@@ -39,7 +39,7 @@ public class Server {
 	private Vector<User> waiting;
 
 	Server() {
-		this(443);
+		this(8080);
 	}
 
 	Server(int port) {
@@ -53,7 +53,7 @@ public class Server {
 			this.waiting = new Vector<User>();	
 			this.handlers = new ThreadGroup("Server Handlers");
 		} catch (IOException e) {
-			//e.printStackTrace();
+			e.printStackTrace();
 			System.out.println("FATAL ERROR: failed to initialize socket");
 			System.exit(0);
 		}

@@ -22,9 +22,9 @@ public class Client {
 	//do something with this...
 	//support hostnames?
 	//public final static String ip = "192.168.1.2";
-	public final static String ip = "128.62.24.234";
+	public final static String ip = "127.0.0.1";
 	public final static int NULL = 0;
-	public final static int port = 443;
+	public final static int port = 8080;
 	public static Client getInstance() {
 		return Client.instance;
 	}

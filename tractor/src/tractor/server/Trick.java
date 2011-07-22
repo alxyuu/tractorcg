@@ -1,5 +1,6 @@
 package tractor.server;
 
+import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
 
@@ -10,11 +11,14 @@ public class Trick {
 	private List<Card> singles;
 	private List<Card> pairs;
 	private List<Card> triples;
+	private List<Card> pc, tc;
 	private List<Tractor> tractors;
 	Trick() {
 		this.singles = new LinkedList<Card>();
 		this.pairs = new LinkedList<Card>();
 		this.triples = new LinkedList<Card>();
+		this.pc = new LinkedList<Card>();
+		this.tc = new LinkedList<Card>();
 		this.tractors = new LinkedList<Tractor>();
 	}
 
@@ -23,15 +27,39 @@ public class Trick {
 	}
 
 	public void addPair(Card pair) {
+		this.addPair(pair,true);
+	}
+	public void addPair(Card pair, boolean addToTotal) {
 		this.pairs.add(pair);
+		if(addToTotal)
+			this.pc.add(pair);
 	}
 
 	public void addTriple(Card triple) {
+		this.addTriple(triple, true);
+	}
+	public void addTriple(Card triple, boolean addToTotal) {
 		this.triples.add(triple);
+		if(addToTotal)
+			this.tc.add(triple);
 	}
 
 	public void addTractor(Tractor tractor) {
 		this.tractors.add(tractor);
+		switch (tractor.getType()) {
+		case 2:
+			for(Card card : tractor.getCards()) {
+				this.pc.add(card);
+			}
+			break;
+		case 3:
+			for(Card card : tractor.getCards()) {
+				this.tc.add(card);
+			}
+			break;
+		default:
+			System.out.println("broken broken broken");
+		}
 	}
 
 	public List<Card> getSingles() {
@@ -41,9 +69,19 @@ public class Trick {
 	public List<Card> getPairs() {
 		return pairs;
 	}
+	
+	// cannot be modified, returned possibly out of order
+	public List<Card> getPairsPlusTractors() {
+		return pc;
+	}
 
 	public List<Card> getTriples() {
 		return triples;
+	}
+	
+	// cannot be modified, returned possibly out of order
+	public List<Card> getTriplesPlusTractors() {
+		return tc;
 	}
 
 	public List<Tractor> getTractors() {
@@ -57,9 +95,31 @@ public class Trick {
 	public int countPairs() {
 		return this.pairs.size();
 	}
-
+	
+	public int countPairsPlusTractors() {
+		return this.pc.size();
+	}
+	
 	public int countTriples() {
 		return this.triples.size();
+	}
+	
+	public int countTriplesPlusTractors() {
+		return this.tc.size();
+	}
+	
+	public void tripleToPair(Card card) {
+		this.triples.remove(card);
+		this.tc.remove(card);
+		this.addPair(card);
+		this.addSingle(card);
+	}
+	
+	public void pairToSingle(Card card) {
+		this.pairs.remove(card);
+		this.pc.remove(card);
+		this.addSingle(card);
+		this.addSingle(card);
 	}
 
 	public int countTractors() {

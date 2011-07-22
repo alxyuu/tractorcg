@@ -252,5 +252,9 @@ public class Card implements Comparable<Card> {
 	public int getSuit() {
 		return this.suit;
 	}
+	
+	public int getGameSuit(int trumpsuit, int trumpnumber) {
+		return ( this.getSuit() == trumpsuit || this.getNumber() == trumpnumber ) ? Card.TRUMP : this.getSuit();
+	}
 
 }

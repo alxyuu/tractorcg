@@ -13,8 +13,7 @@ public class PlayerHand {
 
 	private List<Card> cards;
 	private List<Card> currentPlay;
-	private List<Card> pairs,triples;
-	private List<Tractor> tractors;
+	private Trick hand;
 	//private String name;
 
 	public PlayerHand() {
@@ -27,22 +26,21 @@ public class PlayerHand {
 		this.currentPlay = Collections.emptyList();
 	}
 	
-	public void init(List<Card> pairs, List<Card> triples, List<Tractor> tractors) {
-		this.pairs = pairs;
-		this.triples = triples;
-		this.tractors = tractors;
+	public void init(Trick hand) {
+		this.hand = hand;
 	}
 	
 	public List<Tractor> getTractors() {
-		return this.tractors;
+		return this.hand.getTractors();
 	}
 	
 	public List<Card> getPairs() {
-		return this.pairs;
+		return this.hand.getPairsPlusTractors();
 	}
 	
+	
 	public List<Card> getTriples() {
-		return this.triples;
+		return this.hand.getTriplesPlusTractors();
 	}
 	
 	public int getNumSuit(int suit) {
@@ -133,6 +131,6 @@ public class PlayerHand {
 	}
 	
 	public String toString() {
-		return "Cards: " + cards.toString() + "\nPairs: " + pairs.toString() + "\nTriples: " + triples.toString() + "\nTractors: " + tractors.toString();
+		return "Cards: " + cards.toString() + "\nPairs: " + this.getPairs().toString() + "\nTriples: " + this.getTriples().toString() + "\nTractors: " + this.getTractors().toString();
 	}
 }

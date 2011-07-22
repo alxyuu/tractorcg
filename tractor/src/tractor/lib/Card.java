@@ -33,6 +33,7 @@ public class Card implements Comparable<Card> {
 	public static int TRUMP_SUIT = 4;
 	public static int TRUMP_NUMBER = 4;
 	//TODO: EL PROBLEMO - MORE THAN ONE TRUMP SUIT/NUMBER WHEN RUNNING SERVER BECAUSE OF MULTIPLE GAMES BAWWW
+	//^ fixed by moving trump_suit and trump_number to gameroom, no?
 	//public static final int SET_TRUMP_BONUS = 13;
 
 	static {

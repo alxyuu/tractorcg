@@ -37,6 +37,7 @@ public class Trick {
 	public List<Card> getSingles() {
 		return this.singles;
 	}
+	
 	public List<Card> getPairs() {
 		return pairs;
 	}

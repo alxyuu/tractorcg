@@ -22,6 +22,9 @@ class Tractor {
 	public int getLength() {
 		return this.cards.size();
 	}
+	public Card getStartingCard() {
+		return this.cards.get(0);
+	}
 	public String toString()
 	{
 		return (this.type==2 ? "double" : this.type==3 ? "triple" : "unknown") + "tractor: " + cards.toString();

@@ -32,7 +32,36 @@ public class PlayerHand {
 		this.triples = triples;
 		this.tractors = tractors;
 	}
-
+	
+	public List<Tractor> getTractors() {
+		return this.tractors;
+	}
+	
+	public List<Card> getPairs() {
+		return this.pairs;
+	}
+	
+	public List<Card> getTriples() {
+		return this.triples;
+	}
+	
+	public int getNumSuit(int suit) {
+		int numsuit = 0;
+		for(Card card : this.cards) {
+			if(card.getSuit() == suit)
+				numsuit++;
+		}
+		return numsuit;
+	}
+	
+	public int getNumTrump(int trumpsuit, int trumpnumber) {
+		int trump = 0;
+		for(Card card: this.cards) {
+			if(card.getSuit() == trumpsuit || card.getSuit() == Card.TRUMP || card.getNumber() == trumpnumber)
+				trump++;
+		}
+		return trump;
+	}
 	/**It gives the frequency that the card appears in the players hand.
 	 * @param card
 	 * @return

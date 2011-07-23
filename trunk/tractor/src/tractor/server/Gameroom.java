@@ -435,6 +435,7 @@ public class Gameroom extends Chatroom implements Runnable { // do I need a thre
 		}
 		
 		Collections.sort(trick.getTractors(),tractorComparator);
+		played.remove(played.size()-1); //remove the null we put in
 		return trick;
 	}
 	
@@ -571,14 +572,17 @@ public class Gameroom extends Chatroom implements Runnable { // do I need a thre
 							users.get(1).setTeam(team2);
 							users.get(3).setTeam(team2);
 							
+							int index = users.indexOf(lead)-1;
+							if(index < 0) //can't possibly be not found...
+								index += users.size();
 							if(lead.getTeam() == team1) {
 								team1.setCurrentUser(lead);
-								team2.setCurrentUser(users.get(users.indexOf(lead)-1 % users.size()));
+								team2.setCurrentUser(users.get(index));
 								this.defending = team1;
 								this.attacking = team2;
 							} else {
 								team2.setCurrentUser(lead);
-								team1.setCurrentUser(users.get(users.indexOf(lead)-1 % users.size()));
+								team1.setCurrentUser(users.get(index));
 								this.defending = team2;
 								this.attacking = team1;
 							}
@@ -829,9 +833,20 @@ public class Gameroom extends Chatroom implements Runnable { // do I need a thre
 												if(triple.getSuit() == this.currentSuit && triple.getNumber() != TRUMP_NUMBER)
 													triples++;
 											}
-											if(triples >= this.currentTrick.countTriplesPlusTractors()) {
+											if(triples > trick.countTriplesPlusTractors()) {
 												sendCommand(GameCommand.PLAY_INVALID+" must play triples",user);
 												break CommandSwitch;
+											}
+											if(trick.countPairsPlusTractors() + trick.countTriplesPlusTractors() < this.currentTrick.countTriplesPlusTractors() + this.currentTrick.countPairsPlusTractors()) {
+												int pairs = 0;
+												for( Card pair : user.getHand().getPairs() ) {
+													if(pair.getSuit() == this.currentSuit && pair.getNumber() != TRUMP_NUMBER)
+														pairs++;
+												}
+												if( pairs > trick.countPairsPlusTractors() ) {
+													sendCommand(GameCommand.PLAY_INVALID+" must play pairs",user);
+													break CommandSwitch;
+												}
 											}
 											break;
 										} else if( !all_trump ) {
@@ -852,7 +867,7 @@ public class Gameroom extends Chatroom implements Runnable { // do I need a thre
 												if(pair.getSuit() == this.currentSuit && pair.getNumber() != TRUMP_NUMBER)
 													pairs++;
 											}
-											if(pairs >= this.currentTrick.countPairsPlusTractors()) {
+											if(pairs > trick.countPairsPlusTractors()) {
 												sendCommand(GameCommand.PLAY_INVALID+" must play pairs",user);
 												break CommandSwitch;
 											}
@@ -906,18 +921,18 @@ public class Gameroom extends Chatroom implements Runnable { // do I need a thre
 										//check to see who's high now
 										//shouldn't have an issue with comparator returning 9999 since anything that's not the same suit will have been eliminated
 										if(this.currentTrick.countTractors() > 0) {
-											if(tractorComparator.compare(trick.getTractors().get(trick.countTractors()-1),this.currentTrick.getTractors().get(this.currentTrick.countTractors()-1)) < 0 )
+											if(tractorComparator.compare(trick.getTractors().get(trick.countTractors()-1),this.currentTrick.getTractors().get(this.currentTrick.countTractors()-1)) <= 0 )
 												break;
 										} else if (this.currentTrick.countTriples() > 0) {
-											if( cardComparator.gameCompare(trick.getTriples().get(trick.countTriples()-1), this.currentTrick.getTriples().get(this.currentTrick.countTriples()-1)) < 0 ) {
+											if( cardComparator.gameCompare(trick.getTriples().get(trick.countTriples()-1), this.currentTrick.getTriples().get(this.currentTrick.countTriples()-1)) <= 0 ) {
 												break;
 											}
 										} else if ( this.currentTrick.countPairs() > 0 ) {
-											if( cardComparator.gameCompare(trick.getPairs().get(trick.countPairs()-1), this.currentTrick.getPairs().get(this.currentTrick.countPairs()-1)) < 0 ) {
+											if( cardComparator.gameCompare(trick.getPairs().get(trick.countPairs()-1), this.currentTrick.getPairs().get(this.currentTrick.countPairs()-1)) <= 0 ) {
 												break;
 											}
 										} else {
-											if( cardComparator.gameCompare(trick.getSingles().get(trick.countSingles()-1), this.currentTrick.getSingles().get(this.currentTrick.countSingles()-1)) < 0 ) {
+											if( cardComparator.gameCompare(trick.getSingles().get(trick.countSingles()-1), this.currentTrick.getSingles().get(this.currentTrick.countSingles()-1)) <= 0 ) {
 												break;
 											}
 										}

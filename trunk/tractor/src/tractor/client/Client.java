@@ -24,7 +24,7 @@ public class Client {
 	//public final static String ip = "192.168.1.2";
 	public final static String ip = "127.0.0.1";
 	public final static int NULL = 0;
-	public final static int port = 8080;
+	public final static int port = 9741;
 	public static Client getInstance() {
 		return Client.instance;
 	}

@@ -39,7 +39,7 @@ public class Server {
 	private Vector<User> waiting;
 
 	Server() {
-		this(8080);
+		this(9741);
 	}
 
 	Server(int port) {

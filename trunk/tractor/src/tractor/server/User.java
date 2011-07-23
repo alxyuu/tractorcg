@@ -35,7 +35,7 @@ public class User {
 	private int gameposition;
 	private int gamescore;
 	private PlayerHand hand;
-	private List<User> team;
+	private Team team;
 
 	/** Constructor of the User class that initializes the attributes
 	 * @param socket
@@ -108,11 +108,11 @@ public class User {
 		this.hand = new PlayerHand();
 	}
 	
-	public List<User> getTeam() {
+	public Team getTeam() {
 		return this.team;
 	}
 	
-	public void setTeam(List<User> team) {
+	public void setTeam(Team team) {
 		this.team = team;
 	}
 

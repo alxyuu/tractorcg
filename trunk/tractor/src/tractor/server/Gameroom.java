@@ -36,8 +36,10 @@ public class Gameroom extends Chatroom implements Runnable { // do I need a thre
 	private boolean trumped;
 	private CardComparator<Card> cardComparator;
 	private Comparator<Tractor> tractorComparator;
-	private List<User> team1;
-	private List<User> team2;
+	private Team team1;
+	private Team team2;
+	private Team defending;
+	private Team attacking;
 	/** It constructs the game room.
 	 * @param players
 	 */
@@ -48,8 +50,8 @@ public class Gameroom extends Chatroom implements Runnable { // do I need a thre
 		this.state = GameCommand.WAITING;
 		this.firstgame = true;
 		this.dipai = Collections.emptyList();
-		this.team1 = new ArrayList<User>();
-		this.team2 = new ArrayList<User>();
+		this.team1 = new Team();
+		this.team2 = new Team();
 		
 		this.cardComparator = new CardComparator<Card>() {
 			/**
@@ -338,11 +340,14 @@ public class Gameroom extends Chatroom implements Runnable { // do I need a thre
 	}
 	
 	public void addPoints(List<Card> cards) {
+		this.addPoints(cards,1);
+	}
+	public void addPoints(List<Card> cards, int multiplier) {
 		for(Card card : cards) {
 			if(card.getNumber() == Card.KING || card.getNumber() == Card.TEN)
-				this.currentPoints += 10;
+				this.currentPoints += 10*multiplier;
 			else if (card.getNumber() == Card.FIVE)
-				this.currentPoints += 5;
+				this.currentPoints += 5*multiplier;
 		}
 	}
 	
@@ -499,11 +504,11 @@ public class Gameroom extends Chatroom implements Runnable { // do I need a thre
 						} else if(this.state == GameCommand.DIPAI) { // laying down dipai
 							if(user != this.lead) {
 								this.sendCommand(GameCommand.PLAY_INVALID + " calling out of turn", user);
-								break;
+								break CommandSwitch;
 							}
 							if(Integer.parseInt(message[1]) != this.dipaiSize) {
 								this.sendCommand(GameCommand.PLAY_INVALID + " not enough cards", user);
-								break;
+								break CommandSwitch;
 							}
 							this.dipai = Collections.synchronizedList(new ArrayList<Card>());
 							//System.out.println(Arrays.toString(message));
@@ -566,9 +571,20 @@ public class Gameroom extends Chatroom implements Runnable { // do I need a thre
 							users.get(1).setTeam(team2);
 							users.get(3).setTeam(team2);
 							
+							if(lead.getTeam() == team1) {
+								team1.setCurrentUser(lead);
+								team2.setCurrentUser(users.get(users.indexOf(lead)-1 % users.size()));
+								this.defending = team1;
+								this.attacking = team2;
+							} else {
+								team2.setCurrentUser(lead);
+								team1.setCurrentUser(users.get(users.indexOf(lead)-1 % users.size()));
+								this.defending = team2;
+								this.attacking = team1;
+							}
+							
 							this.currentPoints = 0;
 							this.gamePoints = 0;
-							
 							
 							this.sendUpdateState(GameCommand.PLAYING);
 							this.setLead(lead);
@@ -747,7 +763,7 @@ public class Gameroom extends Chatroom implements Runnable { // do I need a thre
 								
 								//check if all trump but only if void and current play is not trump
 								boolean all_trump = false;
-								if(void_in_suit && this.currentSuit != Card.TRUMP /*&& this.trumped == false*/) {
+								if(void_in_suit && this.currentSuit != Card.TRUMP && this.trumped == false) {
 									all_trump = true;
 									for( Card card : played ) {
 										if( !( card.getNumber() == TRUMP_NUMBER || card.getSuit() == Card.TRUMP || card.getSuit() == TRUMP_SUIT ) ) {
@@ -926,13 +942,50 @@ public class Gameroom extends Chatroom implements Runnable { // do I need a thre
 							}
 							sendCommandExclude(tosend,user);
 
-
-
 							if(!userIterator.hasNext()) { 
-								//TODO: add points etc
+
+								if(highest.getTeam() != this.defending) //if team is not the one with dipai
+									this.gamePoints += this.currentPoints;
+								this.currentPoints = 0;
+								
 								if(currentUser.getHand().getCards().size() == 0) {
-									//TODO: game over, update score
-									break;
+									
+									//TODO: show dipai
+									if(highest.getTeam() != this.defending) {
+										this.addPoints(dipai,played.size()*2);
+										this.gamePoints += this.currentPoints;
+									}
+									
+									if(gamePoints == 0) {
+										this.TRUMP_NUMBER = this.defending.goUp(3);
+										this.setLead(this.defending.next());
+									} else if ( gamePoints < 60 ) {
+										this.TRUMP_NUMBER = this.defending.goUp(2);
+										this.setLead(this.defending.next());
+									} else if ( gamePoints < 120 ) {
+										this.TRUMP_NUMBER = this.defending.goUp(1);
+										this.setLead(this.defending.next());
+									} else if ( gamePoints < 180 ) {
+										this.TRUMP_NUMBER = this.attacking.getCurrentTrump();
+										this.setLead(this.attacking.next());
+									} else if ( gamePoints < 240 ) {
+										this.TRUMP_NUMBER = this.attacking.goUp(1);
+										this.setLead(this.attacking.next());
+									} else if ( gamePoints < 300 ) {
+										this.TRUMP_NUMBER = this.attacking.goUp(2);
+										this.setLead(this.attacking.next());
+									} else {
+										this.TRUMP_NUMBER = this.attacking.goUp(3);
+										this.setLead(this.attacking.next());
+									}
+									
+									this.gamePoints = 0;
+									
+									if(this.TRUMP_NUMBER > Card.ACE) {
+										//TODO: this.lead.getTeam() wins
+									}
+									
+									break CommandSwitch;
 								}
 								try {
 									Thread.sleep(1000);
@@ -941,10 +994,8 @@ public class Gameroom extends Chatroom implements Runnable { // do I need a thre
 									e.printStackTrace();
 								}
 								
-								if(highest.getTeam() != this.team1) //if team is not the one with dipai
-									this.gamePoints += this.currentPoints;
-								this.currentPoints = 0;
-								for(Iterator<User> i2 = users.iterator(); i.hasNext();) 
+								
+								for(Iterator<User> i2 = users.iterator(); i.hasNext();) //what does this do?
 									i2.next().getHand().setCurrentPlay(null);
 								this.sendCommand(GameCommand.CLEAR_TABLE+" "+gamePoints);
 								this.setLead(highest);

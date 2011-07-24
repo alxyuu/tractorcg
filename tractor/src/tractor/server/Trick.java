@@ -1,25 +1,28 @@
 package tractor.server;
 
 import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Set;
+import java.util.TreeSet;
 
 import tractor.lib.Card;
 import tractor.server.Tractor;
 
 public class Trick {
 	private List<Card> singles;
-	private List<Card> pairs;
-	private List<Card> triples;
-	private List<Card> pc, tc;
-	private List<Tractor> tractors;
-	Trick() {
+	private TreeSet<Card> pairs;
+	private TreeSet<Card> triples;
+	private TreeSet<Card> pc, tc;
+	private TreeSet<Tractor> tractors;
+	Trick(CardComparator<Card> cc, Comparator<Tractor> tc) {
 		this.singles = new LinkedList<Card>();
-		this.pairs = new LinkedList<Card>();
-		this.triples = new LinkedList<Card>();
-		this.pc = new LinkedList<Card>();
-		this.tc = new LinkedList<Card>();
-		this.tractors = new LinkedList<Tractor>();
+		this.pairs = new TreeSet<Card>(cc);
+		this.triples = new TreeSet<Card>(cc);
+		this.pc = new TreeSet<Card>(cc);
+		this.tc = new TreeSet<Card>(cc);
+		this.tractors = new TreeSet<Tractor>(tc);
 	}
 
 	public void addSingle(Card card) {
@@ -29,6 +32,7 @@ public class Trick {
 	public void addPair(Card pair) {
 		this.addPair(pair,true);
 	}
+	
 	public void addPair(Card pair, boolean addToTotal) {
 		this.pairs.add(pair);
 		if(addToTotal)
@@ -66,25 +70,24 @@ public class Trick {
 		return this.singles;
 	}
 	
-	public List<Card> getPairs() {
+	public TreeSet<Card> getPairs() {
 		return pairs;
 	}
 	
-	// cannot be modified, returned possibly out of order
-	public List<Card> getPairsPlusTractors() {
+	public TreeSet<Card> getPairsPlusTractors() {
 		return pc;
 	}
 
-	public List<Card> getTriples() {
+	public TreeSet<Card> getTriples() {
 		return triples;
 	}
 	
 	// cannot be modified, returned possibly out of order
-	public List<Card> getTriplesPlusTractors() {
+	public TreeSet<Card> getTriplesPlusTractors() {
 		return tc;
 	}
 
-	public List<Tractor> getTractors() {
+	public TreeSet<Tractor> getTractors() {
 		return tractors;
 	}
 
@@ -100,6 +103,12 @@ public class Trick {
 		return this.pc.size();
 	}
 	
+	/*public boolean pairInTractor(Card card) {
+		if(this.pc.indexOf(card) != -1 && this.pairs.indexOf(card) == -1)
+			return true;
+		return false;
+	}*/
+	
 	public int countTriples() {
 		return this.triples.size();
 	}
@@ -114,6 +123,12 @@ public class Trick {
 		this.addPair(card);
 		this.addSingle(card);
 	}
+	
+	/*public boolean tripleInTractor(Card card) {
+		if(this.tc.indexOf(card) != -1 && this.triples.indexOf(card) == -1)
+			return true;
+		return false;
+	}*/
 	
 	public void pairToSingle(Card card) {
 		this.pairs.remove(card);

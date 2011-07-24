@@ -16,6 +16,10 @@ class Tractor {
 	public int getType() {
 		return this.type;
 	}
+	public void tripleToPair() {
+		if(this.type == 3)
+			this.type = 2;
+	}
 	public List<Card> getCards() {
 		return this.cards;
 	}
@@ -28,5 +32,11 @@ class Tractor {
 	public String toString()
 	{
 		return (this.type==2 ? "double" : this.type==3 ? "triple" : "unknown") + "tractor: " + cards.toString();
+	}
+	
+	public boolean equals(Tractor t) {
+		if(t.type == this.type && this.cards.containsAll(t.cards) && t.cards.containsAll(this.cards))
+			return true;
+		return false;
 	}
 }

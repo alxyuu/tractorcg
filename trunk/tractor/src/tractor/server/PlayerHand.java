@@ -5,15 +5,20 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.Iterator;
+import java.util.LinkedList;
 import java.util.List;
+import java.util.TreeSet;
 
 import tractor.lib.Card;
 
 public class PlayerHand {
 
 	private List<Card> cards;
+	private TreeSet<Card> pairs;
+	private TreeSet<Card> triples;
+	private TreeSet<Tractor> tractors;
 	private List<Card> currentPlay;
-	private Trick hand;
+	private CardComparator<Card> cc;
 	//private String name;
 
 	public PlayerHand() {
@@ -26,27 +31,30 @@ public class PlayerHand {
 		this.currentPlay = Collections.emptyList();
 	}
 	
-	public void init(Trick hand) {
-		this.hand = hand;
+	public void init(TreeSet<Card> pairs, TreeSet<Card> triples, TreeSet<Tractor> tractors) {
+		this.pairs = pairs;
+		this.triples = triples;
+		this.tractors = tractors;
+		this.cc = ((CardComparator<Card>)this.pairs.comparator());
 	}
 	
-	public List<Tractor> getTractors() {
-		return this.hand.getTractors();
+	public TreeSet<Tractor> getTractors() {
+		return this.tractors;
 	}
 	
-	public List<Card> getPairs() {
-		return this.hand.getPairsPlusTractors();
+	public TreeSet<Card> getPairs() {
+		return this.pairs;
 	}
 	
 	
-	public List<Card> getTriples() {
-		return this.hand.getTriplesPlusTractors();
+	public TreeSet<Card> getTriples() {
+		return this.triples;
 	}
 	
-	public int getNumSuit(int suit) {
+	public int getNumSuit(int suit, int trumpnumber) {
 		int numsuit = 0;
 		for(Card card : this.cards) {
-			if(card.getSuit() == suit)
+			if(card.getSuit() == suit && card.getNumber() != trumpnumber)
 				numsuit++;
 		}
 		return numsuit;
@@ -105,11 +113,109 @@ public class PlayerHand {
 	 * @param card
 	 */
 	public void removeCard(Card card) {
+		if(this.triples.contains(card)) {
+			this.triples.remove(card);
+			this.pairs.add(card);
+			
+			for(Iterator<Tractor> i = this.tractors.iterator(); i.hasNext();) {
+				Tractor tractor = i.next();
+				int index = tractor.getCards().indexOf(card);
+				if( index > -1) {
+					if(tractor.getType() == 3) {
+						//TODO: tractors might be out of order if there's a pair tractor with cards larger than the triple tractor
+						// ^ but does it ever matter that the tractors in the hand are sorted?
+						tractor.tripleToPair();
+						if(tractor.getLength() > 2) {
+							Iterator<Card> it = tractor.getCards().iterator();
+							Card current = it.next();
+							if(current == card)
+								current = it.next();
+							
+							while(it.hasNext()) {
+								Card previous;
+								List<Card> tractorcards = new LinkedList<Card>();
+								do {
+									tractorcards.add(current);
+									previous = current;
+									current = it.next();
+									if(current == card) {
+										if(it.hasNext()) {
+											current = it.next();
+										} else {
+											current = null;
+											break;
+										}
+									}
+								} while ( it.hasNext() && this.cc.gameCompare(current, previous) == 1 );
+								if(this.cc.gameCompare(current, previous) == 1)
+									tractorcards.add(current);
+								
+								if(tractorcards.size() >= 2) {
+									tractors.add(new Tractor(3, tractorcards));
+								}
+								tractorcards.clear();
+							}
+						}
+					}
+					break;
+				}
+			}
+		} else if (this.pairs.contains(card)) {
+			this.pairs.remove(card);
+			
+			for(Iterator<Tractor> i = this.tractors.iterator(); i.hasNext();) {
+				Tractor tractor = i.next();
+				int index = tractor.getCards().indexOf(card);
+				if( index > -1) {
+					if(tractor.getType() == 2) {
+						i.remove();
+						
+						if(tractor.getLength() > 2) {
+							Iterator<Card> it = tractor.getCards().iterator();
+							Card current = it.next();
+							if(current == card)
+								current = it.next();
+							
+							while(it.hasNext()) {
+								Card previous;
+								List<Card> tractorcards = new LinkedList<Card>();
+								do {
+									tractorcards.add(current);
+									previous = current;
+									current = it.next();
+									if(current == card) {
+										if(it.hasNext()) {
+											current = it.next();
+										} else {
+											current = null;
+											break;
+										}
+									}
+								} while ( it.hasNext() && this.cc.gameCompare(current, previous) == 1 );
+								if(this.cc.gameCompare(current, previous) == 1)
+									tractorcards.add(current);
+								
+								if(tractorcards.size() >= 2) {
+									tractors.add(new Tractor(2, tractorcards));
+								}
+								tractorcards.clear();
+							}
+						}
+					}
+					break;
+				}
+			}
+			
+		}
+
 		this.cards.remove(card);
 	}
 	
 	public void removeAllCards(Collection<Card> cards) {
-		this.cards.removeAll(cards);
+		//TODO: optimize for removing sets...
+		for(Card card : cards) {
+			this.removeCard(card);
+		}
 	}
 
 	/** It sets the current play.

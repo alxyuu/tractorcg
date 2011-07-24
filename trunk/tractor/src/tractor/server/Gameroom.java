@@ -7,6 +7,8 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Iterator;
 import java.util.ListIterator;
+import java.util.NoSuchElementException;
+import java.util.TreeSet;
 import java.util.concurrent.CopyOnWriteArrayList;
 
 import tractor.lib.Card;
@@ -150,18 +152,12 @@ public class Gameroom extends Chatroom implements Runnable { // do I need a thre
 	
 		this.tractorComparator = new Comparator<Tractor>() {
 			public int compare(Tractor t1, Tractor t2) {
-				if(t1.getType() > t2.getType()) {
+				if(t1.getType() > t2.getType() && t1.getLength() >= t2.getLength() || t1.getType() >= t2.getType() && t1.getLength() > t2.getLength()) {
 					return 1;
-				} else if (t1.getType() < t2.getType()) {
+				} else if (t1.getType() < t2.getType() || t1.getLength() < t2.getLength()) {
 					return -1;
 				} else {
-					if(t1.getLength() > t2.getLength()) {
-						return 1;
-					} else if (t1.getLength() < t2.getLength()) {
-						return -1;
-					} else {
-						return cardComparator.compare(t1.getStartingCard(), t2.getStartingCard());
-					}
+					return cardComparator.compare(t1.getStartingCard(), t2.getStartingCard());
 				}
 			}
 		};
@@ -375,7 +371,7 @@ public class Gameroom extends Chatroom implements Runnable { // do I need a thre
 
 	public Trick calculateTrick(List<Card> played) {
 		played.add(null); //trick the while loop into going one more round...
-		Trick trick = new Trick();
+		Trick trick = new Trick(this.cardComparator, this.tractorComparator);
 		//calculate stuffs
 		Iterator<Card> it=played.iterator();
 		Card previous=it.next();
@@ -434,7 +430,6 @@ public class Gameroom extends Chatroom implements Runnable { // do I need a thre
 			previous=current;
 		}
 		
-		Collections.sort(trick.getTractors(),tractorComparator);
 		played.remove(played.size()-1); //remove the null we put in
 		return trick;
 	}
@@ -516,7 +511,7 @@ public class Gameroom extends Chatroom implements Runnable { // do I need a thre
 							for(int k=0; k<this.dipaiSize*2; k+=2) {
 								Card dpcard = Card.getCard(message[k+2],message[k+3]);
 								this.dipai.add(dpcard);
-								user.getHand().removeCard(dpcard);
+								user.getHand().getCards().remove(dpcard);
 							}
 							//System.out.println(this.dipai);
 							
@@ -530,18 +525,20 @@ public class Gameroom extends Chatroom implements Runnable { // do I need a thre
 							
 							//calculate sets in hand
 							for(User u : users) {
-								Trick hand = calculateTrick(u.getHand().getCards());
-								System.out.println(hand);
-								List<Tractor> tractors = hand.getTractors();
-								List<Card> combined = new LinkedList<Card>();
-								combined.addAll(hand.getPairs());
-								combined.addAll(hand.getTriples());
-								Collections.sort(combined,cardComparator);
+								Trick trick = calculateTrick(u.getHand().getCards());
+								TreeSet<Tractor> tractors = trick.getTractors();
+								TreeSet<Card> pairs = trick.getPairsPlusTractors();
+								TreeSet<Card> triples = trick.getTriplesPlusTractors();
+								TreeSet<Card> combined = new TreeSet<Card>(cardComparator);
+								combined.addAll(pairs);
+								combined.addAll(triples);
 								
 								Iterator<Card> it = combined.iterator();
 								Card current = it.next();
 								
 								while(it.hasNext()) {
+									
+									//TODO: what if the person has 2 non trump suit trump numbers...?
 									Card previous;
 									List<Card> tractorcards = new LinkedList<Card>();
 									do {
@@ -549,14 +546,27 @@ public class Gameroom extends Chatroom implements Runnable { // do I need a thre
 										previous = current;
 										current = it.next();
 									} while ( it.hasNext() && cardComparator.gameCompare(current, previous) == 1 );
+									if(cardComparator.gameCompare(current, previous) == 1)
+										tractorcards.add(current);
+									
 									if(tractorcards.size() >= 2) {
-										tractors.add(new Tractor(2, tractorcards));
+										Tractor t = new Tractor(2, tractorcards);
+										Tractor t3 = new Tractor(3, tractorcards);
+										if(!tractors.contains(t) && !tractors.contains(t3)) {
+											pairs.removeAll(tractorcards);
+											triples.removeAll(tractorcards);
+											pairs.addAll(tractorcards);
+											tractors.add(t);
+										}
 									}
 									tractorcards.clear();
 								}
 								
+								//remove any triples from the pairs
+								
+								
 								//TODO: 
-								u.getHand().init(hand);
+								u.getHand().init(pairs, triples, tractors);
 								System.out.println(u.getName() + "'s Hand: \n " + u.getHand());
 							}
 							
@@ -601,7 +611,7 @@ public class Gameroom extends Chatroom implements Runnable { // do I need a thre
 								break CommandSwitch;
 							}
 							int numPlayed = Integer.parseInt(message[1]);
-							ArrayList<Card> played = new ArrayList<Card>();
+							LinkedList<Card> played = new LinkedList<Card>();
 							for(int k=0;k<numPlayed*2; k+=2) {
 								played.add(Card.getCard(message[k+2],message[k+3]));
 							}
@@ -672,7 +682,7 @@ public class Gameroom extends Chatroom implements Runnable { // do I need a thre
 										}
 									}
 									if(trick.countPairs() > 0) {
-										Card pair = trick.getPairs().get(0);
+										Card pair = trick.getPairs().first();
 											for(Iterator<User> i2 = users.iterator();i2.hasNext();)
 											{
 												User u = i2.next();
@@ -688,7 +698,7 @@ public class Gameroom extends Chatroom implements Runnable { // do I need a thre
 											}
 									}
 									if(trick.countTriples() > 0) {
-										Card triple = trick.getTriples().get(0);
+										Card triple = trick.getTriples().first();
 											for(Iterator<User> i2 = users.iterator();i2.hasNext();)
 											{
 												User u = i2.next();
@@ -748,26 +758,28 @@ public class Gameroom extends Chatroom implements Runnable { // do I need a thre
 								//make sure following suit
 								int cards_following_suit = 0;
 								for(Card card : played) {
-									if( card.getNumber() != TRUMP_NUMBER && card.getSuit() == this.currentSuit || (this.currentSuit == Card.TRUMP && (card.getNumber() == this.TRUMP_NUMBER || card.getSuit() == this.TRUMP_SUIT))) {
+									if( card.getNumber() != TRUMP_NUMBER && card.getSuit() == this.currentSuit || (this.currentSuit == Card.TRUMP && (card.getNumber() == this.TRUMP_NUMBER || card.getSuit() == this.TRUMP_SUIT || card.getSuit() == Card.TRUMP))) {
 										cards_following_suit++;
 									}
 								}
 								boolean following_suit = cards_following_suit == this.currentTrick.countCards();
+								System.out.println("following suit: "+following_suit);
 								
 								//check if void
 								boolean void_in_suit = false;
 								if(!following_suit) {
-									if(this.currentSuit == Card.TRUMP && user.getHand().getNumTrump(TRUMP_SUIT, TRUMP_NUMBER) > cards_following_suit || this.currentSuit != Card.TRUMP && user.getHand().getNumSuit(this.currentSuit) > cards_following_suit) {
+									if(this.currentSuit == Card.TRUMP && user.getHand().getNumTrump(TRUMP_SUIT, TRUMP_NUMBER) > cards_following_suit || this.currentSuit != Card.TRUMP && user.getHand().getNumSuit(this.currentSuit, this.TRUMP_NUMBER) > cards_following_suit) {
 										sendCommand(GameCommand.PLAY_INVALID+" not following suit",user);
 										break CommandSwitch;
 									} else {
 										void_in_suit = true;
 									}
 								}
+								System.out.println("void in suit: "+void_in_suit);
 								
 								//check if all trump but only if void and current play is not trump
 								boolean all_trump = false;
-								if(void_in_suit && this.currentSuit != Card.TRUMP && this.trumped == false) {
+								if(void_in_suit && this.currentSuit != Card.TRUMP) {
 									all_trump = true;
 									for( Card card : played ) {
 										if( !( card.getNumber() == TRUMP_NUMBER || card.getSuit() == Card.TRUMP || card.getSuit() == TRUMP_SUIT ) ) {
@@ -776,18 +788,20 @@ public class Gameroom extends Chatroom implements Runnable { // do I need a thre
 										}
 									}
 								}
+								System.out.println("all trump: "+all_trump);
 								
 								Trick trick = calculateTrick(played);
 								
 								CheckPlay: while ( following_suit || all_trump ) { //dirty...dirty hack
 									
 									boolean skipTractorCheck = false;
+									boolean following_play = true;
 									
 									//convert extra tractors to triples and pairs
 									if(trick.countTractors() > this.currentTrick.countTractors()) {
 										
-										List<Tractor> tricktractors = trick.getTractors();
-										List<Tractor> temp = new ArrayList<Tractor>();
+										TreeSet<Tractor> tricktractors = trick.getTractors();
+										List<Tractor> temp = new LinkedList<Tractor>();
 										
 										for(Tractor tractor : this.currentTrick.getTractors()) {
 											skipTractorCheck = false;
@@ -800,8 +814,10 @@ public class Gameroom extends Chatroom implements Runnable { // do I need a thre
 													break;
 												}
 											}
-											if(!skipTractorCheck)
-												break CheckPlay;
+											if(!skipTractorCheck) {
+												following_play = false;
+												break;
+											}
 										}
 										
 										for(Iterator<Tractor> it = tricktractors.iterator(); it.hasNext();) {
@@ -819,20 +835,20 @@ public class Gameroom extends Chatroom implements Runnable { // do I need a thre
 										}
 										
 										tricktractors.addAll(temp);
-										Collections.sort(tricktractors, tractorComparator);
 										
 									}
 									
 									
 									
-									
+									System.out.println("played triples: " + trick.countTriplesPlusTractors());
 									if(trick.countTriplesPlusTractors() < this.currentTrick.countTriplesPlusTractors()) {
 										if( following_suit ) {
 											int triples = 0;
 											for( Card triple : user.getHand().getTriples() ) {
-												if(triple.getSuit() == this.currentSuit && triple.getNumber() != TRUMP_NUMBER)
+												if(triple.getGameSuit(this.TRUMP_NUMBER, this.TRUMP_SUIT) == this.currentSuit)
 													triples++;
 											}
+											System.out.println("triples: "+triples);
 											if(triples > trick.countTriplesPlusTractors()) {
 												sendCommand(GameCommand.PLAY_INVALID+" must play triples",user);
 												break CommandSwitch;
@@ -840,7 +856,7 @@ public class Gameroom extends Chatroom implements Runnable { // do I need a thre
 											if(trick.countPairsPlusTractors() + trick.countTriplesPlusTractors() < this.currentTrick.countTriplesPlusTractors() + this.currentTrick.countPairsPlusTractors()) {
 												int pairs = 0;
 												for( Card pair : user.getHand().getPairs() ) {
-													if(pair.getSuit() == this.currentSuit && pair.getNumber() != TRUMP_NUMBER)
+													if(pair.getGameSuit(this.TRUMP_NUMBER, this.TRUMP_SUIT) == this.currentSuit)
 														pairs++;
 												}
 												if( pairs > trick.countPairsPlusTractors() ) {
@@ -848,53 +864,109 @@ public class Gameroom extends Chatroom implements Runnable { // do I need a thre
 													break CommandSwitch;
 												}
 											}
-											break;
-										} else if( !all_trump ) {
-											break;
 										}
+										following_play = false;
 									} else if ( trick.countTriples() > this.currentTrick.countTriples() ) {
 										//convert extra triples to pairs and singles
 										do {
-											trick.tripleToPair(trick.getTriples().get(0));
+											trick.tripleToPair(trick.getTriples().first());
 										} while(trick.countTriples() > this.currentTrick.countTriples());
-										Collections.sort(trick.getPairs(),cardComparator);
 									}
 									
 									if(trick.countPairsPlusTractors() < this.currentTrick.countPairsPlusTractors()) {
 										if( following_suit ) {
 											int pairs = 0;
 											for( Card pair : user.getHand().getPairs() ) {
-												if(pair.getSuit() == this.currentSuit && pair.getNumber() != TRUMP_NUMBER)
+												if(pair.getGameSuit(this.TRUMP_NUMBER, this.TRUMP_SUIT) == this.currentSuit)
 													pairs++;
 											}
 											if(pairs > trick.countPairsPlusTractors()) {
 												sendCommand(GameCommand.PLAY_INVALID+" must play pairs",user);
 												break CommandSwitch;
 											}
-											break;
-										} else if( !all_trump ) {
-											break;
 										}
+										following_play = false;
 									} else if ( trick.countPairs() > this.currentTrick.countPairs() ) {
-										//convert extra triples to pairs and singles
+										//convert extra pairs to singles
 										do {
-											trick.pairToSingle(trick.getPairs().get(0));
+											trick.pairToSingle(trick.getPairs().first());
 										} while(trick.countPairs() > this.currentTrick.countPairs());
 										Collections.sort(trick.getSingles(),cardComparator);
 									}
 									
 									//check tractors
 									if (!skipTractorCheck) {
-										List<Tractor> ctrick = this.currentTrick.getTractors();
-										List<Tractor> ttrick = trick.getTractors();
-										int offset = ttrick.size() - ctrick.size();
-										for(int k = ctrick.size()-1; k >= 0; k--) {
-											if(k+offset < 0 || ctrick.get(k).getLength() > ttrick.get(k+offset).getLength() || ctrick.get(k).getType() > ttrick.get(k+offset).getLength()) {
-												//tractor not long enough search for longer tractor
+										TreeSet<Tractor> ctrick = this.currentTrick.getTractors();
+										TreeSet<Tractor> ttrick = trick.getTractors();
+										Iterator<Tractor> ci = ctrick.iterator();
+										Iterator<Tractor> ti = ttrick.iterator();
+										//for(int k = 0; k < ctrick.size(); k++) {
+										while(ci.hasNext()) {
+											Tractor ct = ci.next();
+											Tractor tt;
+											try {
+												tt = ti.next();
+											} catch (NoSuchElementException e) {
+												tt = null;
+											}
+											if(tt == null) {
 												for(Tractor tractor : user.getHand().getTractors()) {
-													if(tractor.getStartingCard().getGameSuit(TRUMP_SUIT, TRUMP_NUMBER) == this.currentSuit && tractor.getLength() >= ctrick.get(k).getLength() && tractor.getType() == ctrick.get(k).getType() && !ttrick.contains(tractor) ) {
+													if(tractor.getStartingCard().getGameSuit(TRUMP_SUIT, TRUMP_NUMBER) == this.currentSuit && tractor.getType() == ct.getType() && !ttrick.contains(tractor) ) {
 														sendCommand(GameCommand.PLAY_INVALID+" must play tractors",user);
 														break CommandSwitch;
+													}
+												}
+												following_play = false;
+											} else if( tt.getType() < ct.getType() || tt.getCards().size() < ct.getCards().size() ) {
+												for(Tractor tractor : user.getHand().getTractors()) {
+													if(tractor.getStartingCard().getGameSuit(TRUMP_SUIT, TRUMP_NUMBER) == this.currentSuit && tractor.getLength() >= ct.getLength() && tractor.getType() == ct.getType() && !ttrick.contains(tractor) ) {
+														sendCommand(GameCommand.PLAY_INVALID+" must play tractors",user);
+														break CommandSwitch;
+													}
+												}
+												following_play = false;
+											} else {
+												if (tt.getType() > ct.getType()) {
+													tt.tripleToPair();
+													//TODO: tractors might be out of order if there's a pair tractor with cards larger than the triple tractor
+													List<Card> cards = tt.getCards();
+													for(Card card : cards) {
+														trick.tripleToPair(card);
+													}
+												}
+												if (tt.getLength() > ct.getLength()) {
+													if(tt.getType() == 3) {
+														do {
+															Card card = tt.getCards().remove(0); 
+															trick.getTriplesPlusTractors().remove(card);
+															trick.addTriple(card);
+														} while (tt.getLength() > ct.getLength());
+														if ( trick.countTriples() > this.currentTrick.countTriples() ) {
+															//convert extra triples to pairs and singles
+															do {
+																trick.tripleToPair(trick.getTriples().first());
+															} while(trick.countTriples() > this.currentTrick.countTriples());
+														}
+														if ( trick.countPairs() > this.currentTrick.countPairs() ) {
+															//convert extra pairs to singles
+															do {
+																trick.pairToSingle(trick.getPairs().first());
+															} while(trick.countPairs() > this.currentTrick.countPairs());
+															Collections.sort(trick.getSingles(),cardComparator);
+														}
+													} else if(tt.getType() == 2) {
+														do {
+															Card card = tt.getCards().remove(0); 
+															trick.getPairsPlusTractors().remove(card);
+															trick.addPair(card);
+														} while (tt.getLength() > ct.getLength());
+														if ( trick.countPairs() > this.currentTrick.countPairs() ) {
+															//convert extra pairs to singles
+															do {
+																trick.pairToSingle(trick.getPairs().first());
+															} while(trick.countPairs() > this.currentTrick.countPairs());
+															Collections.sort(trick.getSingles(),cardComparator);
+														}
 													}
 												}
 											}
@@ -902,44 +974,36 @@ public class Gameroom extends Chatroom implements Runnable { // do I need a thre
 									}
 									
 									
-								
-									if(all_trump) {
-										this.trumped = true; 
-										//let's make any extra pairs and triples into singles
-										while(trick.countPairs() > this.currentTrick.countPairs()) {
-											Card card = trick.getPairs().remove(0);
-											trick.addSingle(card);
-											trick.addSingle(card);
-										}
-										while(trick.countTriples() > this.currentTrick.countTriples()) {
-											Card card = trick.getTriples().remove(0);
-											trick.addSingle(card);
-											trick.addSingle(card);
-											trick.addSingle(card);
-										}
-									} else {
-										//check to see who's high now
-										//shouldn't have an issue with comparator returning 9999 since anything that's not the same suit will have been eliminated
-										if(this.currentTrick.countTractors() > 0) {
-											if(tractorComparator.compare(trick.getTractors().get(trick.countTractors()-1),this.currentTrick.getTractors().get(this.currentTrick.countTractors()-1)) <= 0 )
-												break;
-										} else if (this.currentTrick.countTriples() > 0) {
-											if( cardComparator.gameCompare(trick.getTriples().get(trick.countTriples()-1), this.currentTrick.getTriples().get(this.currentTrick.countTriples()-1)) <= 0 ) {
-												break;
-											}
-										} else if ( this.currentTrick.countPairs() > 0 ) {
-											if( cardComparator.gameCompare(trick.getPairs().get(trick.countPairs()-1), this.currentTrick.getPairs().get(this.currentTrick.countPairs()-1)) <= 0 ) {
-												break;
-											}
+									if(following_play) {
+										if(all_trump && !this.trumped) {
+											this.trumped = true; 
 										} else {
-											if( cardComparator.gameCompare(trick.getSingles().get(trick.countSingles()-1), this.currentTrick.getSingles().get(this.currentTrick.countSingles()-1)) <= 0 ) {
-												break;
+											if(this.trumped && !all_trump)
+												break CheckPlay;
+											
+											//check to see who's high now
+											//shouldn't have an issue with comparator returning 9999 since anything that's not the same suit will have been eliminated
+											if(this.currentTrick.countTractors() > 0) {
+												if(tractorComparator.compare(trick.getTractors().last(),this.currentTrick.getTractors().last()) <= 0 )
+													break CheckPlay;
+											} else if (this.currentTrick.countTriples() > 0) {
+												if( cardComparator.gameCompare(trick.getTriples().last(), this.currentTrick.getTriples().last()) <= 0 ) {
+													break CheckPlay;
+												}
+											} else if ( this.currentTrick.countPairs() > 0 ) {
+												if( cardComparator.gameCompare(trick.getPairs().last(), this.currentTrick.getPairs().last()) <= 0 ) {
+													break CheckPlay;
+												}
+											} else {
+												if( cardComparator.gameCompare(trick.getSingles().get(trick.countSingles()-1), this.currentTrick.getSingles().get(this.currentTrick.countSingles()-1)) <= 0 ) {
+													break CheckPlay;
+												}
 											}
 										}
+										
+										this.highest = user;
+										this.currentTrick = trick;
 									}
-									
-									this.highest = user;
-									this.currentTrick = trick;
 									break;
 								}
 
@@ -995,6 +1059,7 @@ public class Gameroom extends Chatroom implements Runnable { // do I need a thre
 									}
 									
 									this.gamePoints = 0;
+									this.trumped = false;
 									
 									if(this.TRUMP_NUMBER > Card.ACE) {
 										//TODO: this.lead.getTeam() wins

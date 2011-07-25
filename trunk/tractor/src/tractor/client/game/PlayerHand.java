@@ -110,7 +110,7 @@ public class PlayerHand {
 	/** It sorts the players hand based on the trump suit.
 	 * @param trumpsuit
 	 */
-	public void sort(int trumpsuit, int trumpnumber) {
+	public void sort() {
 		synchronized(this) {
 			//REMOVE EVERYTHING AND READD TO SORT LOL
 			HashMap<CardButton,GraphicsCard> temp = new HashMap<CardButton,GraphicsCard>();
@@ -120,8 +120,7 @@ public class PlayerHand {
 				temp.put(cb,this.hand.get(cb));
 				fail.remove();
 			}
-			GraphicsCard.TRUMP_SUIT = trumpsuit;
-			GraphicsCard.TRUMP_NUMBER = trumpnumber;
+			
 			fail = temp.keySet().iterator();
 			while( fail.hasNext() ) {
 				CardButton cb = fail.next();

@@ -4,7 +4,8 @@ import java.util.ArrayList;
 
 import tractor.client.game.GraphicsCard;
 
-public class Card implements Comparable<Card> {
+//public class Card implements Comparable<Card> {
+public class Card {
 
 	protected static final ArrayList<Card> cards;
 	public static final int ACE = 12;
@@ -30,8 +31,8 @@ public class Card implements Comparable<Card> {
 	public static final int HEARTS = 3;
 	public static final int TRUMP = 4;
 	public static final int CARDS_PER_SUIT = 13;
-	public static int TRUMP_SUIT = 4;
-	public static int TRUMP_NUMBER = 4;
+	//public static int TRUMP_SUIT = 4;
+	//public static int TRUMP_NUMBER = 4;
 	//TODO: EL PROBLEMO - MORE THAN ONE TRUMP SUIT/NUMBER WHEN RUNNING SERVER BECAUSE OF MULTIPLE GAMES BAWWW
 	//^ fixed by moving trump_suit and trump_number to gameroom, no?
 	//public static final int SET_TRUMP_BONUS = 13;
@@ -143,7 +144,7 @@ public class Card implements Comparable<Card> {
 	/** it gets the sorted suit.
 	 * @return
 	 */
-	private int getSortingSuit() {
+	/*private int getSortingSuit() {
 		if (this.suit == Card.TRUMP)
 			return Card.TRUMP+Card.TRUMP+2;
 		else if(this.suit == Card.TRUMP_SUIT && this.value == Card.TRUMP_NUMBER)
@@ -154,7 +155,7 @@ public class Card implements Comparable<Card> {
 			return Card.TRUMP;
 		else
 			return this.suit;
-	}
+	}*/
 	
 	/** It gets the sorting value of the card.
 	 * @return
@@ -165,14 +166,14 @@ public class Card implements Comparable<Card> {
 		return this.value;
 	}
 
-	public int compareTo(Card card) {
+	/*public int compareTo(Card card) {
 		if(this.getSortingSuit() == card.getSortingSuit()) {
 			return this.getSortingValue()-card.getSortingValue();
 		} else {
 			return this.getSortingSuit() - card.getSortingSuit();
 		}
 		//return this.getrandombs() - card.getrandombs();
-	}
+	}*/
 
 	public String toString() {
 		String out = "";

@@ -132,7 +132,7 @@ public class MessageFactory {
 			this.renewPong();
 			if(type == MessageFactory.KEEPALIVE) return;
 			this.in[type].add(message.substring(1,message.length()));
-			System.out.println("input: "+message+"-end-");
+			//System.out.println("input: "+message+"-end-");
 		} catch (NumberFormatException e) {
 			throw new ErroneousMessageException("Message type not supplied");
 		} catch (ArrayIndexOutOfBoundsException e) {
@@ -173,7 +173,7 @@ public class MessageFactory {
 	public void write(String message, int type) {
 		this.out.offer(type+message);
 		this.renewPing();
-		if( type != MessageFactory.KEEPALIVE ) System.out.println("output: "+message+"-end-");
+		//if( type != MessageFactory.KEEPALIVE ) System.out.println("output: "+message+"-end-");
 	}
 
 	/** It writes whether the message factory is timed out.

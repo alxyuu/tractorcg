@@ -43,8 +43,25 @@ public class CardButton extends MouseOverArea implements Comparable<CardButton> 
 	public GraphicsCard getCard() {
 		return this.card;
 	}
+	private int getSortingSuit() {
+		if (this.card.getSuit()== GraphicsCard.TRUMP)
+			return GraphicsCard.TRUMP+GraphicsCard.TRUMP+2;
+		else if(this.card.getSuit() == this.game.getTrumpSuit() && this.card.getNumber() == this.game.getTrumpNumber())
+			return GraphicsCard.TRUMP+GraphicsCard.TRUMP+1;
+		else if(this.card.getNumber() == this.game.getTrumpNumber())
+			return GraphicsCard.TRUMP+this.card.getSuit()+1;
+		else if(this.card.getSuit() == this.game.getTrumpSuit())
+			return GraphicsCard.TRUMP;
+		else
+			return this.card.getSuit();
+	}
 	public int compareTo(CardButton cb) {
-		int compare = this.card.compareTo(cb.card);
+		int compare;
+		if(this.getSortingSuit() == cb.getSortingSuit()) {
+			compare = this.card.getNumber()-cb.card.getNumber();
+		} else {
+			compare = this.getSortingSuit() - cb.getSortingSuit();
+		}
 		return (compare == 0) ? ( (this==cb) ? 0 : -1 ): compare;
 	}
 	public String toString() {

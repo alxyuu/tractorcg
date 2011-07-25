@@ -276,6 +276,9 @@ public class Gameroom extends Chatroom implements Runnable { // do I need a thre
 	 * 
 	 */
 	private void deal() {
+		this.trumped = false;
+		this.gamePoints = 0;
+		this.updateStats();
 		this.sendUpdateState(GameCommand.DEALING);
 		Thread dealing = new Thread("dealing-"+this.getName()) {
 			public void run() {
@@ -475,7 +478,6 @@ public class Gameroom extends Chatroom implements Runnable { // do I need a thre
 						this.TRUMP_SUIT  = -1;
 						this.called_cards = 0;
 						this.setLead(host);
-						this.updateStats();
 						this.deal();
 					}
 					break;
@@ -487,7 +489,7 @@ public class Gameroom extends Chatroom implements Runnable { // do I need a thre
 							int call_number = Integer.parseInt(message[3]);
 							if(played.getNumber() == this.TRUMP_NUMBER || played.getSuit() == Card.TRUMP) { // make sure the call is valid 
 								//card number for jokers might cause first half to return true, shouldn't matter
-								if( user.getHand().frequency(played) >= call_number && (call_number > this.called_cards || call_number == this.called_cards && played.getSuit() == Card.TRUMP) ) {
+								if( user.getHand().frequency(played) >= call_number && (call_number > this.called_cards || call_number >= 2 && call_number >= this.called_cards && played.getSuit() == Card.TRUMP) ) {
 									//TODO: differentiate between big and small jokers
 									this.called_cards = call_number;
 									this.TRUMP_SUIT = played.getSuit();
@@ -1044,26 +1046,28 @@ public class Gameroom extends Chatroom implements Runnable { // do I need a thre
 									} else if ( gamePoints < 120 ) {
 										this.TRUMP_NUMBER = this.defending.goUp(1);
 										this.setLead(this.defending.next());
-									} else if ( gamePoints < 180 ) {
-										this.TRUMP_NUMBER = this.attacking.getCurrentTrump();
-										this.setLead(this.attacking.next());
-									} else if ( gamePoints < 240 ) {
-										this.TRUMP_NUMBER = this.attacking.goUp(1);
-										this.setLead(this.attacking.next());
-									} else if ( gamePoints < 300 ) {
-										this.TRUMP_NUMBER = this.attacking.goUp(2);
-										this.setLead(this.attacking.next());
 									} else {
-										this.TRUMP_NUMBER = this.attacking.goUp(3);
+										if(this.attacking.getCurrentTrump() == Card.TWO || gamePoints < 180 ) {
+											this.TRUMP_NUMBER = this.attacking.getCurrentTrump();
+											
+										} else {
+											if ( gamePoints < 240 ) {
+												this.TRUMP_NUMBER = this.attacking.goUp(1);
+											} else if ( gamePoints < 300 ) {
+												this.TRUMP_NUMBER = this.attacking.goUp(2);
+											} else {
+												this.TRUMP_NUMBER = this.attacking.goUp(3);
+											}
+										}
 										this.setLead(this.attacking.next());
 									}
-									
-									this.gamePoints = 0;
-									this.trumped = false;
 									
 									if(this.TRUMP_NUMBER > Card.ACE) {
 										//TODO: this.lead.getTeam() wins
 									}
+									
+									this.sendCommand(GameCommand.CLEAR_TABLE+" "+gamePoints);
+									this.deal();
 									
 									break CommandSwitch;
 								}

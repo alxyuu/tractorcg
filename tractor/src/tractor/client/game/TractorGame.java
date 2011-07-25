@@ -45,7 +45,9 @@ public class TractorGame extends BasicGame {
 	private boolean showDipai;
 	private Button playButton;
 	private String errorMessage;
-	private int attackingScore;
+	private int attackingScore = 0;
+	private int TRUMP_NUMBER = 0;
+	private int TRUMP_SUIT = 4;
 	//private OtherPlayerHand hand;
 	/** It constructs the tractor game.
 	 * @param position
@@ -85,25 +87,25 @@ public class TractorGame extends BasicGame {
 			this.spades = new Button(container,new Image("images/suits/"+GraphicsCard.SPADES+".png"), new Image("images/suits/"+GraphicsCard.SPADES+"s.png"), 600, 370);
 			this.spades.addButtonPressedListener(new ButtonPressedListener() {
 				public void buttonPressed() {
-					sendCommand(GameCommand.PLAY_CARD+" "+GraphicsCard.SPADES + " " + GraphicsCard.TRUMP_NUMBER + " " + (called_cards+1));
+					sendCommand(GameCommand.PLAY_CARD+" "+GraphicsCard.SPADES + " " + TRUMP_NUMBER + " " + (called_cards+1));
 				}
 			});
 			this.clubs = new Button(container,new Image("images/suits/"+GraphicsCard.CLUBS+".png"), new Image("images/suits/"+GraphicsCard.CLUBS+"s.png"), 631, 370);
 			this.clubs.addButtonPressedListener(new ButtonPressedListener() {
 				public void buttonPressed() {
-					sendCommand(GameCommand.PLAY_CARD+" "+GraphicsCard.CLUBS + " " + GraphicsCard.TRUMP_NUMBER + " " + (called_cards+1));
+					sendCommand(GameCommand.PLAY_CARD+" "+GraphicsCard.CLUBS + " " + TRUMP_NUMBER + " " + (called_cards+1));
 				}
 			});
 			this.diamonds = new Button(container,new Image("images/suits/"+GraphicsCard.DIAMONDS+".png"), new Image("images/suits/"+GraphicsCard.DIAMONDS+"s.png"), 662, 370);
 			this.diamonds.addButtonPressedListener(new ButtonPressedListener() {
 				public void buttonPressed() {
-					sendCommand(GameCommand.PLAY_CARD+" "+GraphicsCard.DIAMONDS + " " + GraphicsCard.TRUMP_NUMBER + " " + (called_cards+1));
+					sendCommand(GameCommand.PLAY_CARD+" "+GraphicsCard.DIAMONDS + " " + TRUMP_NUMBER + " " + (called_cards+1));
 				}
 			});
 			this.hearts = new Button(container,new Image("images/suits/"+GraphicsCard.HEARTS+".png"), new Image("images/suits/"+GraphicsCard.HEARTS+"s.png"), 693, 370);
 			this.hearts.addButtonPressedListener(new ButtonPressedListener() {
 				public void buttonPressed() {
-					sendCommand(GameCommand.PLAY_CARD+" "+GraphicsCard.HEARTS + " " + GraphicsCard.TRUMP_NUMBER + " " + (called_cards+1));
+					sendCommand(GameCommand.PLAY_CARD+" "+GraphicsCard.HEARTS + " " + TRUMP_NUMBER + " " + (called_cards+1));
 				}
 			});
 			this.notrump = new Button(container,new Image("images/suits/"+GraphicsCard.TRUMP+".png"), new Image("images/suits/"+GraphicsCard.TRUMP+"s.png"), 724, 370);
@@ -163,6 +165,14 @@ public class TractorGame extends BasicGame {
 			//hands.put("Player"+((players+position-2)%players+1), new OtherPlayerHand(container.getWidth()-100,container.getHeight()/2));
 		}
 		this.hand = new PlayerHand(container.getWidth()/2,container.getHeight()-100, container.getWidth()/2,container.getHeight()-250 );
+	}
+	
+	public int getTrumpNumber() {
+		return this.TRUMP_NUMBER;
+	}
+	
+	public int getTrumpSuit() {
+		return this.TRUMP_SUIT;
 	}
 
 	/** It gets the coordinates of the game.
@@ -273,7 +283,6 @@ public class TractorGame extends BasicGame {
 				}
 				this.hand.playCards(list);
 				this.selected.clear();
-				System.out.println("selected cards removed: "+this.selected);
 				this.state = GameCommand.PLAYING;
 			}
 			break;
@@ -321,14 +330,15 @@ public class TractorGame extends BasicGame {
 			case GameCommand.PLAY_CARD:
 			{
 				if(this.state == GameCommand.DEALING) { // being called
+					this.TRUMP_SUIT = Integer.parseInt(message[2]);
 					this.called_cards = Integer.parseInt(message[3]);
 					ArrayList<GraphicsCard> list = new ArrayList<GraphicsCard>();
 					for(int i = 0; i < called_cards; i++) {
-						list.add(GraphicsCard.getCard(Integer.parseInt(message[2]),GraphicsCard.TRUMP_NUMBER));
+						list.add(GraphicsCard.getCard(this.TRUMP_SUIT,this.TRUMP_NUMBER));
 					}
 
 					// I'm so cool
-					hand.sort(Integer.parseInt(message[2]),GraphicsCard.TRUMP_NUMBER);
+					hand.sort();
 					
 					if(message[1].equals(Client.getInstance().getUsername())) {
 						this.hand.playCards(list);
@@ -356,7 +366,8 @@ public class TractorGame extends BasicGame {
 			break;
 			case GameCommand.SET_STATS: 
 			{
-				this.hand.sort(GraphicsCard.TRUMP_SUIT,Integer.parseInt(message[1]));
+				this.TRUMP_NUMBER = Integer.parseInt(message[1]);
+				this.hand.sort();
 				int players = Integer.parseInt(message[2]);
 				for( int i = 0; i < players*2; i+=2 ) {
 					if(message[i+3].equals(Client.getInstance().getUsername())) {
@@ -440,6 +451,8 @@ public class TractorGame extends BasicGame {
 	throws SlickException {
 		g.setColor(this.background);
 		g.fillRect(0,0,container.getWidth(),container.getHeight());
+		g.setColor(Color.white);
+		g.drawString("Score: "+attackingScore, 8, 30);
 		g.setColor(Color.black);
 		for(Iterator<OtherPlayerHand> i = hands.values().iterator(); i.hasNext(); ) {
 			i.next().render(g);
@@ -494,7 +507,7 @@ public class TractorGame extends BasicGame {
 	 * @param card
 	 */
 	public void checkCalling(GraphicsCard card) {
-		if( ( card.getNumber() == GraphicsCard.TRUMP_NUMBER && this.hand.frequency(card) > called_cards ) || ( card.getSuit() == GraphicsCard.TRUMP && this.hand.frequency(card) >= called_cards && this.hand.frequency(card) >= 2 ) ) {
+		if( ( card.getNumber() == this.TRUMP_NUMBER && this.hand.frequency(card) > called_cards ) || ( card.getSuit() == GraphicsCard.TRUMP && this.hand.frequency(card) >= called_cards && this.hand.frequency(card) >= 2 ) ) {
 			switch(card.getSuit()) {
 			case GraphicsCard.SPADES:
 				this.spades.enable();

@@ -452,7 +452,14 @@ public class TractorGame extends BasicGame {
 		g.setColor(this.background);
 		g.fillRect(0,0,container.getWidth(),container.getHeight());
 		g.setColor(Color.white);
-		g.drawString("Score: "+attackingScore, 8, 30);
+		g.drawString("Points: "+attackingScore, 8, 30);
+		g.drawString("Your Score: "+this.score , 8, 45);
+		int count = 0;
+		for(Iterator<String> i = hands.keySet().iterator(); i.hasNext(); ) {
+			String un = i.next();
+			g.drawString(un+"'s Score: "+hands.get(un).getScore() , 8, 60+count*15);
+			count++;
+		}
 		g.setColor(Color.black);
 		for(Iterator<OtherPlayerHand> i = hands.values().iterator(); i.hasNext(); ) {
 			i.next().render(g);

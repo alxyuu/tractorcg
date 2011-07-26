@@ -114,17 +114,19 @@ public class PlayerHand {
 		synchronized(this) {
 			//REMOVE EVERYTHING AND READD TO SORT LOL
 			HashMap<CardButton,GraphicsCard> temp = new HashMap<CardButton,GraphicsCard>();
-			Iterator<CardButton> fail = this.hand.keySet().iterator();
+			Iterator<Map.Entry<CardButton, GraphicsCard>> fail = this.hand.entrySet().iterator();
 			while( fail.hasNext() ) {
-				CardButton cb = fail.next();
-				temp.put(cb,this.hand.get(cb));
+				Map.Entry<CardButton, GraphicsCard> entry = fail.next();
+				CardButton cb = entry.getKey();
+				temp.put(cb,entry.getValue());
 				fail.remove();
 			}
 			
-			fail = temp.keySet().iterator();
+			fail = this.hand.entrySet().iterator();
 			while( fail.hasNext() ) {
-				CardButton cb = fail.next();
-				this.hand.put(cb,temp.get(cb));
+				Map.Entry<CardButton, GraphicsCard> entry = fail.next();
+				CardButton cb = entry.getKey();
+				this.hand.put(cb,entry.getValue());
 				fail.remove();
 			}
 			updateLocations();

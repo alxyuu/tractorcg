@@ -17,6 +17,7 @@ public class OtherPlayerHand {
 	private static final int spacing2 = 20;
 	private String name;
 	private List<GraphicsCard> playedcards;
+	private List<GraphicsCard> lasthand;
 	private int score;
 
 	/** It constructs the other players hand
@@ -75,6 +76,7 @@ public class OtherPlayerHand {
 	 * 
 	 */
 	public void clearTable() {
+		this.lasthand = this.playedcards;
 		this.playedcards.clear();
 	}
 

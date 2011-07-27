@@ -9,12 +9,10 @@ public class Team {
 	
 	private List<User> users;
 	private int index;
-	private int TRUMP_NUMBER;
 	
 	Team() {
 		users = new ArrayList<User>();
 		this.index = 0;
-		this.TRUMP_NUMBER = Card.TWO;
 	}
 	
 	public void clear() {
@@ -42,12 +40,8 @@ public class Team {
 		return this.users.get(index);
 	}
 	
-	public int goUp(int num) {
-		this.TRUMP_NUMBER += num;
-		return this.TRUMP_NUMBER;
-	}
-	
-	public int getCurrentTrump() {
-		return this.TRUMP_NUMBER;
+	public void goUp(int num) {
+		for(User user : this.users)
+			user.goUp(num);
 	}
 }

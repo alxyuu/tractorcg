@@ -110,23 +110,22 @@ public class PlayerHand {
 	/** It sorts the players hand based on the trump suit.
 	 * @param trumpsuit
 	 */
-	public void sort() {
+	public void sort(int trumpsuit, int trumpnumber) {
 		synchronized(this) {
 			//REMOVE EVERYTHING AND READD TO SORT LOL
 			HashMap<CardButton,GraphicsCard> temp = new HashMap<CardButton,GraphicsCard>();
-			Iterator<Map.Entry<CardButton, GraphicsCard>> fail = this.hand.entrySet().iterator();
+			Iterator<CardButton> fail = this.hand.keySet().iterator();
 			while( fail.hasNext() ) {
-				Map.Entry<CardButton, GraphicsCard> entry = fail.next();
-				CardButton cb = entry.getKey();
-				temp.put(cb,entry.getValue());
+				CardButton cb = fail.next();
+				temp.put(cb,this.hand.get(cb));
 				fail.remove();
 			}
-			
-			fail = this.hand.entrySet().iterator();
+			GraphicsCard.TRUMP_SUIT = trumpsuit;
+			GraphicsCard.TRUMP_NUMBER = trumpnumber;
+			fail = temp.keySet().iterator();
 			while( fail.hasNext() ) {
-				Map.Entry<CardButton, GraphicsCard> entry = fail.next();
-				CardButton cb = entry.getKey();
-				this.hand.put(cb,entry.getValue());
+				CardButton cb = fail.next();
+				this.hand.put(cb,temp.get(cb));
 				fail.remove();
 			}
 			updateLocations();
@@ -175,7 +174,7 @@ public class PlayerHand {
 					}
 					previous = card;
 				} else {
-					if(!i.hasNext()) {
+					if(!i.hasNext() && previous != null ) {
 						previous.setSize(100,148);
 						break;
 					}

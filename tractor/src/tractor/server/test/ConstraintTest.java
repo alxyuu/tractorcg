@@ -9,7 +9,10 @@ import java.util.List;
 import java.util.ListIterator;
 
 import tractor.lib.Card;
+import tractor.server.CardComparator;
 import tractor.server.PlayerHand;
+import tractor.server.Tractor;
+import tractor.server.Trick;
 import tractor.server.test.User;
 
 public class ConstraintTest {
@@ -22,6 +25,7 @@ public class ConstraintTest {
 	private Trick currenTrick;
 	private Trick currentTrick;
 	private CardComparator<Card> cardComparator;
+	private Comparator<Tractor> tractorComparator;
 
 	public static void main(String[] args) {
 		Card.populateDeck();
@@ -86,39 +90,56 @@ public class ConstraintTest {
 			}
 
 			public int gameCompare(Card c1, Card c2) {
-				int value1 = getGameValue(c1);
-				int value2 = getGameValue(c2);
-				if(value1 == value2) {
-					int toreturn = c1.getNumber() - c2.getNumber();
-					if(toreturn > 0 && TRUMP_NUMBER < c1.getNumber() && TRUMP_NUMBER > c2.getNumber())
-						return toreturn -1;
-					else if(toreturn < 0 && TRUMP_NUMBER > c1.getNumber() && TRUMP_NUMBER < c2.getNumber())
-						return toreturn +1;
-					else
-						return toreturn;
-				} else {
-					if(value1 >= 4 && value2 >= 4) {
-						if(value1 == 4) {
-							int decrease = (Card.ACE-1) - c1.getNumber();
-							if(TRUMP_NUMBER < c1.getNumber()) {
-								decrease++;
-							}
-							return value1-decrease-value2;
-						} else if(value2 == 4) {
-							int decrease = (Card.ACE-1) - c2.getNumber();
-							if(TRUMP_NUMBER < c2.getNumber()) {
-								decrease++;
-							}
-							return value1+decrease-value2;
-						} else {
-							return value1-value2;
-						}
+				try {
+					int value1 = getGameValue(c1);
+					int value2 = getGameValue(c2);
+					if(value1 == value2) {
+						int toreturn = c1.getNumber() - c2.getNumber();
+						if(toreturn > 0 && TRUMP_NUMBER < c1.getNumber() && TRUMP_NUMBER > c2.getNumber())
+							return toreturn -1;
+						else if(toreturn < 0 && TRUMP_NUMBER > c1.getNumber() && TRUMP_NUMBER < c2.getNumber())
+							return toreturn +1;
+						else
+							return toreturn;
 					} else {
-						return 9999;
+						if(value1 >= 4 && value2 >= 4) {
+							if(value1 == 4) {
+								int decrease = (Card.ACE-1) - c1.getNumber();
+								if(TRUMP_NUMBER < c1.getNumber()) {
+									decrease++;
+								}
+								return value1-decrease-value2;
+							} else if(value2 == 4) {
+								int decrease = (Card.ACE-1) - c2.getNumber();
+								if(TRUMP_NUMBER < c2.getNumber()) {
+									decrease++;
+								}
+								return value1+decrease-value2;
+							} else {
+								return value1-value2;
+							}
+						} else {
+							return 9999;
+						}
 					}
+				} catch (NullPointerException e) {
+					return 9999;
 				}
 			}
 		};
+	
+		this.tractorComparator = new Comparator<Tractor>() {
+			public int compare(Tractor t1, Tractor t2) {
+				if(t1.getType() > t2.getType() && t1.getLength() >= t2.getLength() || t1.getType() >= t2.getType() && t1.getLength() > t2.getLength()) {
+					return 1;
+				} else if (t1.getType() < t2.getType() || t1.getLength() < t2.getLength()) {
+					return -1;
+				} else {
+					return cardComparator.compare(t1.getStartingCard(), t2.getStartingCard());
+				}
+			}
+		};
+		
 		this.users = new ArrayList<User>();
 		users.add(new User());
 		users.add(new User());
@@ -176,579 +197,111 @@ public class ConstraintTest {
 		User user = users.get(1);
 
 		ArrayList<Card> played = new ArrayList<Card>();
-		played.add(Card.getCard(Card.SPADES, Card.KING));
-		played.add(Card.getCard(Card.SPADES, Card.KING));
-		played.add(Card.getCard(Card.SPADES, Card.ACE));
+		played.add(Card.getCard(Card.CLUBS, Card.EIGHT));
+		played.add(Card.getCard(Card.CLUBS, Card.NINE));
+		played.add(Card.getCard(Card.CLUBS, Card.TEN));
+		played.add(Card.getCard(Card.CLUBS, Card.TEN));
+		
 		//add cards
 
 
 
 
 
-		Collections.sort(played,cardComparator);
+		//Collections.sort(played,cardComparator);
 
-		if(user == this.lead) {
-			//the player is the first player, check to make sure the play is high
+		System.out.println(calculateTrick(played));
+	}
 
-			Iterator<Card> it = played.iterator();
-			Card card = it.next();
-			int suit = (card.getNumber() == this.TRUMP_NUMBER || card.getSuit() == this.TRUMP_SUIT) ? Card.TRUMP : card.getSuit();
-			while(it.hasNext()) {
-				card = it.next();
-				//if it's not the same suit and both this and the previous suit aren't trump
-				if( !( 
-						( suit == card.getSuit()  && (suit != Card.TRUMP && card.getNumber() != TRUMP_NUMBER) ) ||
-						(card.getSuit() == this.TRUMP_SUIT || card.getSuit() == Card.TRUMP || card.getNumber() == this.TRUMP_NUMBER) && suit == Card.TRUMP
-				) ) 
-				{
-					System.out.println("must play same suit");
-					return;
-				}
-				//suit = ( card.getNumber() == this.TRUMP_NUMBER ) ? Card.TRUMP : card.getSuit();
-			}
-
-			Trick trick = calculateTrick(played);
-			System.out.println(trick);
-
-			//check if high only if there's more than one play
-			if(trick.countPlays() >= 1) {
-
-				//just check the first in each play, since they're all sorted
-				if(trick.countSingles() > 0) {
-					Card single = trick.getSingles().get(0);
-					if(single.getSuit() != TRUMP_SUIT && single.getNumber() != TRUMP_NUMBER && single.getSuit() != Card.TRUMP) {
-						for(Iterator<User> i2 = users.iterator();i2.hasNext();)
-						{
-							User u = i2.next();
-							if(u != user)
-							{
-								for(int k=single.getNumber()+1; k<=Card.ACE; k++) {
-									if(k != TRUMP_NUMBER && u.getHand().contains(Card.getCard(single.getSuit(),k))) {
-										System.out.println("not high (normal single found)");
-										return;
-									}
-								}
-							}
-						}
-					} else {
-						for(Iterator<User> i2 = users.iterator();i2.hasNext();)
-						{
-							User u = i2.next();
-							if(u != user)
-							{
-								List<Card> cards = u.getHand().getCards();
-								//just check the highest card since it's sorted
-								if( cardComparator.gameCompare(single,cards.get(cards.size()-1)) < 0 ) {
-									System.out.println("not high (trump single found)");
-									return;
-								}
-							}
-						}
-					}
-				}
-				if(trick.countPairs() > 0) {
-					Card pair = trick.getPairs().get(0);
-					if(pair.getSuit() != TRUMP_SUIT && pair.getNumber() != TRUMP_NUMBER && pair.getSuit() != Card.TRUMP) {
-						for(Iterator<User> i2 = users.iterator();i2.hasNext();)
-						{
-							User u = i2.next();
-							if(u != user)
-							{
-								for(int k=pair.getNumber()+1; k<=Card.ACE; k++) {
-									if(k != TRUMP_NUMBER && u.getHand().frequency(Card.getCard(pair.getSuit(),k)) >= 2) {
-										System.out.println("not high (normal pair found)");
-										return;
-									}
-								}
-							}
-						}
-					} else {
-						for(Iterator<User> i2 = users.iterator();i2.hasNext();)
-						{
-							User u = i2.next();
-							if(u != user)
-							{
-								ListIterator<Card> cards = u.getHand().getCards().listIterator(u.getHand().getCards().size());
-								//assuming the hand isn't empty
-								Card previous = cards.previous();
-								cardComparator.gameCompare(pair,previous);
-								while( cards.hasPrevious() ) {
-									Card current = cards.previous();
-									//too lazy to optimize for triples
-									if(current == previous) {
-										if(cardComparator.gameCompare(pair,previous) < 0) {
-											System.out.println("not high (trump pair found)");
-											return;
-										}
-										//they're smaller now, just get out.
-										break;
-									}
-									previous = current;
-								}
-							}
-						}
-					}
-				}
-				if(trick.countTriples() > 0) {
-					Card triple = trick.getTriples().get(0);
-					if(triple.getSuit() != TRUMP_SUIT && triple.getNumber() != TRUMP_NUMBER && triple.getSuit() != Card.TRUMP) {
-						for(Iterator<User> i2 = users.iterator();i2.hasNext();)
-						{
-							User u = i2.next();
-							if(u != user)
-							{
-								for(int k=triple.getNumber()+1; k<=Card.ACE; k++) {
-									if(k != TRUMP_NUMBER && u.getHand().frequency(Card.getCard(triple.getSuit(),k)) >= 3) {
-										System.out.println("not high (normal triple found)");
-										return;
-									}
-								}
-							}
-						}
-					} else {
-						for(Iterator<User> i2 = users.iterator();i2.hasNext();)
-						{
-							User u = i2.next();
-							if(u != user)
-							{
-								ListIterator<Card> cards = u.getHand().getCards().listIterator(u.getHand().getCards().size());
-								//assuming the hand isn't empty
-								Card previous = cards.previous();
-								Card twoPrevious = null;
-								while( cards.hasPrevious() ) {
-									Card current = cards.previous();
-									//too lazy to optimize, just move one at a time
-									if(current == previous && previous == twoPrevious) {
-										if(cardComparator.gameCompare(triple,previous) < 0) {
-											System.out.println("not high (trump triple found)");
-											return;
-										}
-										//they're smaller now, just get out.
-										break;
-									}
-									twoPrevious = previous;
-									previous = current;
-								}
-							}
-						}
-					}
-				}
-
-			} else if (trick.countPlays() == 0) { // this should never happen...
-				System.out.println("some bad shit happened");
-				return;
-			}
-
-
-			//the trick is valid so set it
-			this.currentTrick = trick;
-			//assume lead is always high until beaten by someone else
-			this.highest = user;
-			//don't set suit until after the play has been verified as high
-			this.currentSuit = suit;
+	private void addCardsToTrick(List<Card> cardlist, Trick trick, int size) {
+		if(cardlist.size() >= 2) {
+			trick.addTractor(new Tractor(size, cardlist));
 		} else {
-			//not lead, check following suit, playing doubles/tractors/triples/whatever
-			//compare to highest user's play
-			//make sure the number of cards are correct
-
-
-
-
+			for(Card c : cardlist) {
+				switch(size) {
+					case 1:
+						trick.addSingle(c); //shouldn't ever happen though...
+						break;
+					case 2:
+						trick.addPair(c);
+						break;
+					case 3:
+						trick.addTriple(c);
+						break;
+					default:
+						System.out.println("something went terribly terribly wrong");
+				}
+			}
 		}
-
-		System.out.println("congratulations all tests passed");
 	}
 
 	public Trick calculateTrick(List<Card> played) {
-		Trick trick = new Trick();
+		played.add(null); //trick the while loop into going one more round...
+		Trick trick = new Trick(this.cardComparator, this.tractorComparator);
 		//calculate stuffs
 		Iterator<Card> it=played.iterator();
 		Card previous=it.next();
-		ArrayList<Card> previousCards=new ArrayList<Card>();
-		previousCards.add(previous);
-		Card twoPrevious=null;
+		ArrayList<Card> cardlist = new ArrayList<Card>();
+		cardlist.add(previous);
+		int currentsize = 1;
+		int maxsize = 1;
 		while(it.hasNext())
 		{
 			Card current=it.next();
 			if(current==previous) //if they are equal add to list for possible pair/triple/tractor
 			{
-				previousCards.add(current);
-				twoPrevious=previous;
-				previous=current;
+				currentsize++;
 			}
 			else
 			{
-				if( cardComparator.gameCompare(current, previous) == 1 )
+				if(maxsize == 1)
+					maxsize = currentsize;
+					
+				if(maxsize != currentsize) 
 				{
-					if(previousCards.size()==1) //if only one other card held then its just a single so get rid of the old card and add the new one
-					{
-						trick.addSingle(previous);
-						previousCards.clear();
-						previousCards.add(current);
-						twoPrevious=null;
-						previous=current;
-					}
-					else if(twoPrevious!=previous) //if the last two cards aren't equal then the there is no tractor possibility so remove previous
-					{
-						trick.addSingle(previous);
-						previousCards.remove(previousCards.size()-1);
-						if(previousCards.size()==1) //if there's only one other card then add it as a single
-						{
-							trick.addSingle(twoPrevious);
-							previousCards.clear();
-							previousCards.add(current);
-							twoPrevious=null;
-							previous=current;
-
-						}
-						else if(previousCards.size()==2) //if there was two add as pair
-						{
-							trick.addPair(twoPrevious);
-							previousCards.clear();
-							previousCards.add(current);
-							twoPrevious=null;
-							previous=current;
-						}
-						else if(previousCards.size()==3) //if there are 3 left then its a triple
-						{
-							trick.addTriple(twoPrevious);
-							previousCards.clear();
-							previousCards.add(current);
-							twoPrevious=null;
-							previous=current;
-						}
-						else //otherwise if theres more its a tractor
-						{
-							int pairCount=0;
-							int tripleCount=0;
-							Iterator<Card> it2=previousCards.iterator();
-							Card first=it2.next();
-							it2.next(); // skip one because we know it's a tractor
-							Card before=first;
-							Card current2=first;
-							while(true)
-							{
-								current2=it2.next();
-								if(before==current2)     //if third card equals first then triple
-								{
-									tripleCount++;
-									if(it2.hasNext())
-									{
-										before=it2.next();
-										it2.next();
-										continue;
-									} else {
-										break;
-									}
-								}
-								else				//third and first different
-								{
-									pairCount++;
-									before=current2;
-								}
-								it2.next();
-								if(!it2.hasNext()) {
-									pairCount++;
-									break;
-								}
-							}
-
-							trick.addTractor(new Tractor(pairCount, tripleCount, first.getNumber(), first.getSuit(), Math.abs(cardComparator.gameCompare(first,current2))+1));
-							previousCards.clear();
-							previousCards.add(current);
-							twoPrevious=null;
-							previous=current;
-						}
-					}
-					else {
-						previousCards.add(current);
-						twoPrevious=previous;
-						previous = current;
-					}
-
-				}
-				else //no tractor/pairs/triples
-				{
-					//why? there could be a pair after
-					//trick.addSingle(current);
-					if(previousCards.size()==1) //if there's only one other card then add it as a single
-					{
-						trick.addSingle(previous);
-						previousCards.clear();
-						previousCards.add(current);
-						previous=current;
-
-					}
-					else if(previousCards.size()==2) //if there was two add as pair
-					{
-						trick.addPair(previous);
-						previousCards.clear();
-						previousCards.add(current);
-						previous=current;
-					}
-					else if(previousCards.size()==3) //if there are 3 left then its a triple
-					{
-						trick.addTriple(previous);
-						previousCards.clear();
-						previousCards.add(current);
-						previous=current;
-					}
-					else //otherwise if theres more its a tractor
-					{
-						int pairCount=0;
-						int tripleCount=0;
-						Iterator<Card> it2=previousCards.iterator();
-						Card first=it2.next();
-						it2.next(); // skip one because we know it's a tractor
-						Card before=first;
-						Card current2=first;
-						while(true)
-						{
-							current2=it2.next();
-							if(before==current2)     //if third card equals first then triple
-							{
-								tripleCount++;
-								if(it2.hasNext())
-								{
-									before=it2.next();
-									it2.next();
-									continue;
-								} else {
-									break;
-								}
-							}
-							else				//third and first different
-							{
-								pairCount++;
-								before=current2;
-							}
-							it2.next();
-							if(!it2.hasNext()) {
-								pairCount++;
-								break;
-							}
-						}
-						trick.addTractor(new Tractor(pairCount, tripleCount, first.getNumber(), first.getSuit(),Math.abs(cardComparator.gameCompare(first,current2))+1));
-						previousCards.clear();
-						previousCards.add(current);
-						twoPrevious=null;
-						previous=current;
-					}
-
-				}
-			}
-
-		}
-
-		//take care of the last set
-		if(previousCards.size()==0) {
-			System.out.println("some bad shit happened");
-		}
-		if(previousCards.size()==1) //if only one other card held then its just a single so get rid of the old card and add the new one
-		{
-			trick.addSingle(previous);
-			previousCards.clear();
-		}
-		else if(twoPrevious!=previous) //if the last two cards aren't equal then the there is no tractor possibility so remove previous
-		{
-			trick.addSingle(previous);
-			previousCards.remove(previousCards.size()-1);
-			if(previousCards.size()==1) //if there's only one other card then add it as a single
-			{
-				trick.addSingle(twoPrevious);
-				previousCards.clear();
-			}
-			else if(previousCards.size()==2) //if there was two add as pair
-			{
-				trick.addPair(twoPrevious);
-				previousCards.clear();
-			}
-			else if(previousCards.size()==3) //if there are 3 left then its a triple
-			{
-				trick.addTriple(twoPrevious);
-				previousCards.clear();
-			}
-			else //otherwise if theres more its a tractor
-			{
-				int pairCount=0;
-				int tripleCount=0;
-				Iterator<Card> it2=previousCards.iterator();
-				Card first=it2.next();
-				it2.next(); // skip one because we know it's a tractor
-				Card before=first;
-				Card current2=first;
-				while(true)
-				{
-					current2=it2.next();
-					if(before==current2)     //if third card equals first then triple
-					{
-						tripleCount++;
-						if(it2.hasNext())
-						{
-							before=it2.next();
-							it2.next();
-							continue;
-						} else {
-							break;
-						}
-					}
-					else				//third and first different
-					{
-						pairCount++;
-						before=current2;
-					}
-					it2.next();
-					if(!it2.hasNext()) {
-						pairCount++;
-						break;
+					Card temp = cardlist.remove(cardlist.size()-1);
+					this.addCardsToTrick(cardlist, trick, maxsize);
+					cardlist.clear();
+					maxsize = currentsize;
+					if(currentsize == 1) {
+						trick.addSingle(temp);
+					} else {
+						cardlist.add(temp);
 					}
 				}
-
-				trick.addTractor(new Tractor(pairCount, tripleCount, first.getNumber(), first.getSuit(), Math.abs(cardComparator.gameCompare(first,current2))+1));
-				previousCards.clear();
-			}
-		}
-		else {
-			if(previousCards.size()==2) //if there was two add as pair
-			{
-				trick.addPair(twoPrevious);
-				previousCards.clear();
-			}
-			else if(previousCards.size()==3) //if there are 3 left then its a triple
-			{
-				trick.addTriple(twoPrevious);
-				previousCards.clear();
-			}
-			else //otherwise if theres more its a tractor
-			{
-				int pairCount=0;
-				int tripleCount=0;
-				Iterator<Card> it2=previousCards.iterator();
-				Card first=it2.next();
-				it2.next(); // skip one because we know it's a tractor
-				Card before=first;
-				Card current2=first;
-				while(true)
+				else
 				{
-					current2=it2.next();
-					if(before==current2)     //if third card equals first then triple
+					
+					if( cardComparator.gameCompare(current, previous) == 1 )
 					{
-						tripleCount++;
-						if(it2.hasNext())
+						if(currentsize == 1) 
 						{
-							before=it2.next();
-							it2.next();
-							continue;
-						} else {
-							break;
+							trick.addSingle(previous);
+							cardlist.clear();
 						}
+					} 
+					else //skipped a card, current card can't be part of tractor
+					{ 
+						this.addCardsToTrick(cardlist, trick, maxsize);
+						cardlist.clear();
+						maxsize = 1;
 					}
-					else				//third and first different
-					{
-						pairCount++;
-						before=current2;
-					}
-					it2.next();
-					if(!it2.hasNext()) {
-						pairCount++;
-						break;
-					}
-				}
 
-				trick.addTractor(new Tractor(pairCount, tripleCount, first.getNumber(), first.getSuit(), Math.abs(cardComparator.gameCompare(first,current2))+1));
-				previousCards.clear();
+					
+					
+				}
+				if(current != null) {
+					cardlist.add(current);
+					currentsize = 1;
+				} else {
+					this.addCardsToTrick(cardlist, trick, maxsize);
+					break;
+				}
 			}
+			previous=current;
 		}
 		
+		played.remove(played.size()-1); //remove the null we put in
 		return trick;
-	}
-}
-
-class Trick {
-	private List<Card> singles;
-	private List<Card> pairs;
-	private List<Card> triples;
-	private List<Tractor> tractors;
-	Trick() {
-		this.singles = new LinkedList<Card>();
-		this.pairs = new LinkedList<Card>();
-		this.triples = new LinkedList<Card>();
-		this.tractors = new LinkedList<Tractor>();
-	}
-
-	public void addSingle(Card card) {
-		this.singles.add(card);
-	}
-
-	public void addPair(Card pair) {
-		this.pairs.add(pair);
-	}
-
-	public void addTriple(Card triple) {
-		this.triples.add(triple);
-	}
-
-	public void addTractor(Tractor tractor) {
-		this.tractors.add(tractor);
-	}
-
-	public List<Card> getSingles() {
-		return this.singles;
-	}
-	public List<Card> getPairs() {
-		return pairs;
-	}
-
-	public List<Card> getTriples() {
-		return triples;
-	}
-
-	public List<Tractor> getTractors() {
-		return tractors;
-	}
-
-	public int countSingles() {
-		return this.singles.size();
-	}
-
-	public int countPairs() {
-		return this.pairs.size();
-	}
-
-	public int countTriples() {
-		return this.triples.size();
-	}
-
-	public int countTractors() {
-		return this.tractors.size();
-	}
-
-	public int countPlays() {
-		return this.countSingles() + this.countPairs() + this.countTriples() + this.countTractors();
-	}
-
-	public String toString() {
-		return "Singles: "+this.singles + "\nPairs: " + this.pairs + "\nTriples: " + this.triples + "\nTractors: " + this.tractors;
-	}
-
-}
-
-class Tractor {
-	int pairs;
-	int triples;
-	int start;
-	int end;
-	private int length;
-	private int suit;
-	Tractor(int pairs, int triples, int start, int suit, int length) {
-		this.pairs = pairs;
-		this.triples = triples;
-		this.start = start;
-		this.suit = suit;
-		this.length = length;
-	}
-	public String toString()
-	{
-		return "tractor starting at "+Card.getCard(suit,start)+" of length "+length+" :: "+pairs+" pairs and "+triples+" triples";
 	}
 }

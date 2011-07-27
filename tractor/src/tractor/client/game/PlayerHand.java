@@ -160,24 +160,22 @@ public class PlayerHand {
 		CardButton card = null;
 		CardButton previous = null;
 		Iterator<CardButton> i = hand.keySet().iterator();
-		if(i.hasNext()) {
-			while( true ){
-				card = i.next();
-				card.setX(start);
-				if(card.isAcceptingInput()) {
-					if(i.hasNext()) {
-						card.setSize(spacing,148);
-						start+=spacing;
-					} else {
-						card.setSize(100,148);
-						break;
-					}
-					previous = card;
+		while( i.hasNext() ){
+			card = i.next();
+			card.setX(start);
+			if(card.isAcceptingInput()) {
+				if(i.hasNext()) {
+					card.setSize(spacing,148);
+					start+=spacing;
 				} else {
-					if(!i.hasNext() && previous != null ) {
-						previous.setSize(100,148);
-						break;
-					}
+					card.setSize(100,148);
+					break;
+				}
+				previous = card;
+			} else {
+				if(!i.hasNext() && previous != null ) {
+					previous.setSize(100,148);
+					break;
 				}
 			}
 		}

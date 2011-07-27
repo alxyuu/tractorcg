@@ -281,16 +281,23 @@ public class TractorGame extends BasicGame {
 			break;
 			case GameCommand.PLAY_SUCCESS:
 			{
-				System.out.println("selected cards: "+this.selected);
+				//System.out.println("selected cards: "+this.selected);
+				int num = Integer.parseInt(message[1]);
 				List<GraphicsCard> list = new LinkedList<GraphicsCard>();
+				for (int i = 0; i<num*2; i+=2) {
+					list.add(GraphicsCard.getCard(message[i+2],message[i+3]));
+				}
 				for(Iterator<CardButton> i = this.selected.iterator(); i.hasNext();) {
 					CardButton card = i.next();
-					list.add(card.getCard());
-					this.hand.removeCard(card);
+					//problem with multiple of the same card, but for the case of this game, if the play is successful all of a certain card should be played...
+					if(list.contains(card.getCard()))
+						this.hand.removeCard(card);
+					else
+						card.down();
 				}
 				this.hand.playCards(list);
 				this.selected.clear();
-				System.out.println("selected cards removed: "+this.selected);
+				//System.out.println("selected cards removed: "+this.selected);
 				this.state = GameCommand.PLAYING;
 			}
 			break;

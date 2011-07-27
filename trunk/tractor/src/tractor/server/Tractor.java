@@ -5,10 +5,10 @@ import java.util.List;
 
 import tractor.lib.Card;
 
-class Tractor {
+public class Tractor {
 	private int type;
 	private List<Card> cards;
-	Tractor(int type, List<Card> cards) {
+	public Tractor(int type, List<Card> cards) {
 		//2=doubles 3=trips
 		this.type = type;
 		this.cards = new ArrayList<Card>(cards);

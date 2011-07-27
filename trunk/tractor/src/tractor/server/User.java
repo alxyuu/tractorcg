@@ -99,6 +99,10 @@ public class User {
 	public int getGameScore() {
 		return this.gamescore;
 	}
+	
+	public void goUp(int num) {
+		this.gamescore+=num;
+	}
 
 	public PlayerHand getHand() {
 		return this.hand;

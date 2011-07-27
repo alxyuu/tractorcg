@@ -5,6 +5,7 @@ import java.awt.geom.Point2D;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
+import java.util.LinkedList;
 import java.util.Set;
 
 import java.util.Iterator;
@@ -19,6 +20,7 @@ import org.newdawn.slick.AppGameContainer;
 
 import tractor.client.Client;
 import tractor.client.handlers.IOFactory;
+import tractor.lib.Card;
 import tractor.lib.GameCommand;
 import tractor.lib.MessageFactory;
 import tractor.server.User;
@@ -30,7 +32,7 @@ public class TractorGame extends BasicGame {
 	private int players;
 	private int position;
 	private GameContainer gamecontainer;
-	private String name;
+	private String name; //name of the gameroom i.e. @123456789
 	private PlayerHand hand;
 	private Button startButton;
 	private boolean isHost;
@@ -45,9 +47,8 @@ public class TractorGame extends BasicGame {
 	private boolean showDipai;
 	private Button playButton;
 	private String errorMessage;
-	private int attackingScore = 0;
-	private int TRUMP_NUMBER = 0;
-	private int TRUMP_SUIT = 4;
+	private int attackingScore;
+	private String banker;
 	//private OtherPlayerHand hand;
 	/** It constructs the tractor game.
 	 * @param position
@@ -63,6 +64,7 @@ public class TractorGame extends BasicGame {
 		this.isHost = false;
 		this.called_cards = 0;
 		this.selected = new ArrayList<CardButton>();
+		this.banker = null;
 	}
 
 	@Override
@@ -75,6 +77,7 @@ public class TractorGame extends BasicGame {
         	this.hand.addCard();
         }*/
 		this.gamecontainer = container;
+		this.gamecontainer.setShowFPS(false);
 		this.io = Client.getInstance().getIO();
 		this.background = new Color(0,150,0);
 		this.startButton = new Button(container,GraphicsCard.getCard(GraphicsCard.DIAMONDS,GraphicsCard.ACE).getImage(),GraphicsCard.getCard(GraphicsCard.CLUBS,GraphicsCard.ACE).getImage(),GraphicsCard.getCard(GraphicsCard.HEARTS,GraphicsCard.ACE).getImage(),container.getWidth()/2,container.getHeight()/2);
@@ -87,25 +90,25 @@ public class TractorGame extends BasicGame {
 			this.spades = new Button(container,new Image("images/suits/"+GraphicsCard.SPADES+".png"), new Image("images/suits/"+GraphicsCard.SPADES+"s.png"), 600, 370);
 			this.spades.addButtonPressedListener(new ButtonPressedListener() {
 				public void buttonPressed() {
-					sendCommand(GameCommand.PLAY_CARD+" "+GraphicsCard.SPADES + " " + TRUMP_NUMBER + " " + (called_cards+1));
+					sendCommand(GameCommand.PLAY_CARD+" "+GraphicsCard.SPADES + " " + GraphicsCard.TRUMP_NUMBER + " " + (called_cards+1));
 				}
 			});
 			this.clubs = new Button(container,new Image("images/suits/"+GraphicsCard.CLUBS+".png"), new Image("images/suits/"+GraphicsCard.CLUBS+"s.png"), 631, 370);
 			this.clubs.addButtonPressedListener(new ButtonPressedListener() {
 				public void buttonPressed() {
-					sendCommand(GameCommand.PLAY_CARD+" "+GraphicsCard.CLUBS + " " + TRUMP_NUMBER + " " + (called_cards+1));
+					sendCommand(GameCommand.PLAY_CARD+" "+GraphicsCard.CLUBS + " " + GraphicsCard.TRUMP_NUMBER + " " + (called_cards+1));
 				}
 			});
 			this.diamonds = new Button(container,new Image("images/suits/"+GraphicsCard.DIAMONDS+".png"), new Image("images/suits/"+GraphicsCard.DIAMONDS+"s.png"), 662, 370);
 			this.diamonds.addButtonPressedListener(new ButtonPressedListener() {
 				public void buttonPressed() {
-					sendCommand(GameCommand.PLAY_CARD+" "+GraphicsCard.DIAMONDS + " " + TRUMP_NUMBER + " " + (called_cards+1));
+					sendCommand(GameCommand.PLAY_CARD+" "+GraphicsCard.DIAMONDS + " " + GraphicsCard.TRUMP_NUMBER + " " + (called_cards+1));
 				}
 			});
 			this.hearts = new Button(container,new Image("images/suits/"+GraphicsCard.HEARTS+".png"), new Image("images/suits/"+GraphicsCard.HEARTS+"s.png"), 693, 370);
 			this.hearts.addButtonPressedListener(new ButtonPressedListener() {
 				public void buttonPressed() {
-					sendCommand(GameCommand.PLAY_CARD+" "+GraphicsCard.HEARTS + " " + TRUMP_NUMBER + " " + (called_cards+1));
+					sendCommand(GameCommand.PLAY_CARD+" "+GraphicsCard.HEARTS + " " + GraphicsCard.TRUMP_NUMBER + " " + (called_cards+1));
 				}
 			});
 			this.notrump = new Button(container,new Image("images/suits/"+GraphicsCard.TRUMP+".png"), new Image("images/suits/"+GraphicsCard.TRUMP+"s.png"), 724, 370);
@@ -165,14 +168,6 @@ public class TractorGame extends BasicGame {
 			//hands.put("Player"+((players+position-2)%players+1), new OtherPlayerHand(container.getWidth()-100,container.getHeight()/2));
 		}
 		this.hand = new PlayerHand(container.getWidth()/2,container.getHeight()-100, container.getWidth()/2,container.getHeight()-250 );
-	}
-	
-	public int getTrumpNumber() {
-		return this.TRUMP_NUMBER;
-	}
-	
-	public int getTrumpSuit() {
-		return this.TRUMP_SUIT;
 	}
 
 	/** It gets the coordinates of the game.
@@ -235,6 +230,7 @@ public class TractorGame extends BasicGame {
 				{
 					this.startButton.hide();
 					this.callingEnabled = true;
+					this.showDipai = false;
 				}
 				break;
 				case GameCommand.DIPAI:
@@ -258,6 +254,17 @@ public class TractorGame extends BasicGame {
 					this.selected.clear();
 				}
 				break;
+				case GameCommand.FINISHED:
+				{
+					dipai = Collections.synchronizedList(new LinkedList<GraphicsCard>());
+					int size = Integer.parseInt(message[2]);
+					for(int i=0; i<size*2; i+=2) {
+						dipai.add(GraphicsCard.getCard(message[i+3],message[i+4]));
+					}
+					this.showDipai = true;
+					this.banker = null;
+				}
+				break;
 				default:
 				{
 					//TODO: state not found
@@ -275,7 +282,7 @@ public class TractorGame extends BasicGame {
 			case GameCommand.PLAY_SUCCESS:
 			{
 				System.out.println("selected cards: "+this.selected);
-				ArrayList<GraphicsCard> list = new ArrayList<GraphicsCard>();
+				List<GraphicsCard> list = new LinkedList<GraphicsCard>();
 				for(Iterator<CardButton> i = this.selected.iterator(); i.hasNext();) {
 					CardButton card = i.next();
 					list.add(card.getCard());
@@ -283,6 +290,7 @@ public class TractorGame extends BasicGame {
 				}
 				this.hand.playCards(list);
 				this.selected.clear();
+				System.out.println("selected cards removed: "+this.selected);
 				this.state = GameCommand.PLAYING;
 			}
 			break;
@@ -330,15 +338,14 @@ public class TractorGame extends BasicGame {
 			case GameCommand.PLAY_CARD:
 			{
 				if(this.state == GameCommand.DEALING) { // being called
-					this.TRUMP_SUIT = Integer.parseInt(message[2]);
 					this.called_cards = Integer.parseInt(message[3]);
-					ArrayList<GraphicsCard> list = new ArrayList<GraphicsCard>();
+					List<GraphicsCard> list = new LinkedList<GraphicsCard>();
 					for(int i = 0; i < called_cards; i++) {
-						list.add(GraphicsCard.getCard(this.TRUMP_SUIT,this.TRUMP_NUMBER));
+						list.add(GraphicsCard.getCard(Integer.parseInt(message[2]),GraphicsCard.TRUMP_NUMBER));
 					}
 
 					// I'm so cool
-					hand.sort();
+					hand.sort(Integer.parseInt(message[2]),GraphicsCard.TRUMP_NUMBER);
 					
 					if(message[1].equals(Client.getInstance().getUsername())) {
 						this.hand.playCards(list);
@@ -348,7 +355,7 @@ public class TractorGame extends BasicGame {
 					checkAllCalling();
 				} else if (this.state == GameCommand.PLAYING) {
 					int cards = Integer.parseInt(message[2]);
-					ArrayList<GraphicsCard> list = new ArrayList<GraphicsCard>();
+					List<GraphicsCard> list = new LinkedList<GraphicsCard>();
 					for(int i = 0; i < cards*2; i+=2) {
 						list.add(GraphicsCard.getCard(message[i+3],message[i+4]));
 					}
@@ -366,8 +373,7 @@ public class TractorGame extends BasicGame {
 			break;
 			case GameCommand.SET_STATS: 
 			{
-				this.TRUMP_NUMBER = Integer.parseInt(message[1]);
-				this.hand.sort();
+				this.hand.sort(GraphicsCard.TRUMP_SUIT,Integer.parseInt(message[1]));
 				int players = Integer.parseInt(message[2]);
 				for( int i = 0; i < players*2; i+=2 ) {
 					if(message[i+3].equals(Client.getInstance().getUsername())) {
@@ -391,29 +397,32 @@ public class TractorGame extends BasicGame {
 			break;
 			case GameCommand.DIPAI: 
 			{
-				Thread dpthread = new Thread() {
-					public void run() {
-						dipai = Collections.synchronizedList(new ArrayList<GraphicsCard>());
-						int size = Integer.parseInt(message[1]);
-						for(int i=0; i<size*2; i+=2) {
-							dipai.add(GraphicsCard.getCard(message[i+2],message[i+3]));
+				this.banker = message[1];
+				if(message[1].equals(Client.getInstance().getUsername())) {
+					Thread dpthread = new Thread() {
+						public void run() {
+							dipai = Collections.synchronizedList(new LinkedList<GraphicsCard>());
+							int size = Integer.parseInt(message[2]);
+							for(int i=0; i<size*2; i+=2) {
+								dipai.add(GraphicsCard.getCard(message[i+3],message[i+4]));
+							}
+							showDipai = true;
+							try{
+								Thread.sleep(1500);
+							} catch (InterruptedException e) {
+								e.printStackTrace();
+								return;
+							}
+							for(int i=0; i<size; i++) {
+								hand.addCard(gamecontainer,dipai.get(i));
+							}
+							showDipai = false;
+							playButton.enable();
+							playButton.show();
 						}
-						showDipai = true;
-						try{
-							Thread.sleep(1000);
-						} catch (InterruptedException e) {
-							e.printStackTrace();
-							return;
-						}
-						for(int i=0; i<size; i++) {
-							hand.addCard(gamecontainer,dipai.get(i));
-						}
-						showDipai = false;
-						playButton.enable();
-						playButton.show();
-					}
-				};
-				dpthread.start();
+					};
+					dpthread.start();
+				}
 			}
 			break;
 			case GameCommand.SET_HOST:
@@ -452,12 +461,15 @@ public class TractorGame extends BasicGame {
 		g.setColor(this.background);
 		g.fillRect(0,0,container.getWidth(),container.getHeight());
 		g.setColor(Color.white);
-		g.drawString("Points: "+attackingScore, 8, 30);
-		g.drawString("Your Score: "+this.score , 8, 45);
+		g.drawString("Points: " + attackingScore, 8, 8);
+		g.drawString("Trump: " + ((Card.TRUMP_NUMBER != -1) ? Card.getNameOfNumber(Card.TRUMP_NUMBER) : ""), 8, 28 );
+		g.drawString("Trump Suit: " + ((Card.TRUMP_SUIT != -1) ? Card.getNameOfSuit(Card.TRUMP_SUIT) : ""), 8, 48 );
+		g.drawString("Banker: " + ((this.banker != null) ? this.banker : ""), 8, 68 );
+		g.drawString("Your Score: " + Card.getNameOfNumber(this.score) , 8, 88);
 		int count = 0;
 		for(Iterator<String> i = hands.keySet().iterator(); i.hasNext(); ) {
 			String un = i.next();
-			g.drawString(un+"'s Score: "+hands.get(un).getScore() , 8, 60+count*15);
+			g.drawString(un+"'s Score: "+Card.getNameOfNumber(hands.get(un).getScore()) , 8, 148-count*20);
 			count++;
 		}
 		g.setColor(Color.black);
@@ -514,7 +526,7 @@ public class TractorGame extends BasicGame {
 	 * @param card
 	 */
 	public void checkCalling(GraphicsCard card) {
-		if( ( card.getNumber() == this.TRUMP_NUMBER && this.hand.frequency(card) > called_cards ) || ( card.getSuit() == GraphicsCard.TRUMP && this.hand.frequency(card) >= called_cards && this.hand.frequency(card) >= 2 ) ) {
+		if( ( card.getNumber() == GraphicsCard.TRUMP_NUMBER && this.hand.frequency(card) > called_cards ) || ( card.getSuit() == GraphicsCard.TRUMP && this.hand.frequency(card) >= called_cards && this.hand.frequency(card) >= 2 ) ) {
 			switch(card.getSuit()) {
 			case GraphicsCard.SPADES:
 				this.spades.enable();

@@ -2,10 +2,7 @@ package tractor.lib;
 
 import java.util.ArrayList;
 
-import tractor.client.game.GraphicsCard;
-
-//public class Card implements Comparable<Card> {
-public class Card {
+public class Card implements Comparable<Card> {
 
 	protected static final ArrayList<Card> cards;
 	public static final int ACE = 12;
@@ -31,8 +28,8 @@ public class Card {
 	public static final int HEARTS = 3;
 	public static final int TRUMP = 4;
 	public static final int CARDS_PER_SUIT = 13;
-	//public static int TRUMP_SUIT = 4;
-	//public static int TRUMP_NUMBER = 4;
+	public static int TRUMP_SUIT = -1;
+	public static int TRUMP_NUMBER = -1;
 	//TODO: EL PROBLEMO - MORE THAN ONE TRUMP SUIT/NUMBER WHEN RUNNING SERVER BECAUSE OF MULTIPLE GAMES BAWWW
 	//^ fixed by moving trump_suit and trump_number to gameroom, no?
 	//public static final int SET_TRUMP_BONUS = 13;
@@ -144,7 +141,7 @@ public class Card {
 	/** it gets the sorted suit.
 	 * @return
 	 */
-	/*private int getSortingSuit() {
+	private int getSortingSuit() {
 		if (this.suit == Card.TRUMP)
 			return Card.TRUMP+Card.TRUMP+2;
 		else if(this.suit == Card.TRUMP_SUIT && this.value == Card.TRUMP_NUMBER)
@@ -155,7 +152,7 @@ public class Card {
 			return Card.TRUMP;
 		else
 			return this.suit;
-	}*/
+	}
 	
 	/** It gets the sorting value of the card.
 	 * @return
@@ -166,79 +163,127 @@ public class Card {
 		return this.value;
 	}
 
-	/*public int compareTo(Card card) {
+	public int compareTo(Card card) {
 		if(this.getSortingSuit() == card.getSortingSuit()) {
 			return this.getSortingValue()-card.getSortingValue();
 		} else {
 			return this.getSortingSuit() - card.getSortingSuit();
 		}
 		//return this.getrandombs() - card.getrandombs();
-	}*/
+	}
 
+	public static String getNameOfNumber(int num) {
+		switch(num) {
+		case Card.TWO:
+			return "Two";
+		case Card.THREE:
+			return "Three";
+		case Card.FOUR:
+			return "Four";
+		case Card.FIVE:
+			return "Five";
+		case Card.SIX:
+			return "Six";
+		case Card.SEVEN:
+			return "Seven";
+		case Card.EIGHT:
+			return "Eight";
+		case Card.NINE:
+			return "Nine";
+		case Card.TEN:
+			return "Ten";
+		case Card.JACK:
+			return "Jack";
+		case Card.QUEEN:
+			return "Queen";
+		case Card.KING:
+			return "King";
+		case Card.ACE:
+			return "Ace";
+		}
+		return "";
+	}
+	
+	public static String getNameOfSuit(int num) {
+		switch(num) {
+		case Card.SPADES:
+			return "Spades";
+		case Card.CLUBS:
+			return "Clubs";
+		case Card.DIAMONDS:
+			return "Diamonds";
+		case Card.HEARTS:
+			return "Hearts";
+		case Card.TRUMP:
+			return "No Trump";
+		}
+		return "";
+	}
+	
 	public String toString() {
 		String out = "";
 		switch(this.value) {
-		case GraphicsCard.TWO:
-			if(this.suit == GraphicsCard.TRUMP)
+		case Card.TWO:
+			if(this.suit == Card.TRUMP)
 				out += "small joker";
 			else
 				out += "two";
 			break;
-		case GraphicsCard.THREE:
-			if(this.suit == GraphicsCard.TRUMP)
+		case Card.THREE:
+			if(this.suit == Card.TRUMP)
 				out += "big joker";
 			else
 				out += "three";
 			break;
-		case GraphicsCard.FOUR:
+		case Card.FOUR:
 			out += "four";
 			break;
-		case GraphicsCard.FIVE:
+		case Card.FIVE:
 			out += "five";
 			break;
-		case GraphicsCard.SIX:
+		case Card.SIX:
 			out += "six";
 			break;
-		case GraphicsCard.SEVEN:
+		case Card.SEVEN:
 			out += "seven";
 			break;
-		case GraphicsCard.EIGHT:
+		case Card.EIGHT:
 			out+= "eight";
 			break;
-		case GraphicsCard.NINE:
+		case Card.NINE:
 			out+= "nine";
 			break;
-		case GraphicsCard.TEN:
+		case Card.TEN:
 			out += "ten";
 			break;
-		case GraphicsCard.JACK:
+		case Card.JACK:
 			out += "jack";
 			break;
-		case GraphicsCard.QUEEN:
+		case Card.QUEEN:
 			out += "queen";
 			break;
-		case GraphicsCard.KING:
+		case Card.KING:
 			out += "king";
 			break;
-		case GraphicsCard.ACE:
+		case Card.ACE:
 			out += "ace";
 			break;
 		}
 		out += " of ";
 		switch(this.suit) {
-		case GraphicsCard.SPADES:
+		case Card.SPADES:
 			out+="spades";
 			break;
-		case GraphicsCard.CLUBS:
+		case Card.CLUBS:
 			out+="clubs";
 			break;
-		case GraphicsCard.DIAMONDS:
+		case Card.DIAMONDS:
 			out+="diamonds";
 			break;
-		case GraphicsCard.HEARTS:
+		case Card.HEARTS:
 			out+="hearts";
 			break;
-		case GraphicsCard.TRUMP:
+		case Card.TRUMP:
 			out+="trump";
 			break;
 		}

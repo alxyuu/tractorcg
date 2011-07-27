@@ -25,4 +25,5 @@ public class GameCommand {
 	public final static int DEALING = 13;
 	public final static int DIPAI  = 14;
 	public final static int PLAYING = 15;
+	public final static int FINISHED = 16;
 }

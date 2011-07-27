@@ -210,6 +210,12 @@ public class Gameroom extends Chatroom implements Runnable { // do I need a thre
 		this.sendCommand(GameCommand.UPDATE_STATE + " " + state);
 		this.state = state;
 	}
+	
+	private void sendUpdateState(int state, String message) {
+		this.sendCommand(GameCommand.UPDATE_STATE + " " + state + " " + message);
+		this.state = state;
+	}
+	
 	/** It sends the updated stated.
 	 * @param state
 	 * @param user
@@ -325,12 +331,15 @@ public class Gameroom extends Chatroom implements Runnable { // do I need a thre
 
 				dipaiSize = cards.size();
 				//TODO: flip dipai if no one calls
-				String dipai = " "+cards.size();
+				String dipai = ""+cards.size();
 				for(Card card : cards) {
 					dipai += " "+card.getSuit()+" "+card.getNumber();
 					lead.getHand().addCard(card);
 				}
-				sendCommand(GameCommand.DIPAI + dipai, lead);
+				sendCommand(GameCommand.DIPAI + " " + lead.getName() + " " + dipai, lead);
+				
+				sendCommandExclude(GameCommand.DIPAI + " " + lead.getName(), lead);
+				
 				sendUpdateState(GameCommand.DIPAI);
 				sendCommand(GameCommand.CLEAR_TABLE+" 0");
 			}
@@ -427,8 +436,13 @@ public class Gameroom extends Chatroom implements Runnable { // do I need a thre
 					
 					
 				}
-				cardlist.add(current);
-				currentsize = 1;
+				if(current != null) {
+					cardlist.add(current);
+					currentsize = 1;
+				} else {
+					this.addCardsToTrick(cardlist, trick, maxsize);
+					break;
+				}
 			}
 			previous=current;
 		}
@@ -1030,6 +1044,7 @@ public class Gameroom extends Chatroom implements Runnable { // do I need a thre
 								this.currentPoints = 0;
 								
 								if(currentUser.getHand().getCards().size() == 0) {
+									System.out.println("GAME ENDING");
 									
 									//TODO: show dipai
 									if(highest.getTeam() != this.defending) {
@@ -1038,35 +1053,39 @@ public class Gameroom extends Chatroom implements Runnable { // do I need a thre
 									}
 									
 									if(gamePoints == 0) {
-										this.TRUMP_NUMBER = this.defending.goUp(3);
+										this.defending.goUp(3);
 										this.setLead(this.defending.next());
 									} else if ( gamePoints < 60 ) {
-										this.TRUMP_NUMBER = this.defending.goUp(2);
+										this.defending.goUp(2);
 										this.setLead(this.defending.next());
 									} else if ( gamePoints < 120 ) {
-										this.TRUMP_NUMBER = this.defending.goUp(1);
+										this.defending.goUp(1);
 										this.setLead(this.defending.next());
 									} else {
-										if(this.attacking.getCurrentTrump() == Card.TWO || gamePoints < 180 ) {
-											this.TRUMP_NUMBER = this.attacking.getCurrentTrump();
-											
-										} else {
+										this.setLead(this.attacking.next());
+										if(this.lead.getGameScore() != Card.TWO && gamePoints >= 180 ) {
 											if ( gamePoints < 240 ) {
-												this.TRUMP_NUMBER = this.attacking.goUp(1);
+												this.attacking.goUp(1);
 											} else if ( gamePoints < 300 ) {
-												this.TRUMP_NUMBER = this.attacking.goUp(2);
+												this.attacking.goUp(2);
 											} else {
-												this.TRUMP_NUMBER = this.attacking.goUp(3);
+												this.attacking.goUp(3);
 											}
 										}
-										this.setLead(this.attacking.next());
 									}
+									
+									this.TRUMP_NUMBER = this.lead.getGameScore();
 									
 									if(this.TRUMP_NUMBER > Card.ACE) {
 										//TODO: this.lead.getTeam() wins
 									}
 									
 									this.sendCommand(GameCommand.CLEAR_TABLE+" "+gamePoints);
+									String dps = "" + this.dipai.size();
+									for(Card card : this.dipai) {
+										dps += " " + card.getSuit() + " " + card.getNumber();
+									}
+									this.sendUpdateState(GameCommand.FINISHED, dps);
 									this.deal();
 									
 									break CommandSwitch;

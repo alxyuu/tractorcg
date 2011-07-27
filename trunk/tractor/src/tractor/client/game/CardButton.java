@@ -28,14 +28,21 @@ public class CardButton extends MouseOverArea implements Comparable<CardButton> 
 		if(this.game.getState() != GameCommand.DEALING  && this.game.getState() != GameCommand.WAITING && isMouseOver()) {
 			System.out.println("CLICK: "+this);
 			if(!selected) {
-				this.setLocation(this.getX(),this.getY()-20);
+				this.up();
 				this.game.addSelected(this);
 			} else {
-				this.setLocation(this.getX(),this.getY()+20);
+				this.down();
 				this.game.removeSelected(this);
 			}
-			this.selected = !this.selected;
 		}
+	}
+	public void up() {
+		this.setLocation(this.getX(),this.getY()-20);
+		this.selected = true;
+	}
+	public void down() {
+		this.setLocation(this.getX(),this.getY()+20);
+		this.selected = false;
 	}
 	/** It gets the card.
 	 * @return
@@ -43,25 +50,8 @@ public class CardButton extends MouseOverArea implements Comparable<CardButton> 
 	public GraphicsCard getCard() {
 		return this.card;
 	}
-	private int getSortingSuit() {
-		if (this.card.getSuit()== GraphicsCard.TRUMP)
-			return GraphicsCard.TRUMP+GraphicsCard.TRUMP+2;
-		else if(this.card.getSuit() == this.game.getTrumpSuit() && this.card.getNumber() == this.game.getTrumpNumber())
-			return GraphicsCard.TRUMP+GraphicsCard.TRUMP+1;
-		else if(this.card.getNumber() == this.game.getTrumpNumber())
-			return GraphicsCard.TRUMP+this.card.getSuit()+1;
-		else if(this.card.getSuit() == this.game.getTrumpSuit())
-			return GraphicsCard.TRUMP;
-		else
-			return this.card.getSuit();
-	}
 	public int compareTo(CardButton cb) {
-		int compare;
-		if(this.getSortingSuit() == cb.getSortingSuit()) {
-			compare = this.card.getNumber()-cb.card.getNumber();
-		} else {
-			compare = this.getSortingSuit() - cb.getSortingSuit();
-		}
+		int compare = this.card.compareTo(cb.card);
 		return (compare == 0) ? ( (this==cb) ? 0 : -1 ): compare;
 	}
 	public String toString() {

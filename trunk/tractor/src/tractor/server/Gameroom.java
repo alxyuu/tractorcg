@@ -284,6 +284,7 @@ public class Gameroom extends Chatroom implements Runnable { // do I need a thre
 	private void deal() {
 		this.trumped = false;
 		this.gamePoints = 0;
+		this.called_cards = 0;
 		this.updateStats();
 		this.sendUpdateState(GameCommand.DEALING);
 		Thread dealing = new Thread("dealing-"+this.getName()) {
@@ -466,7 +467,7 @@ public class Gameroom extends Chatroom implements Runnable { // do I need a thre
 						break;*/
 					case GameCommand.JOIN: 
 					{
-						System.out.println("join");
+						//System.out.println("join");
 						this.sendCommandExclude(GameCommand.JOIN + " " + user.getGamePosition() + " " + user.getName(), user);
 						for(Iterator<User> i2 = users.iterator();i2.hasNext();) {
 							User u = i2.next();
@@ -490,7 +491,6 @@ public class Gameroom extends Chatroom implements Runnable { // do I need a thre
 						}
 						this.TRUMP_NUMBER = Card.TWO;
 						this.TRUMP_SUIT  = -1;
-						this.called_cards = 0;
 						this.setLead(host);
 						this.deal();
 					}
@@ -536,7 +536,7 @@ public class Gameroom extends Chatroom implements Runnable { // do I need a thre
 							{
 								User temp = i2.next();
 								temp.getHand().sort(cardComparator);
-								System.out.println(temp.getHand().getCards());
+								//System.out.println(temp.getHand().getCards());
 							}
 							
 							//calculate sets in hand
@@ -635,7 +635,7 @@ public class Gameroom extends Chatroom implements Runnable { // do I need a thre
 								sendCommand(GameCommand.PLAY_INVALID+" no cards played!",user);
 								break CommandSwitch;
 							}
-							System.out.println(user.getHand().getCards());
+							//System.out.println(user.getHand().getCards());
 							if(!user.getHand().contains(played)) {
 								sendCommand(GameCommand.PLAY_INVALID+" cheating the system, cards not in your hand!",user);
 								break CommandSwitch;
@@ -648,7 +648,7 @@ public class Gameroom extends Chatroom implements Runnable { // do I need a thre
 							if(user == this.lead) {
 								//the player is the first player, check to make sure the play is high
 
-								System.out.println("LEAD VERIFICATION");
+								System.out.println("LEAD VERIFICATION FOR: "+user.getName());
 								Iterator<Card> it = played.iterator();
 								Card card = it.next();
 								int suit = (card.getNumber() == this.TRUMP_NUMBER || card.getSuit() == this.TRUMP_SUIT) ? Card.TRUMP : card.getSuit();
@@ -672,7 +672,7 @@ public class Gameroom extends Chatroom implements Runnable { // do I need a thre
 								System.out.println(trick);
 
 								//check if high only if there's more than one play
-								if(trick.countPlays() > 1) {
+								CheckPlay: while(trick.countPlays() > 1) {
 									
 									//can't just throw trump
 									if( suit == Card.TRUMP ) {
@@ -690,8 +690,13 @@ public class Gameroom extends Chatroom implements Runnable { // do I need a thre
 											{
 												for(int k=single.getNumber()+1; k<=Card.ACE; k++) {
 													if(k != TRUMP_NUMBER && u.getHand().contains(Card.getCard(single.getSuit(),k))) {
-														sendCommand(GameCommand.PLAY_INVALID+" not high (normal single found)",user);
-														break CommandSwitch;
+														//sendCommand(GameCommand.PLAY_INVALID+" not high (normal single found)",user);
+														//break CommandSwitch;
+														played.clear();
+														played.add(single);
+														trick = new Trick(this.cardComparator, this.tractorComparator);
+														trick.addSingle(single);
+														break CheckPlay;
 													}
 												}
 											}
@@ -706,8 +711,14 @@ public class Gameroom extends Chatroom implements Runnable { // do I need a thre
 												{
 													for(int k=pair.getNumber()+1; k<=Card.ACE; k++) {
 														if(k != TRUMP_NUMBER && u.getHand().frequency(Card.getCard(pair.getSuit(),k)) >= 2) {
-															sendCommand(GameCommand.PLAY_INVALID+" not high (normal pair found)",user);
-															break CommandSwitch;
+															//sendCommand(GameCommand.PLAY_INVALID+" not high (normal pair found)",user);
+															//break CommandSwitch;
+															played.clear();
+															played.add(pair);
+															played.add(pair);
+															trick = new Trick(this.cardComparator, this.tractorComparator);
+															trick.addPair(pair);
+															break CheckPlay;
 														}
 													}
 												}
@@ -722,8 +733,15 @@ public class Gameroom extends Chatroom implements Runnable { // do I need a thre
 												{
 													for(int k=triple.getNumber()+1; k<=Card.ACE; k++) {
 														if(k != TRUMP_NUMBER && u.getHand().frequency(Card.getCard(triple.getSuit(),k)) >= 3) {
-															sendCommand(GameCommand.PLAY_INVALID+" not high (normal triple found)",user);
-															break CommandSwitch;
+															//sendCommand(GameCommand.PLAY_INVALID+" not high (normal triple found)",user);
+															//break CommandSwitch;
+															played.clear();
+															played.add(triple);
+															played.add(triple);
+															played.add(triple);
+															trick = new Trick(this.cardComparator, this.tractorComparator);
+															trick.addTriple(triple);
+															break CheckPlay;
 														}
 													}
 												}
@@ -739,17 +757,26 @@ public class Gameroom extends Chatroom implements Runnable { // do I need a thre
 												{
 													for(Iterator<Tractor> it2 = u.getHand().getTractors().iterator(); it.hasNext();) {
 															Tractor comp = it2.next();
-															if( comp.getStartingCard().getSuit() == tractor.getStartingCard().getSuit() && comp.getLength() >= tractor.getLength() && cardComparator.gameCompare(comp.getStartingCard(), tractor.getStartingCard()) >= 1 ) {
-																sendCommand(GameCommand.PLAY_INVALID+" not high (normal tractor found)",user);
-																break CommandSwitch;
+															if( comp.getStartingCard().getGameSuit(this.TRUMP_SUIT,this.TRUMP_NUMBER) == tractor.getStartingCard().getGameSuit(this.TRUMP_SUIT,this.TRUMP_NUMBER) && comp.getLength() >= tractor.getLength() && cardComparator.gameCompare(comp.getStartingCard(), tractor.getStartingCard()) >= 1 ) {
+																//sendCommand(GameCommand.PLAY_INVALID+" not high (normal tractor found)",user);
+																//break CommandSwitch;
+																played.clear();
+																for(Card c : tractor.getCards()) {
+																	played.add(c);
+																}
+																trick = new Trick(this.cardComparator, this.tractorComparator);
+																trick.addTractor(tractor);
+																break CheckPlay;
 															}
 													}
 												}
 											}
 										}
 									}
-
-								} else if (trick.countPlays() == 0) { // this should never happen...
+									break CheckPlay;
+								}
+								
+								if (trick.countPlays() == 0) { // this should never happen...
 									System.out.println("some bad shit happened");
 									return;
 								}
@@ -762,7 +789,7 @@ public class Gameroom extends Chatroom implements Runnable { // do I need a thre
 								//don't set suit until after the play has been verified as high
 								this.currentSuit = suit;
 							} else {
-								System.out.println("FOLLOWER VERIFICATION");
+								System.out.println("FOLLOWER VERIFICATION FOR: "+user.getName());
 								//not lead, check following suit, playing doubles/tractors/triples/whatever
 								//compare to highest user's play
 								//make sure the number of cards are correct
@@ -807,6 +834,7 @@ public class Gameroom extends Chatroom implements Runnable { // do I need a thre
 								System.out.println("all trump: "+all_trump);
 								
 								Trick trick = calculateTrick(played);
+								System.out.println(trick);
 								
 								CheckPlay: while ( following_suit || all_trump ) { //dirty...dirty hack
 									
@@ -856,15 +884,17 @@ public class Gameroom extends Chatroom implements Runnable { // do I need a thre
 									
 									
 									
-									System.out.println("played triples: " + trick.countTriplesPlusTractors());
+									//System.out.println("played triples: " + trick.countTriplesPlusTractors());
 									if(trick.countTriplesPlusTractors() < this.currentTrick.countTriplesPlusTractors()) {
 										if( following_suit ) {
 											int triples = 0;
 											for( Card triple : user.getHand().getTriples() ) {
-												if(triple.getGameSuit(this.TRUMP_NUMBER, this.TRUMP_SUIT) == this.currentSuit)
+												if(triple.getGameSuit(this.TRUMP_NUMBER, this.TRUMP_SUIT) == this.currentSuit) {
+													System.out.println("Triple in hand: "+triple);
 													triples++;
+												}
 											}
-											System.out.println("triples: "+triples);
+											//System.out.println("triples: "+triples);
 											if(triples > trick.countTriplesPlusTractors()) {
 												sendCommand(GameCommand.PLAY_INVALID+" must play triples",user);
 												break CommandSwitch;
@@ -872,8 +902,10 @@ public class Gameroom extends Chatroom implements Runnable { // do I need a thre
 											if(trick.countPairsPlusTractors() + trick.countTriplesPlusTractors() < this.currentTrick.countTriplesPlusTractors() + this.currentTrick.countPairsPlusTractors()) {
 												int pairs = 0;
 												for( Card pair : user.getHand().getPairs() ) {
-													if(pair.getGameSuit(this.TRUMP_NUMBER, this.TRUMP_SUIT) == this.currentSuit)
+													if(pair.getGameSuit(this.TRUMP_NUMBER, this.TRUMP_SUIT) == this.currentSuit) {
+														System.out.println("Pair in hand: "+pair);
 														pairs++;
+													}
 												}
 												if( pairs > trick.countPairsPlusTractors() ) {
 													sendCommand(GameCommand.PLAY_INVALID+" must play pairs",user);
@@ -893,8 +925,10 @@ public class Gameroom extends Chatroom implements Runnable { // do I need a thre
 										if( following_suit ) {
 											int pairs = 0;
 											for( Card pair : user.getHand().getPairs() ) {
-												if(pair.getGameSuit(this.TRUMP_NUMBER, this.TRUMP_SUIT) == this.currentSuit)
+												if(pair.getGameSuit(this.TRUMP_NUMBER, this.TRUMP_SUIT) == this.currentSuit) {
+													System.out.println("Pair in hand: "+pair);
 													pairs++;
+												}
 											}
 											if(pairs > trick.countPairsPlusTractors()) {
 												sendCommand(GameCommand.PLAY_INVALID+" must play pairs",user);
@@ -928,6 +962,7 @@ public class Gameroom extends Chatroom implements Runnable { // do I need a thre
 											if(tt == null) {
 												for(Tractor tractor : user.getHand().getTractors()) {
 													if(tractor.getStartingCard().getGameSuit(TRUMP_SUIT, TRUMP_NUMBER) == this.currentSuit && tractor.getType() == ct.getType() && !ttrick.contains(tractor) ) {
+														System.out.println("tractor in hand: "+tractor);
 														sendCommand(GameCommand.PLAY_INVALID+" must play tractors",user);
 														break CommandSwitch;
 													}
@@ -936,6 +971,7 @@ public class Gameroom extends Chatroom implements Runnable { // do I need a thre
 											} else if( tt.getType() < ct.getType() || tt.getCards().size() < ct.getCards().size() ) {
 												for(Tractor tractor : user.getHand().getTractors()) {
 													if(tractor.getStartingCard().getGameSuit(TRUMP_SUIT, TRUMP_NUMBER) == this.currentSuit && tractor.getLength() >= ct.getLength() && tractor.getType() == ct.getType() && !ttrick.contains(tractor) ) {
+														System.out.println("tractor in hand: "+tractor);
 														sendCommand(GameCommand.PLAY_INVALID+" must play tractors",user);
 														break CommandSwitch;
 													}
@@ -1029,8 +1065,12 @@ public class Gameroom extends Chatroom implements Runnable { // do I need a thre
 							//should only be here if the play was valid
 							this.addPoints(played);
 							user.getHand().removeAllCards(played);
-							System.out.println("removing cards from "+user.getName()+"'s hand: "+played);
-							sendCommand(GameCommand.PLAY_SUCCESS+"",user);
+							//System.out.println("removing cards from "+user.getName()+"'s hand: "+played);
+							String success = " "+played.size();
+							for(Card c : played) {
+								success += " " + c.getSuit() + " " + c.getNumber();
+							}
+							sendCommand(GameCommand.PLAY_SUCCESS+success,user);
 							String tosend = GameCommand.PLAY_CARD + " " + user.getName() + " " + played.size();
 							for(Card card : played) {
 								tosend += " " + card.getSuit() + " " + card.getNumber();

@@ -173,7 +173,7 @@ public class MessageFactory {
 	public void write(String message, int type) {
 		this.out.offer(type+message);
 		this.renewPing();
-		if( type != MessageFactory.KEEPALIVE ) System.out.println("output: "+message+"-end-");
+		//if( type != MessageFactory.KEEPALIVE ) System.out.println("output: "+message+"-end-");
 	}
 
 	/** It writes whether the message factory is timed out.

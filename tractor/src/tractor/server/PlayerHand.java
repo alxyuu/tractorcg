@@ -17,6 +17,7 @@ public class PlayerHand {
 	private TreeSet<Card> pairs;
 	private TreeSet<Card> triples;
 	private TreeSet<Tractor> tractors;
+	private TreeSet<Tractor> mixed;
 	private List<Card> currentPlay;
 	private CardComparator<Card> cc;
 	//private String name;
@@ -31,15 +32,20 @@ public class PlayerHand {
 		this.currentPlay = Collections.emptyList();
 	}
 	
-	public void init(TreeSet<Card> pairs, TreeSet<Card> triples, TreeSet<Tractor> tractors) {
+	public void init(TreeSet<Card> pairs, TreeSet<Card> triples, TreeSet<Tractor> tractors, TreeSet<Tractor> mixed) {
 		this.pairs = pairs;
 		this.triples = triples;
 		this.tractors = tractors;
+		this.mixed = mixed;
 		this.cc = ((CardComparator<Card>)this.pairs.comparator());
 	}
 	
 	public TreeSet<Tractor> getTractors() {
 		return this.tractors;
+	}
+	
+	public TreeSet<Tractor> getMixedTractors() {
+		return this.mixed;
 	}
 	
 	public TreeSet<Card> getPairs() {
@@ -157,9 +163,12 @@ public class PlayerHand {
 							}
 						}
 					}
-					break;
+					//break;
 				}
 			}
+			
+			//can't be any mixed tractors of type 3
+			
 		} else if (this.pairs.contains(card)) {
 			this.pairs.remove(card);
 			
@@ -202,9 +211,56 @@ public class PlayerHand {
 							}
 						}
 					}
-					break;
+					//break;
 				}
 			}
+			
+			
+			//TODO: combine for statements to optimize 
+			for(Iterator<Tractor> i = this.mixed.iterator(); i.hasNext();) {
+				Tractor tractor = i.next();
+				int index = tractor.getCards().indexOf(card);
+				if( index > -1) {
+					if(tractor.getType() == 2) {
+						i.remove();
+						
+						if(tractor.getLength() > 2) {
+							Iterator<Card> it = tractor.getCards().iterator();
+							Card current = it.next();
+							if(current == card)
+								current = it.next();
+							
+							while(it.hasNext()) {
+								Card previous;
+								List<Card> tractorcards = new LinkedList<Card>();
+								do {
+									tractorcards.add(current);
+									previous = current;
+									current = it.next();
+									if(current == card) {
+										if(it.hasNext()) {
+											current = it.next();
+										} else {
+											current = null;
+											break;
+										}
+									}
+								} while ( it.hasNext() && this.cc.gameCompare(current, previous) == 1 );
+								if(this.cc.gameCompare(current, previous) == 1)
+									tractorcards.add(current);
+								
+								if(tractorcards.size() >= 2) {
+									tractors.add(new Tractor(2, tractorcards));
+								}
+								tractorcards.clear();
+							}
+						}
+					}
+					//break;
+				}
+			}
+			
+			
 			
 		}
 

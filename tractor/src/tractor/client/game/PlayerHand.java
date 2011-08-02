@@ -18,6 +18,7 @@ import org.newdawn.slick.gui.GUIContext;
 public class PlayerHand {
 
 	private float x, y, x2, y2;
+	private float x_i, y_i, x2_i, y2_i;
 	private static final int spacing = 20;
 	private Map<CardButton, GraphicsCard> hand;
 	private Collection<GraphicsCard> cards;
@@ -33,10 +34,10 @@ public class PlayerHand {
 	 */
 	PlayerHand(float x, float y, float x2, float y2) {
 		//this.name = Client.getInstance().getUsername();
-		this.x = x - ( 100 - spacing )/2;
-		this.y = y - 74;
-		this.x2 = x2 - ( 100 - spacing )/2;
-		this.y2 = y2 - 74;
+		this.x = this.x_i = x - ( 100 - spacing )/2;
+		this.y = this.y_i = y - 74;
+		this.x2 = this.x2_i = x2 - ( 100 - spacing )/2;
+		this.y2 = this.y2_i = y2 - 74;
 		this.hand = new ConcurrentSkipListMap<CardButton, GraphicsCard>();
 		this.cards = hand.values();
 		this.playedcards = Collections.emptyList();
@@ -49,6 +50,14 @@ public class PlayerHand {
 	public Collection<GraphicsCard> getCards() {
 		return this.cards;
 	}
+	
+	public void reset() {
+		this.x = this.x_i;
+		this.y = this.y_i;
+		this.x2 = this.x2_i;
+		this.y2 = this.y2_i;
+	}
+	
 	/** it returns the frequency of a card.
 	 * @param card
 	 * @return

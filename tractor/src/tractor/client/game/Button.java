@@ -17,7 +17,7 @@ public class Button extends MouseOverArea {
 	private Image disabledImage;
 	private Image mouseoverImage;
 	private IOFactory io;
-	private ButtonPressedListener listener;
+	protected ButtonPressedListener listener;
 
 	/** It constructs the button.
 	 * @param container

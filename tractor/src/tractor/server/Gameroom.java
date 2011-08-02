@@ -546,8 +546,10 @@ public class Gameroom extends Chatroom implements Runnable { // do I need a thre
 								TreeSet<Card> pairs = trick.getPairsPlusTractors();
 								TreeSet<Card> triples = trick.getTriplesPlusTractors();
 								TreeSet<Card> combined = new TreeSet<Card>(cardComparator);
+								TreeSet<Tractor> mixed = new TreeSet<Tractor>(tractorComparator);
 								combined.addAll(pairs);
 								combined.addAll(triples);
+								mixed.addAll(tractors);
 								
 								Iterator<Card> it = combined.iterator();
 								Card current = it.next();
@@ -569,10 +571,10 @@ public class Gameroom extends Chatroom implements Runnable { // do I need a thre
 										Tractor t = new Tractor(2, tractorcards);
 										Tractor t3 = new Tractor(3, tractorcards);
 										if(!tractors.contains(t) && !tractors.contains(t3)) {
-											pairs.removeAll(tractorcards);
-											triples.removeAll(tractorcards);
+											//pairs.removeAll(tractorcards);
+											//don't need to remove, no duplicates in a set
 											pairs.addAll(tractorcards);
-											tractors.add(t);
+											mixed.add(t);
 										}
 									}
 									tractorcards.clear();
@@ -582,7 +584,7 @@ public class Gameroom extends Chatroom implements Runnable { // do I need a thre
 								
 								
 								//TODO: 
-								u.getHand().init(pairs, triples, tractors);
+								u.getHand().init(pairs, triples, tractors, mixed);
 								System.out.println(u.getName() + "'s Hand: \n " + u.getHand());
 							}
 							
@@ -755,7 +757,7 @@ public class Gameroom extends Chatroom implements Runnable { // do I need a thre
 												User u = i2.next();
 												if(u != user)
 												{
-													for(Iterator<Tractor> it2 = u.getHand().getTractors().iterator(); it.hasNext();) {
+													for(Iterator<Tractor> it2 = u.getHand().getMixedTractors().iterator(); it.hasNext();) {
 															Tractor comp = it2.next();
 															if( comp.getStartingCard().getGameSuit(this.TRUMP_SUIT,this.TRUMP_NUMBER) == tractor.getStartingCard().getGameSuit(this.TRUMP_SUIT,this.TRUMP_NUMBER) && comp.getLength() >= tractor.getLength() && cardComparator.gameCompare(comp.getStartingCard(), tractor.getStartingCard()) >= 1 ) {
 																//sendCommand(GameCommand.PLAY_INVALID+" not high (normal tractor found)",user);
@@ -889,7 +891,7 @@ public class Gameroom extends Chatroom implements Runnable { // do I need a thre
 										if( following_suit ) {
 											int triples = 0;
 											for( Card triple : user.getHand().getTriples() ) {
-												if(triple.getGameSuit(this.TRUMP_NUMBER, this.TRUMP_SUIT) == this.currentSuit) {
+												if(triple.getGameSuit(this.TRUMP_SUIT, this.TRUMP_NUMBER) == this.currentSuit) {
 													System.out.println("Triple in hand: "+triple);
 													triples++;
 												}
@@ -902,7 +904,7 @@ public class Gameroom extends Chatroom implements Runnable { // do I need a thre
 											if(trick.countPairsPlusTractors() + trick.countTriplesPlusTractors() < this.currentTrick.countTriplesPlusTractors() + this.currentTrick.countPairsPlusTractors()) {
 												int pairs = 0;
 												for( Card pair : user.getHand().getPairs() ) {
-													if(pair.getGameSuit(this.TRUMP_NUMBER, this.TRUMP_SUIT) == this.currentSuit) {
+													if(pair.getGameSuit(this.TRUMP_SUIT, this.TRUMP_NUMBER) == this.currentSuit) {
 														System.out.println("Pair in hand: "+pair);
 														pairs++;
 													}
@@ -925,7 +927,7 @@ public class Gameroom extends Chatroom implements Runnable { // do I need a thre
 										if( following_suit ) {
 											int pairs = 0;
 											for( Card pair : user.getHand().getPairs() ) {
-												if(pair.getGameSuit(this.TRUMP_NUMBER, this.TRUMP_SUIT) == this.currentSuit) {
+												if(pair.getGameSuit(this.TRUMP_SUIT, this.TRUMP_NUMBER) == this.currentSuit) {
 													System.out.println("Pair in hand: "+pair);
 													pairs++;
 												}

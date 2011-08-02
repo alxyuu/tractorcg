@@ -191,16 +191,21 @@ public class ConstraintTest {
 		/*
 		 * SET TRUMP AND ADD CARDS HERE
 		 */
-		this.TRUMP_SUIT = Card.DIAMONDS;
+		this.TRUMP_SUIT = Card.CLUBS;
 		this.TRUMP_NUMBER = Card.TWO;
 
 		User user = users.get(1);
 
 		ArrayList<Card> played = new ArrayList<Card>();
-		played.add(Card.getCard(Card.CLUBS, Card.EIGHT));
-		played.add(Card.getCard(Card.CLUBS, Card.NINE));
-		played.add(Card.getCard(Card.CLUBS, Card.TEN));
-		played.add(Card.getCard(Card.CLUBS, Card.TEN));
+		played.add(Card.getCard(Card.HEARTS, Card.ACE));
+		played.add(Card.getCard(Card.CLUBS, Card.THREE));
+		played.add(Card.getCard(Card.CLUBS, Card.THREE));
+		played.add(Card.getCard(Card.CLUBS, Card.THREE));
+		played.add(Card.getCard(Card.CLUBS, Card.FOUR));
+		played.add(Card.getCard(Card.CLUBS, Card.FOUR));
+		played.add(Card.getCard(Card.CLUBS, Card.FIVE));
+		played.add(Card.getCard(Card.CLUBS, Card.FIVE));
+
 		
 		//add cards
 

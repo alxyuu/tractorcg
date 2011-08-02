@@ -49,6 +49,8 @@ public class TractorGame extends BasicGame {
 	private String errorMessage;
 	private int attackingScore;
 	private String banker;
+	private boolean played_first_hand;
+	private PressButton lastButton;
 	//private OtherPlayerHand hand;
 	/** It constructs the tractor game.
 	 * @param position
@@ -65,6 +67,7 @@ public class TractorGame extends BasicGame {
 		this.called_cards = 0;
 		this.selected = new ArrayList<CardButton>();
 		this.banker = null;
+		this.played_first_hand = false;
 	}
 
 	@Override
@@ -133,6 +136,19 @@ public class TractorGame extends BasicGame {
 					playButton.hide();
 				}
 			});
+			
+			this.lastButton = new PressButton(container,new Image("images/suits/"+GraphicsCard.TRUMP+".png"), new Image("images/suits/"+GraphicsCard.TRUMP+"s.png"), container.getWidth()-130, 100);
+			this.lastButton.addButtonPressedListener(new ButtonPressedListener() {
+				public void buttonPressed() {
+					
+				}
+			});
+			this.lastButton.addButtonReleasedListener(new ButtonReleasedListener() {
+				public void buttonReleased() {
+					
+				}
+			});
+			
 		} catch (SlickException e) {
 			e.printStackTrace();
 		}
@@ -231,6 +247,11 @@ public class TractorGame extends BasicGame {
 					this.startButton.hide();
 					this.callingEnabled = true;
 					this.showDipai = false;
+					this.called_cards = 0;
+					for(Iterator<OtherPlayerHand> i = hands.values().iterator(); i.hasNext(); ) {
+						i.next().reset();
+					}
+					this.hand.reset();
 				}
 				break;
 				case GameCommand.DIPAI:
@@ -299,6 +320,7 @@ public class TractorGame extends BasicGame {
 				this.selected.clear();
 				//System.out.println("selected cards removed: "+this.selected);
 				this.state = GameCommand.PLAYING;
+				this.played_first_hand = true;
 			}
 			break;
 			case GameCommand.JOIN:
@@ -340,6 +362,8 @@ public class TractorGame extends BasicGame {
 				} else {
 					this.hands.get(message[1]).addCard();
 				}
+				this.played_first_hand = false;
+				this.lastButton.hide();
 			}
 			break;
 			case GameCommand.PLAY_CARD:
@@ -399,6 +423,10 @@ public class TractorGame extends BasicGame {
 				hand.clearTable();
 				if(message.length > 1) {
 					this.attackingScore = Integer.parseInt(message[1]);
+				}
+				if(this.played_first_hand) {
+					this.lastButton.show();
+					this.lastButton.enable();
 				}
 			}
 			break;

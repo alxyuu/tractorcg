@@ -1,0 +1,6 @@
+===TODO:===
+  * resume previous games
+  * client error messages
+  * resizable game window
+  * polish ui
+  * find a friend

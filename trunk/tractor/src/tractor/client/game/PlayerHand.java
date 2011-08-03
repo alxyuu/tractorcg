@@ -36,7 +36,7 @@ public class PlayerHand {
 		//this.name = Client.getInstance().getUsername();
 		this.x = x - ( 100 - spacing )/2;
 		this.y = y - 74;
-		this.x2 = 2 - ( 100 - spacing )/2;
+		this.x2 = x2 - ( 100 - spacing )/2;
 		this.y2 = y2 - 74;
 		this.hand = new ConcurrentSkipListMap<CardButton, GraphicsCard>();
 		//this.cards = hand.values();

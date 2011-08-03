@@ -1,4 +1,6 @@
-===TODO:===
+#summary List of features to be implemented
+
+===TODO===
   * resume previous games
   * client error messages
   * resizable game window

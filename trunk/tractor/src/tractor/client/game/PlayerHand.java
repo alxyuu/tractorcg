@@ -18,10 +18,9 @@ import org.newdawn.slick.gui.GUIContext;
 public class PlayerHand {
 
 	private float x, y, x2, y2;
-	private float x_i, y_i, x2_i, y2_i;
 	private static final int spacing = 20;
 	private Map<CardButton, GraphicsCard> hand;
-	private Collection<GraphicsCard> cards;
+	//private Collection<GraphicsCard> cards;
 	private List<GraphicsCard> playedcards;
 	private List<GraphicsCard> lasthand;
 	private boolean show_last;
@@ -35,12 +34,12 @@ public class PlayerHand {
 	 */
 	PlayerHand(float x, float y, float x2, float y2) {
 		//this.name = Client.getInstance().getUsername();
-		this.x = this.x_i = x - ( 100 - spacing )/2;
-		this.y = this.y_i = y - 74;
-		this.x2 = this.x2_i = x2 - ( 100 - spacing )/2;
-		this.y2 = this.y2_i = y2 - 74;
+		this.x = x - ( 100 - spacing )/2;
+		this.y = y - 74;
+		this.x2 = 2 - ( 100 - spacing )/2;
+		this.y2 = y2 - 74;
 		this.hand = new ConcurrentSkipListMap<CardButton, GraphicsCard>();
-		this.cards = hand.values();
+		//this.cards = hand.values();
 		this.playedcards = Collections.emptyList();
 		this.lasthand = Collections.emptyList();
 		this.show_last = false;
@@ -50,14 +49,7 @@ public class PlayerHand {
 	 * @return
 	 */
 	public Collection<GraphicsCard> getCards() {
-		return this.cards;
-	}
-	
-	public void reset() {
-		this.x = this.x_i;
-		this.y = this.y_i;
-		this.x2 = this.x2_i;
-		this.y2 = this.y2_i;
+		return this.hand.values();
 	}
 	
 	/** it returns the frequency of a card.
@@ -66,7 +58,7 @@ public class PlayerHand {
 	 */
 	public int frequency(GraphicsCard card) {
 		synchronized(this) {
-			return Collections.frequency(this.cards, card);
+			return Collections.frequency(this.hand.values(), card);
 		}
 	}
 	/** It adds a card to the players hand.
@@ -167,7 +159,7 @@ public class PlayerHand {
 	}*/
 	private void updateLocations() {
 		//never called from unsynchronzied block so no need to sync
-		float start = this.x - (spacing * this.cards.size())/2;
+		float start = this.x - (spacing * this.hand.size())/2;
 		CardButton card = null;
 		CardButton previous = null;
 		Iterator<CardButton> i = hand.keySet().iterator();

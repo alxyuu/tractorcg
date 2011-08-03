@@ -13,7 +13,6 @@ public class OtherPlayerHand {
 
 	private int cards;
 	private float x, y, x2, y2;
-	private float x_i, y_i, x2_i, y2_i;
 	private static final int spacing = 4;
 	private static final int spacing2 = 20;
 	private String name;
@@ -29,10 +28,10 @@ public class OtherPlayerHand {
 	OtherPlayerHand(double x, double y, double x2, double y2) {
 		this.cards = 0;
 		this.name = null;
-		this.x = this.x_i = (float)(x - ( GraphicsCard.SCALED_WIDTH - spacing )/2);
-		this.y = this.y_i = (float)(y-GraphicsCard.SCALED_HEIGHT/2);
-		this.x2 = this.x2_i = (float)(x2 - ( GraphicsCard.SCALED_WIDTH*2 - spacing2 )/2);
-		this.y2 = this.y2_i = (float)(y2-GraphicsCard.SCALED_HEIGHT);
+		this.x = (float)(x - ( GraphicsCard.SCALED_WIDTH - spacing )/2);
+		this.y = (float)(y-GraphicsCard.SCALED_HEIGHT/2);
+		this.x2 = (float)(x2 - ( GraphicsCard.SCALED_WIDTH*2 - spacing2 )/2);
+		this.y2 = (float)(y2-GraphicsCard.SCALED_HEIGHT);
 		this.playedcards = Collections.emptyList();
 		this.lasthand = Collections.emptyList();
 		this.show_last = false;
@@ -89,10 +88,6 @@ public class OtherPlayerHand {
 	 */
 	public void reset() {
 		this.cards = 0;
-		this.x = this.x_i;
-		this.y = this.y_i;
-		this.x2 = this.x2_i;
-		this.y2 = this.y2_i;
 	}
 
 	public void setShowLastTrick(boolean s) {

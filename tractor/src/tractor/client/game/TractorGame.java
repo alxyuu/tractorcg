@@ -271,13 +271,13 @@ public class TractorGame extends BasicGame {
 				break;
 				case GameCommand.PLAYING:
 				{
-					System.out.println("game start CLEAR DAT DIPAI");
-					System.out.println(this.selected);
-					//if doesn't have dipai this shouldn't do anything
-					for(Iterator<CardButton> i = this.selected.iterator(); i.hasNext();) {
-						this.hand.removeCard(i.next());
+					if(this.banker.equals(Client.getInstance().getUsername())) {
+						//if doesn't have dipai this shouldn't do anything
+						for(Iterator<CardButton> i = this.selected.iterator(); i.hasNext();) {
+							this.hand.removeCard(i.next());
+						}
+						this.selected.clear();
 					}
-					this.selected.clear();
 				}
 				break;
 				case GameCommand.FINISHED:
@@ -567,7 +567,7 @@ public class TractorGame extends BasicGame {
 	 * @param card
 	 */
 	public void checkCalling(GraphicsCard card) {
-		if( ( card.getNumber() == GraphicsCard.TRUMP_NUMBER && this.hand.frequency(card) > called_cards ) || ( card.getSuit() == GraphicsCard.TRUMP && this.hand.frequency(card) >= called_cards && this.hand.frequency(card) >= 2 ) ) {
+		if( ( card.getNumber() == GraphicsCard.TRUMP_NUMBER && card.getSuit() != GraphicsCard.TRUMP && this.hand.frequency(card) > called_cards ) || ( card.getSuit() == GraphicsCard.TRUMP && this.hand.frequency(card) >= called_cards && this.hand.frequency(card) >= 2 ) ) {
 			switch(card.getSuit()) {
 			case GraphicsCard.SPADES:
 				this.spades.enable();

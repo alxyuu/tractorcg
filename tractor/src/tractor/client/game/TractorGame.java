@@ -257,7 +257,6 @@ public class TractorGame extends BasicGame {
 					for(Iterator<OtherPlayerHand> i = hands.values().iterator(); i.hasNext(); ) {
 						i.next().reset();
 					}
-					this.hand.reset();
 				}
 				break;
 				case GameCommand.DIPAI:

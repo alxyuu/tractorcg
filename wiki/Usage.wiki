@@ -1,0 +1,17 @@
+#summary How To Play
+#labels Featured,Phase-Deploy
+
+= Requirements =
+  * Java Runtime Environment (downloadable from http://www.java.com/en/download/])
+  * Windows (executables for Linux and OS X can be compiled from source)
+
+= How To Play =
+[http://www.pagat.com/kt5/tractor.html]
+See three deck variation
+
+
+= Commands =
+  * /gcreate - create gameroom
+  * /ghook username - join username's gameroom
+  * /join #channel - join channel
+  * /part - leave current channel

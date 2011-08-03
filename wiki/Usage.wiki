@@ -2,11 +2,12 @@
 #labels Featured,Phase-Deploy
 
 = Requirements =
-  * Java Runtime Environment (downloadable from http://www.java.com/en/download/])
+  * Java Runtime Environment (downloadable from http://www.java.com/en/download/)
   * Windows (executables for Linux and OS X can be compiled from source)
 
 = How To Play =
-[http://www.pagat.com/kt5/tractor.html]
+http://www.pagat.com/kt5/tractor.html
+
 See three deck variation
 
 

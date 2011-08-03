@@ -140,12 +140,18 @@ public class TractorGame extends BasicGame {
 			this.lastButton = new PressButton(container,new Image("images/suits/"+GraphicsCard.TRUMP+".png"), new Image("images/suits/"+GraphicsCard.TRUMP+"s.png"), container.getWidth()-130, 100);
 			this.lastButton.addButtonPressedListener(new ButtonPressedListener() {
 				public void buttonPressed() {
-					
+					for(Iterator<OtherPlayerHand> i = hands.values().iterator(); i.hasNext(); ) {
+						i.next().setShowLastTrick(true);
+					}
+					hand.setShowLastTrick(true);
 				}
 			});
 			this.lastButton.addButtonReleasedListener(new ButtonReleasedListener() {
 				public void buttonReleased() {
-					
+					for(Iterator<OtherPlayerHand> i = hands.values().iterator(); i.hasNext(); ) {
+						i.next().setShowLastTrick(false);
+					}
+					hand.setShowLastTrick(false);
 				}
 			});
 			
@@ -425,8 +431,8 @@ public class TractorGame extends BasicGame {
 					this.attackingScore = Integer.parseInt(message[1]);
 				}
 				if(this.played_first_hand) {
-					this.lastButton.show();
 					this.lastButton.enable();
+					this.lastButton.show();
 				}
 			}
 			break;
@@ -513,6 +519,7 @@ public class TractorGame extends BasicGame {
 		}
 		this.startButton.render(container,g);
 		this.playButton.render(container,g);
+		this.lastButton.render(container,g);
 		if(this.callingEnabled) {
 			g.setColor(Color.black);
 			g.drawLine(630, 370, 631, 400);

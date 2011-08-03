@@ -24,6 +24,7 @@ public class PlayerHand {
 	private Collection<GraphicsCard> cards;
 	private List<GraphicsCard> playedcards;
 	private List<GraphicsCard> lasthand;
+	private boolean show_last;
 	//private String name;
 
 	/** It constructs the player hand.
@@ -42,6 +43,7 @@ public class PlayerHand {
 		this.cards = hand.values();
 		this.playedcards = Collections.emptyList();
 		this.lasthand = Collections.emptyList();
+		this.show_last = false;
 	}
 
 	/** It gets the cards.
@@ -113,7 +115,7 @@ public class PlayerHand {
 	 */
 	public void clearTable() {
 		this.lasthand = this.playedcards;
-		this.playedcards.clear();
+		this.playedcards = Collections.emptyList();
 	}
 	
 	/** It sorts the players hand based on the trump suit.
@@ -189,6 +191,10 @@ public class PlayerHand {
 			}
 		}
 	}
+	
+	public void setShowLastTrick(boolean s) {
+		this.show_last = s;
+	}
 	/** It draws the hand.
 	 * @param container
 	 * @param g
@@ -202,10 +208,19 @@ public class PlayerHand {
 					cb.render(container, g);
 			}
 		}
-		float start = this.x2 - (spacing * this.playedcards.size())/2;
-		for(GraphicsCard card : this.playedcards) {
-			g.drawImage(card.getFullsizeImage(), start, y2);
-			start+=spacing;
+		
+		if(this.show_last) {
+			float start = this.x2 - (spacing * this.lasthand.size())/2;
+			for(GraphicsCard card : this.lasthand) {
+				g.drawImage(card.getFullsizeImage(), start, y2);
+				start+=spacing;
+			}
+		} else {
+			float start = this.x2 - (spacing * this.playedcards.size())/2;
+			for(GraphicsCard card : this.playedcards) {
+				g.drawImage(card.getFullsizeImage(), start, y2);
+				start+=spacing;
+			}
 		}
 	}
 

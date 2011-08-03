@@ -20,6 +20,7 @@ public class OtherPlayerHand {
 	private List<GraphicsCard> playedcards;
 	private List<GraphicsCard> lasthand;
 	private int score;
+	private boolean show_last;
 
 	/** It constructs the other players hand
 	 * @param x
@@ -33,6 +34,8 @@ public class OtherPlayerHand {
 		this.x2 = this.x2_i = (float)(x2 - ( GraphicsCard.SCALED_WIDTH*2 - spacing2 )/2);
 		this.y2 = this.y2_i = (float)(y2-GraphicsCard.SCALED_HEIGHT);
 		this.playedcards = Collections.emptyList();
+		this.lasthand = Collections.emptyList();
+		this.show_last = false;
 	}
 
 	/** It sets the player given the name parameter.
@@ -78,7 +81,7 @@ public class OtherPlayerHand {
 	 */
 	public void clearTable() {
 		this.lasthand = this.playedcards;
-		this.playedcards.clear();
+		this.playedcards = Collections.emptyList();
 	}
 
 	/** It clears the other players hand
@@ -92,6 +95,10 @@ public class OtherPlayerHand {
 		this.y2 = this.y2_i;
 	}
 
+	public void setShowLastTrick(boolean s) {
+		this.show_last = s;
+	}
+	
 	/** It draws the other players hand
 	 * @param g
 	 * @throws SlickException
@@ -107,10 +114,19 @@ public class OtherPlayerHand {
 				start+=spacing;
 			}
 			g.drawString(this.name,x,y);
-			start = this.x2 - (spacing2 * this.playedcards.size())/2;
-			for(GraphicsCard card : this.playedcards) {
-				g.drawImage(card.getFullsizeImage(), start, y2);
-				start+=spacing2;
+			
+			if(this.show_last) {
+				start = this.x2 - (spacing2 * this.lasthand.size())/2;
+				for(GraphicsCard card : this.lasthand) {
+					g.drawImage(card.getFullsizeImage(), start, y2);
+					start+=spacing2;
+				}
+			} else {
+				start = this.x2 - (spacing2 * this.playedcards.size())/2;
+				for(GraphicsCard card : this.playedcards) {
+					g.drawImage(card.getFullsizeImage(), start, y2);
+					start+=spacing2;
+				}
 			}
 		}
 	}

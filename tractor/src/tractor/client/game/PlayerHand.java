@@ -110,6 +110,10 @@ public class PlayerHand {
 		this.playedcards = Collections.emptyList();
 	}
 	
+	public void reset() {
+		this.hand.clear();
+	}
+	
 	/** It sorts the players hand based on the trump suit.
 	 * @param trumpsuit
 	 */

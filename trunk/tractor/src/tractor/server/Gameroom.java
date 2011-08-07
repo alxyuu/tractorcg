@@ -285,6 +285,7 @@ public class Gameroom extends Chatroom implements Runnable { // do I need a thre
 		this.trumped = false;
 		this.gamePoints = 0;
 		this.called_cards = 0;
+		this.caller = null;
 		this.updateStats();
 		this.sendUpdateState(GameCommand.DEALING);
 		Thread dealing = new Thread("dealing-"+this.getName()) {
@@ -429,9 +430,15 @@ public class Gameroom extends Chatroom implements Runnable { // do I need a thre
 					} 
 					else //skipped a card, current card can't be part of tractor
 					{ 
+						Card temp = cardlist.remove(cardlist.size()-1);
 						this.addCardsToTrick(cardlist, trick, maxsize);
 						cardlist.clear();
-						maxsize = 1;
+						maxsize = currentsize;
+						if(currentsize == 1) {
+							trick.addSingle(temp);
+						} else {
+							cardlist.add(temp);
+						}
 					}
 
 					

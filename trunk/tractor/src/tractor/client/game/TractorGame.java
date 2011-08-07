@@ -90,31 +90,31 @@ public class TractorGame extends BasicGame {
 			}
 		});
 		try {
-			this.spades = new Button(container,new Image("images/suits/"+GraphicsCard.SPADES+".png"), new Image("images/suits/"+GraphicsCard.SPADES+"s.png"), 600, 370);
+			this.spades = new Button(container,new Image("images/suits/"+GraphicsCard.SPADES+".png"), new Image("images/suits/"+GraphicsCard.SPADES+"s.png"), container.getWidth()*2/3 , 370);
 			this.spades.addButtonPressedListener(new ButtonPressedListener() {
 				public void buttonPressed() {
 					sendCommand(GameCommand.PLAY_CARD+" "+GraphicsCard.SPADES + " " + GraphicsCard.TRUMP_NUMBER + " " + (called_cards+1));
 				}
 			});
-			this.clubs = new Button(container,new Image("images/suits/"+GraphicsCard.CLUBS+".png"), new Image("images/suits/"+GraphicsCard.CLUBS+"s.png"), 631, 370);
+			this.clubs = new Button(container,new Image("images/suits/"+GraphicsCard.CLUBS+".png"), new Image("images/suits/"+GraphicsCard.CLUBS+"s.png"), container.getWidth()*2/3+31, 370);
 			this.clubs.addButtonPressedListener(new ButtonPressedListener() {
 				public void buttonPressed() {
 					sendCommand(GameCommand.PLAY_CARD+" "+GraphicsCard.CLUBS + " " + GraphicsCard.TRUMP_NUMBER + " " + (called_cards+1));
 				}
 			});
-			this.diamonds = new Button(container,new Image("images/suits/"+GraphicsCard.DIAMONDS+".png"), new Image("images/suits/"+GraphicsCard.DIAMONDS+"s.png"), 662, 370);
+			this.diamonds = new Button(container,new Image("images/suits/"+GraphicsCard.DIAMONDS+".png"), new Image("images/suits/"+GraphicsCard.DIAMONDS+"s.png"), container.getWidth()*2/3+62, 370);
 			this.diamonds.addButtonPressedListener(new ButtonPressedListener() {
 				public void buttonPressed() {
 					sendCommand(GameCommand.PLAY_CARD+" "+GraphicsCard.DIAMONDS + " " + GraphicsCard.TRUMP_NUMBER + " " + (called_cards+1));
 				}
 			});
-			this.hearts = new Button(container,new Image("images/suits/"+GraphicsCard.HEARTS+".png"), new Image("images/suits/"+GraphicsCard.HEARTS+"s.png"), 693, 370);
+			this.hearts = new Button(container,new Image("images/suits/"+GraphicsCard.HEARTS+".png"), new Image("images/suits/"+GraphicsCard.HEARTS+"s.png"), container.getWidth()*2/3+93, 370);
 			this.hearts.addButtonPressedListener(new ButtonPressedListener() {
 				public void buttonPressed() {
 					sendCommand(GameCommand.PLAY_CARD+" "+GraphicsCard.HEARTS + " " + GraphicsCard.TRUMP_NUMBER + " " + (called_cards+1));
 				}
 			});
-			this.notrump = new Button(container,new Image("images/suits/"+GraphicsCard.TRUMP+".png"), new Image("images/suits/"+GraphicsCard.TRUMP+"s.png"), 724, 370);
+			this.notrump = new Button(container,new Image("images/suits/"+GraphicsCard.TRUMP+".png"), new Image("images/suits/"+GraphicsCard.TRUMP+"s.png"), container.getWidth()*2/3+124, 370);
 			this.notrump.addButtonPressedListener(new ButtonPressedListener() {
 				public void buttonPressed() {
 					//TODO: differentiate between big and small
@@ -257,6 +257,7 @@ public class TractorGame extends BasicGame {
 					for(Iterator<OtherPlayerHand> i = hands.values().iterator(); i.hasNext(); ) {
 						i.next().reset();
 					}
+					hand.reset();
 				}
 				break;
 				case GameCommand.DIPAI:
@@ -521,10 +522,10 @@ public class TractorGame extends BasicGame {
 		this.lastButton.render(container,g);
 		if(this.callingEnabled) {
 			g.setColor(Color.black);
-			g.drawLine(630, 370, 631, 400);
-			g.drawLine(661, 370, 662, 400);
-			g.drawLine(692, 370, 693, 400);
-			g.drawLine(723, 370, 724, 400);
+			g.drawLine(container.getWidth()*2/3+30, 370, container.getWidth()*2/3+30, 400);
+			g.drawLine(container.getWidth()*2/3+61, 370, container.getWidth()*2/3+61, 400);
+			g.drawLine(container.getWidth()*2/3+92, 370, container.getWidth()*2/3+92, 400);
+			g.drawLine(container.getWidth()*2/3+123, 370, container.getWidth()*2/3+123, 400);
 			this.spades.render(container,g);
 			this.clubs.render(container,g);
 			this.diamonds.render(container,g);

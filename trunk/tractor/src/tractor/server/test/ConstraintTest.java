@@ -191,21 +191,23 @@ public class ConstraintTest {
 		/*
 		 * SET TRUMP AND ADD CARDS HERE
 		 */
-		this.TRUMP_SUIT = Card.CLUBS;
+		this.TRUMP_SUIT = Card.HEARTS;
 		this.TRUMP_NUMBER = Card.TWO;
 
 		User user = users.get(1);
 
 		ArrayList<Card> played = new ArrayList<Card>();
-		played.add(Card.getCard(Card.HEARTS, Card.ACE));
-		played.add(Card.getCard(Card.CLUBS, Card.THREE));
-		played.add(Card.getCard(Card.CLUBS, Card.THREE));
-		played.add(Card.getCard(Card.CLUBS, Card.THREE));
-		played.add(Card.getCard(Card.CLUBS, Card.FOUR));
-		played.add(Card.getCard(Card.CLUBS, Card.FOUR));
-		played.add(Card.getCard(Card.CLUBS, Card.FIVE));
-		played.add(Card.getCard(Card.CLUBS, Card.FIVE));
+		played.add(Card.getCard(Card.HEARTS,Card.JACK));
+		played.add(Card.getCard(Card.HEARTS,Card.JACK));
+		played.add(Card.getCard(Card.HEARTS,Card.JACK));
+		played.add(Card.getCard(Card.HEARTS,Card.QUEEN));
+		played.add(Card.getCard(Card.HEARTS,Card.QUEEN));
+		played.add(Card.getCard(Card.SPADES,Card.TWO));
+		played.add(Card.getCard(Card.SPADES,Card.TWO));
+		played.add(Card.getCard(Card.CLUBS,Card.TWO));
+		played.add(Card.getCard(Card.TRUMP,Card.SMALL_JOKER));
 
+		System.out.println(cardComparator.gameCompare(Card.getCard(Card.SPADES,Card.TWO), Card.getCard(Card.HEARTS,Card.QUEEN)));
 		
 		//add cards
 
@@ -287,9 +289,15 @@ public class ConstraintTest {
 					} 
 					else //skipped a card, current card can't be part of tractor
 					{ 
+						Card temp = cardlist.remove(cardlist.size()-1);
 						this.addCardsToTrick(cardlist, trick, maxsize);
 						cardlist.clear();
-						maxsize = 1;
+						maxsize = currentsize;
+						if(currentsize == 1) {
+							trick.addSingle(temp);
+						} else {
+							cardlist.add(temp);
+						}
 					}
 
 					

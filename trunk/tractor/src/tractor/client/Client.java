@@ -136,11 +136,12 @@ public class Client {
 			public void run() {
 				AppGameContainer app;
 				try {
-
 					app = new AppGameContainer(game);
-					app.setDisplayMode(960,600,false);
+					app.setDisplayMode(1024,600,false);
 					app.setTargetFrameRate(30);
 					app.setAlwaysRender(true);
+					//TODO: clean up game on close, don't exit whole program
+					//app.setForceExit(false);
 					app.start();
 				} catch (SlickException e) {
 					// TODO Auto-generated catch block

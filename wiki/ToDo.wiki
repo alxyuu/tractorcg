@@ -2,6 +2,7 @@
 
 ===TODO===
   * resume previous games
+  * manually set teams
   * client error messages
   * resizable game window
   * polish ui

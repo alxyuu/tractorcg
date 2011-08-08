@@ -197,15 +197,10 @@ public class ConstraintTest {
 		User user = users.get(1);
 
 		ArrayList<Card> played = new ArrayList<Card>();
-		played.add(Card.getCard(Card.HEARTS,Card.JACK));
-		played.add(Card.getCard(Card.HEARTS,Card.JACK));
-		played.add(Card.getCard(Card.HEARTS,Card.JACK));
-		played.add(Card.getCard(Card.HEARTS,Card.QUEEN));
-		played.add(Card.getCard(Card.HEARTS,Card.QUEEN));
-		played.add(Card.getCard(Card.SPADES,Card.TWO));
-		played.add(Card.getCard(Card.SPADES,Card.TWO));
-		played.add(Card.getCard(Card.CLUBS,Card.TWO));
-		played.add(Card.getCard(Card.TRUMP,Card.SMALL_JOKER));
+		played.add(Card.getCard(Card.HEARTS,Card.SEVEN));
+		played.add(Card.getCard(Card.HEARTS,Card.SEVEN));
+		played.add(Card.getCard(Card.HEARTS,Card.EIGHT));
+		played.add(Card.getCard(Card.HEARTS,Card.EIGHT));
 
 		System.out.println(cardComparator.gameCompare(Card.getCard(Card.SPADES,Card.TWO), Card.getCard(Card.HEARTS,Card.QUEEN)));
 		
@@ -289,14 +284,20 @@ public class ConstraintTest {
 					} 
 					else //skipped a card, current card can't be part of tractor
 					{ 
-						Card temp = cardlist.remove(cardlist.size()-1);
-						this.addCardsToTrick(cardlist, trick, maxsize);
-						cardlist.clear();
-						maxsize = currentsize;
-						if(currentsize == 1) {
-							trick.addSingle(temp);
+						if(  cardlist.size() < 2 || cardComparator.gameCompare(cardlist.get(cardlist.size()-1), cardlist.get(cardlist.size()-2)) == 1 ) {
+							this.addCardsToTrick(cardlist, trick, maxsize);
+							cardlist.clear();
+							maxsize = 1;
 						} else {
-							cardlist.add(temp);
+							Card temp = cardlist.remove(cardlist.size()-1);							
+							this.addCardsToTrick(cardlist, trick, maxsize);
+							cardlist.clear();
+							maxsize = currentsize;
+							if(currentsize == 1) {
+								trick.addSingle(temp);
+							} else {
+								cardlist.add(temp);
+							}
 						}
 					}
 

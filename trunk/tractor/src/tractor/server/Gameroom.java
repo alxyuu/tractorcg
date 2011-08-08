@@ -430,14 +430,20 @@ public class Gameroom extends Chatroom implements Runnable { // do I need a thre
 					} 
 					else //skipped a card, current card can't be part of tractor
 					{ 
-						Card temp = cardlist.remove(cardlist.size()-1);
-						this.addCardsToTrick(cardlist, trick, maxsize);
-						cardlist.clear();
-						maxsize = currentsize;
-						if(currentsize == 1) {
-							trick.addSingle(temp);
+						if(  cardlist.size() < 2 || cardComparator.gameCompare(cardlist.get(cardlist.size()-1), cardlist.get(cardlist.size()-2)) == 1 ) {
+							this.addCardsToTrick(cardlist, trick, maxsize);
+							cardlist.clear();
+							maxsize = 1;
 						} else {
-							cardlist.add(temp);
+							Card temp = cardlist.remove(cardlist.size()-1);							
+							this.addCardsToTrick(cardlist, trick, maxsize);
+							cardlist.clear();
+							maxsize = currentsize;
+							if(currentsize == 1) {
+								trick.addSingle(temp);
+							} else {
+								cardlist.add(temp);
+							}
 						}
 					}
 

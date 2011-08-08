@@ -258,6 +258,9 @@ public class TractorGame extends BasicGame {
 						i.next().reset();
 					}
 					hand.reset();
+					this.banker = "";
+					this.played_first_hand = false;
+					this.lastButton.hide();
 				}
 				break;
 				case GameCommand.DIPAI:
@@ -368,8 +371,6 @@ public class TractorGame extends BasicGame {
 				} else {
 					this.hands.get(message[1]).addCard();
 				}
-				this.played_first_hand = false;
-				this.lastButton.hide();
 			}
 			break;
 			case GameCommand.PLAY_CARD:
@@ -482,9 +483,13 @@ public class TractorGame extends BasicGame {
 				this.errorMessage = message[1];
 				for(int i=2; i<message.length;i++)
 					errorMessage+=" "+message[i];
-				this.playButton.enable();
-				this.playButton.show();
-				this.state = GameCommand.PLAYING;
+				
+				//TODO: double check this...
+				if(this.state == GameCommand.WAITING) {
+					this.playButton.enable();
+					this.playButton.show();
+					this.state = GameCommand.PLAYING;
+				}
 			}
 			break;
 			default:

@@ -23,6 +23,15 @@ public class Server {
 	}
 
 	public static void main(String ... bobby) {
+		Thread.setDefaultUncaughtExceptionHandler( new Thread.UncaughtExceptionHandler() {
+			
+			@Override
+			public void uncaughtException(Thread t, Throwable e) {
+				// TODO Auto-generated method stub
+				e.printStackTrace();
+			}
+		});
+		
 		Server host = new Server();
 		host.addHandler(new ConnectionHandler(), "listener");
 		host.addHandler(new LoginHandler(), "login");

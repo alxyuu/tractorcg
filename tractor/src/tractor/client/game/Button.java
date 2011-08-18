@@ -17,7 +17,9 @@ public class Button extends MouseOverArea {
 	private Image disabledImage;
 	private Image mouseoverImage;
 	private IOFactory io;
-	protected ButtonPressedListener listener;
+	private ButtonPressedListener pressed;
+	private ButtonReleasedListener released;
+	private boolean isPressed;
 
 	/** It constructs the button.
 	 * @param container
@@ -33,6 +35,7 @@ public class Button extends MouseOverArea {
 		this.mouseoverImage = mouseover;
 		this.setNormalImage(normalImage);
 		this.setMouseOverImage(mouseoverImage);
+		this.isPressed = false;
 
 		this.io = Client.getInstance().getIO();
 
@@ -93,11 +96,23 @@ public class Button extends MouseOverArea {
 	 * @param l
 	 */
 	public void addButtonPressedListener(ButtonPressedListener l) {
-		this.listener = l;
+		this.pressed = l;
 	}
+	public void addButtonReleasedListener(ButtonReleasedListener l) {
+		this.released = l;
+	}
+	
 	public void mouseReleased(int button, int mx, int my) {
-		if(this.listener != null && this.isMouseOver()) {
-			this.listener.buttonPressed();
+		if(this.released != null && (this.isPressed && (this.pressed != null || this.isMouseOver())) ){
+			this.released.buttonReleased();
+		}
+		this.isPressed = false;
+	}
+	public void mousePressed(int button, int mx, int my) {
+		if(this.isMouseOver()) {
+			this.isPressed = true;
+			if(this.pressed != null) 
+				this.pressed.buttonPressed();
 		}
 	}
 	/*public void mousePressed(int button, int mx, int my) {

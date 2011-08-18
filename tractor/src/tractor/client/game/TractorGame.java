@@ -50,7 +50,7 @@ public class TractorGame extends BasicGame {
 	private int attackingScore;
 	private String banker;
 	private boolean played_first_hand;
-	private PressButton lastButton;
+	private Button lastButton;
 	//private OtherPlayerHand hand;
 	/** It constructs the tractor game.
 	 * @param position
@@ -84,46 +84,46 @@ public class TractorGame extends BasicGame {
 		this.io = Client.getInstance().getIO();
 		this.background = new Color(0,150,0);
 		this.startButton = new Button(container,GraphicsCard.getCard(GraphicsCard.DIAMONDS,GraphicsCard.ACE).getImage(),GraphicsCard.getCard(GraphicsCard.CLUBS,GraphicsCard.ACE).getImage(),GraphicsCard.getCard(GraphicsCard.HEARTS,GraphicsCard.ACE).getImage(),container.getWidth()/2,container.getHeight()/2);
-		this.startButton.addButtonPressedListener(new ButtonPressedListener() {
-			public void buttonPressed() {
+		this.startButton.addButtonReleasedListener(new ButtonReleasedListener() {
+			public void buttonReleased() {
 				sendCommand(GameCommand.START+"");
 			}
 		});
 		try {
 			this.spades = new Button(container,new Image("images/suits/"+GraphicsCard.SPADES+".png"), new Image("images/suits/"+GraphicsCard.SPADES+"s.png"), container.getWidth()*2/3 , 370);
-			this.spades.addButtonPressedListener(new ButtonPressedListener() {
-				public void buttonPressed() {
+			this.spades.addButtonReleasedListener(new ButtonReleasedListener() {
+				public void buttonReleased() {
 					sendCommand(GameCommand.PLAY_CARD+" "+GraphicsCard.SPADES + " " + GraphicsCard.TRUMP_NUMBER + " " + (called_cards+1));
 				}
 			});
 			this.clubs = new Button(container,new Image("images/suits/"+GraphicsCard.CLUBS+".png"), new Image("images/suits/"+GraphicsCard.CLUBS+"s.png"), container.getWidth()*2/3+31, 370);
-			this.clubs.addButtonPressedListener(new ButtonPressedListener() {
-				public void buttonPressed() {
+			this.clubs.addButtonReleasedListener(new ButtonReleasedListener() {
+				public void buttonReleased() {
 					sendCommand(GameCommand.PLAY_CARD+" "+GraphicsCard.CLUBS + " " + GraphicsCard.TRUMP_NUMBER + " " + (called_cards+1));
 				}
 			});
 			this.diamonds = new Button(container,new Image("images/suits/"+GraphicsCard.DIAMONDS+".png"), new Image("images/suits/"+GraphicsCard.DIAMONDS+"s.png"), container.getWidth()*2/3+62, 370);
-			this.diamonds.addButtonPressedListener(new ButtonPressedListener() {
-				public void buttonPressed() {
+			this.diamonds.addButtonReleasedListener(new ButtonReleasedListener() {
+				public void buttonReleased() {
 					sendCommand(GameCommand.PLAY_CARD+" "+GraphicsCard.DIAMONDS + " " + GraphicsCard.TRUMP_NUMBER + " " + (called_cards+1));
 				}
 			});
 			this.hearts = new Button(container,new Image("images/suits/"+GraphicsCard.HEARTS+".png"), new Image("images/suits/"+GraphicsCard.HEARTS+"s.png"), container.getWidth()*2/3+93, 370);
-			this.hearts.addButtonPressedListener(new ButtonPressedListener() {
-				public void buttonPressed() {
+			this.hearts.addButtonReleasedListener(new ButtonReleasedListener() {
+				public void buttonReleased() {
 					sendCommand(GameCommand.PLAY_CARD+" "+GraphicsCard.HEARTS + " " + GraphicsCard.TRUMP_NUMBER + " " + (called_cards+1));
 				}
 			});
 			this.notrump = new Button(container,new Image("images/suits/"+GraphicsCard.TRUMP+".png"), new Image("images/suits/"+GraphicsCard.TRUMP+"s.png"), container.getWidth()*2/3+124, 370);
-			this.notrump.addButtonPressedListener(new ButtonPressedListener() {
-				public void buttonPressed() {
+			this.notrump.addButtonReleasedListener(new ButtonReleasedListener() {
+				public void buttonReleased() {
 					//TODO: differentiate between big and small
 					sendCommand(GameCommand.PLAY_CARD+" "+GraphicsCard.TRUMP + " " + GraphicsCard.SMALL_JOKER + " " + (Math.max(called_cards,2)));
 				}
 			});
 			this.playButton = new Button(container,new Image("images/play.png"), new Image("images/play_over.png"), container.getWidth()/2-30, 370);
-			this.playButton.addButtonPressedListener(new ButtonPressedListener() {
-				public void buttonPressed() {
+			this.playButton.addButtonReleasedListener(new ButtonReleasedListener() {
+				public void buttonReleased() {
 					//might need to deselect cards but they sohuld be removed when the server responds anyways, doesn't matter?
 					System.out.println(selected);
 					String cmd = GameCommand.PLAY_CARD + " " + selected.size();
@@ -137,7 +137,7 @@ public class TractorGame extends BasicGame {
 				}
 			});
 			
-			this.lastButton = new PressButton(container,new Image("images/suits/"+GraphicsCard.TRUMP+".png"), new Image("images/suits/"+GraphicsCard.TRUMP+"s.png"), container.getWidth()-130, 100);
+			this.lastButton = new Button(container,new Image("images/suits/"+GraphicsCard.TRUMP+".png"), new Image("images/suits/"+GraphicsCard.TRUMP+"s.png"), container.getWidth()-130, 100);
 			this.lastButton.addButtonPressedListener(new ButtonPressedListener() {
 				public void buttonPressed() {
 					for(Iterator<OtherPlayerHand> i = hands.values().iterator(); i.hasNext(); ) {

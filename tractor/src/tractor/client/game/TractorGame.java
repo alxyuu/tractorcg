@@ -81,6 +81,7 @@ public class TractorGame extends BasicGame {
         }*/
 		this.gamecontainer = container;
 		this.gamecontainer.setShowFPS(false);
+		this.gamecontainer.setUpdateOnlyWhenVisible(false);
 		this.io = Client.getInstance().getIO();
 		this.background = new Color(0,150,0);
 		this.startButton = new Button(container,GraphicsCard.getCard(GraphicsCard.DIAMONDS,GraphicsCard.ACE).getImage(),GraphicsCard.getCard(GraphicsCard.CLUBS,GraphicsCard.ACE).getImage(),GraphicsCard.getCard(GraphicsCard.HEARTS,GraphicsCard.ACE).getImage(),container.getWidth()/2,container.getHeight()/2);
@@ -89,6 +90,7 @@ public class TractorGame extends BasicGame {
 				sendCommand(GameCommand.START+"");
 			}
 		});
+
 		try {
 			this.spades = new Button(container,new Image("images/suits/"+GraphicsCard.SPADES+".png"), new Image("images/suits/"+GraphicsCard.SPADES+"s.png"), container.getWidth()*2/3 , 370);
 			this.spades.addButtonReleasedListener(new ButtonReleasedListener() {
@@ -213,7 +215,9 @@ public class TractorGame extends BasicGame {
 	@Override
 	public void update(GameContainer container, int delta)
 	throws SlickException {
+		//System.out.println(this.gamecontainer.getInput().getMouseX()+","+this.gamecontainer.getInput().getMouseY());
 		//System.out.println(delta);
+		this.playButton.mouseMoved(0,0,this.gamecontainer.getInput().getMouseX(),this.gamecontainer.getInput().getMouseY());
 		while(io.hasNextMessage(IOFactory.GAMECMD)) {
 			String msg = io.getNextMessage(IOFactory.GAMECMD);
 			int index = msg.indexOf("|");

@@ -50,7 +50,7 @@ public class Client {
 			@Override
 			public void uncaughtException(Thread t, Throwable e) {
 				// TODO Auto-generated method stub
-				e.printStackTrace();
+				e.printStackTrace(System.out);
 			}
 		});
 		

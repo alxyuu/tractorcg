@@ -4,6 +4,7 @@ import org.newdawn.slick.Graphics;
 import org.newdawn.slick.Image;
 import org.newdawn.slick.SlickException;
 import org.newdawn.slick.gui.GUIContext;
+import org.newdawn.slick.AppGameContainer;
 import tractor.thirdparty.MouseOverArea;
 
 import tractor.client.Client;
@@ -109,7 +110,9 @@ public class Button extends MouseOverArea {
 		this.isPressed = false;
 	}
 	public void mousePressed(int button, int mx, int my) {
-		if(this.isMouseOver()) {
+		System.out.println(((AppGameContainer)this.container).isMouseGrabbed());
+		//if(((AppGameContainer)this.container).isMouseGrabbed() && 
+				if(this.isMouseOver()) {
 			this.isPressed = true;
 			if(this.pressed != null) 
 				this.pressed.buttonPressed();

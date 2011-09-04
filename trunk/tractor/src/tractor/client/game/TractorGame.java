@@ -589,31 +589,31 @@ public class TractorGame extends BasicGame {
 			) {
 			switch(card.getSuit()) {
 			case GraphicsCard.SPADES:
-				if(!this.caller.equals(Client.getInstance().getUsername()) || GraphicsCard.TRUMP_SUIT == GraphicsCard.SPADES) {
+				if(!Client.getInstance().getUsername().equals(this.caller) || GraphicsCard.TRUMP_SUIT == GraphicsCard.SPADES) {
 					this.spades.enable();
 					this.spades.show();
 				}
 				break;
 			case GraphicsCard.CLUBS:
-				if(!this.caller.equals(Client.getInstance().getUsername()) || GraphicsCard.TRUMP_SUIT == GraphicsCard.CLUBS) {
+				if(!Client.getInstance().getUsername().equals(this.caller) || GraphicsCard.TRUMP_SUIT == GraphicsCard.CLUBS) {
 					this.clubs.enable();
 					this.clubs.show();
 				}
 				break;
 			case GraphicsCard.DIAMONDS:
-				if(!this.caller.equals(Client.getInstance().getUsername()) || GraphicsCard.TRUMP_SUIT == GraphicsCard.DIAMONDS) {
+				if(!Client.getInstance().getUsername().equals(this.caller) || GraphicsCard.TRUMP_SUIT == GraphicsCard.DIAMONDS) {
 					this.diamonds.enable();
 					this.diamonds.show();
 				}
 				break;
 			case GraphicsCard.HEARTS:
-				if(!this.caller.equals(Client.getInstance().getUsername()) || GraphicsCard.TRUMP_SUIT == GraphicsCard.HEARTS) {
+				if(!Client.getInstance().getUsername().equals(this.caller) || GraphicsCard.TRUMP_SUIT == GraphicsCard.HEARTS) {
 					this.hearts.enable();
 					this.hearts.show();
 				}
 				break;
 			case GraphicsCard.TRUMP:
-				if(!this.caller.equals(Client.getInstance().getUsername()) || GraphicsCard.TRUMP_SUIT == GraphicsCard.TRUMP) {
+				if(!Client.getInstance().getUsername().equals(this.caller) || GraphicsCard.TRUMP_SUIT == GraphicsCard.TRUMP) {
 					this.notrump.enable();
 					this.notrump.show();
 				}

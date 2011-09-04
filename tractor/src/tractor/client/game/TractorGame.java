@@ -51,6 +51,7 @@ public class TractorGame extends BasicGame {
 	private String banker;
 	private boolean played_first_hand;
 	private Button lastButton;
+	private String caller;
 	//private OtherPlayerHand hand;
 	/** It constructs the tractor game.
 	 * @param position
@@ -263,6 +264,7 @@ public class TractorGame extends BasicGame {
 					}
 					hand.reset();
 					this.banker = "";
+					this.caller = null;
 					this.played_first_hand = false;
 					this.lastButton.hide();
 				}
@@ -380,6 +382,7 @@ public class TractorGame extends BasicGame {
 			case GameCommand.PLAY_CARD:
 			{
 				if(this.state == GameCommand.DEALING) { // being called
+					this.caller = message[1];
 					this.called_cards = Integer.parseInt(message[3]);
 					List<GraphicsCard> list = new LinkedList<GraphicsCard>();
 					for(int i = 0; i < called_cards; i++) {
@@ -577,27 +580,43 @@ public class TractorGame extends BasicGame {
 	 * @param card
 	 */
 	public void checkCalling(GraphicsCard card) {
-		if( ( card.getNumber() == GraphicsCard.TRUMP_NUMBER && card.getSuit() != GraphicsCard.TRUMP && this.hand.frequency(card) > called_cards ) || ( card.getSuit() == GraphicsCard.TRUMP && this.hand.frequency(card) >= called_cards && this.hand.frequency(card) >= 2 ) ) {
+		if( ( card.getNumber() == GraphicsCard.TRUMP_NUMBER && 
+				card.getSuit() != GraphicsCard.TRUMP && 
+				this.hand.frequency(card) > called_cards ) || 
+			( card.getSuit() == GraphicsCard.TRUMP && 
+				this.hand.frequency(card) >= called_cards && 
+				this.hand.frequency(card) >= 2 ) 
+			) {
 			switch(card.getSuit()) {
 			case GraphicsCard.SPADES:
-				this.spades.enable();
-				this.spades.show();
+				if(!this.caller.equals(Client.getInstance().getUsername()) || GraphicsCard.TRUMP_SUIT == GraphicsCard.SPADES) {
+					this.spades.enable();
+					this.spades.show();
+				}
 				break;
 			case GraphicsCard.CLUBS:
-				this.clubs.enable();
-				this.clubs.show();
+				if(!this.caller.equals(Client.getInstance().getUsername()) || GraphicsCard.TRUMP_SUIT == GraphicsCard.CLUBS) {
+					this.clubs.enable();
+					this.clubs.show();
+				}
 				break;
 			case GraphicsCard.DIAMONDS:
-				this.diamonds.enable();
-				this.diamonds.show();
+				if(!this.caller.equals(Client.getInstance().getUsername()) || GraphicsCard.TRUMP_SUIT == GraphicsCard.DIAMONDS) {
+					this.diamonds.enable();
+					this.diamonds.show();
+				}
 				break;
 			case GraphicsCard.HEARTS:
-				this.hearts.enable();
-				this.hearts.show();
+				if(!this.caller.equals(Client.getInstance().getUsername()) || GraphicsCard.TRUMP_SUIT == GraphicsCard.HEARTS) {
+					this.hearts.enable();
+					this.hearts.show();
+				}
 				break;
 			case GraphicsCard.TRUMP:
-				this.notrump.enable();
-				this.notrump.show();
+				if(!this.caller.equals(Client.getInstance().getUsername()) || GraphicsCard.TRUMP_SUIT == GraphicsCard.TRUMP) {
+					this.notrump.enable();
+					this.notrump.show();
+				}
 				break;
 			default:
 				//some shit went wrong
@@ -615,6 +634,7 @@ public class TractorGame extends BasicGame {
 		this.diamonds.hide();
 		this.hearts.hide();
 		this.notrump.hide();
+		//TODO: start from end of hand and only count set trump...no reason to go through the whole hand
 		synchronized(this.hand) {
 			for(Iterator<GraphicsCard> i = this.hand.getCards().iterator(); i.hasNext(); ) {
 				checkCalling(i.next());

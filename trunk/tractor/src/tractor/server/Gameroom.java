@@ -516,7 +516,14 @@ public class Gameroom extends Chatroom implements Runnable { // do I need a thre
 							int call_number = Integer.parseInt(message[3]);
 							if(played.getNumber() == this.TRUMP_NUMBER || played.getSuit() == Card.TRUMP) { // make sure the call is valid 
 								//card number for jokers might cause first half to return true, shouldn't matter
-								if( user.getHand().frequency(played) >= call_number && (call_number > this.called_cards || call_number >= 2 && call_number >= this.called_cards && played.getSuit() == Card.TRUMP) ) {
+								if( user.getHand().frequency(played) >= call_number && 
+									(call_number > this.called_cards || 
+										call_number >= 2 && 
+										call_number >= this.called_cards && 
+										played.getSuit() == Card.TRUMP) &&
+									(user != this.caller ||
+										played.getSuit() == this.TRUMP_SUIT)
+									) {
 									//TODO: differentiate between big and small jokers
 									this.called_cards = call_number;
 									this.TRUMP_SUIT = played.getSuit();

@@ -110,9 +110,7 @@ public class Button extends MouseOverArea {
 		this.isPressed = false;
 	}
 	public void mousePressed(int button, int mx, int my) {
-		System.out.println(((AppGameContainer)this.container).isMouseGrabbed());
-		//if(((AppGameContainer)this.container).isMouseGrabbed() && 
-				if(this.isMouseOver()) {
+		if(this.isMouseOver()) {
 			this.isPressed = true;
 			if(this.pressed != null) 
 				this.pressed.buttonPressed();

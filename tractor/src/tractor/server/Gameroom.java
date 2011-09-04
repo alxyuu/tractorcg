@@ -1125,7 +1125,7 @@ public class Gameroom extends Chatroom implements Runnable { // do I need a thre
 										this.setLead(this.defending.next());
 									} else {
 										this.setLead(this.attacking.next());
-										if(this.lead.getGameScore() != Card.TWO && gamePoints >= 180 ) {
+										if(/*this.lead.getGameScore() != Card.TWO && */gamePoints >= 180 ) {
 											if ( gamePoints < 240 ) {
 												this.attacking.goUp(1);
 											} else if ( gamePoints < 300 ) {

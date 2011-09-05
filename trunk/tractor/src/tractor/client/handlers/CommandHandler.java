@@ -33,6 +33,13 @@ public class CommandHandler extends ClientHandler {
 					ClientView.getInstance().part(command);
 					//do nothing?
 					break;
+				case C_LIST:
+					String[] list = command.split(" ", 2);
+					String users = "";
+					if(list.length > 1) {
+						users = list[1];
+					}
+					ClientView.getInstance().getChatroom(list[0]).append("Current users: "+users);
 				case S_QUIT:
 					//disconnect
 					break;

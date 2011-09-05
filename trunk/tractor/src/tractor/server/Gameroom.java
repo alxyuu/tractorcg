@@ -42,10 +42,16 @@ public class Gameroom extends Chatroom implements Runnable { // do I need a thre
 	private Team team2;
 	private Team defending;
 	private Team attacking;
+	private int decks;
 	/** It constructs the game room.
 	 * @param players
 	 */
-	public Gameroom(int players) {
+	public Gameroom(int players, int decks) {
+		if(decks < 1 || decks > 3 || players < 1) {
+			throw new IllegalArgumentException("shit");
+		}
+		
+		this.decks = decks;
 		this.users = new CopyOnWriteArrayList<User>();
 		this.players = players;
 		this.setName("@"+this.hashCode());
@@ -290,7 +296,6 @@ public class Gameroom extends Chatroom implements Runnable { // do I need a thre
 		this.sendUpdateState(GameCommand.DEALING);
 		Thread dealing = new Thread("dealing-"+this.getName()) {
 			public void run() {
-				int decks = 3;
 				ArrayList<Card> cards = new ArrayList<Card>();
 				for(int i=0;i<decks; i++)
 					cards.addAll(Card.getDeck());
@@ -1117,18 +1122,18 @@ public class Gameroom extends Chatroom implements Runnable { // do I need a thre
 									if(gamePoints == 0) {
 										this.defending.goUp(3);
 										this.setLead(this.defending.next());
-									} else if ( gamePoints < 60 ) {
+									} else if ( gamePoints < decks*20 ) {
 										this.defending.goUp(2);
 										this.setLead(this.defending.next());
-									} else if ( gamePoints < 120 ) {
+									} else if ( gamePoints < decks*40 ) {
 										this.defending.goUp(1);
 										this.setLead(this.defending.next());
 									} else {
 										this.setLead(this.attacking.next());
-										if(/*this.lead.getGameScore() != Card.TWO && */gamePoints >= 180 ) {
-											if ( gamePoints < 240 ) {
+										if(/*this.lead.getGameScore() != Card.TWO && */gamePoints >= decks*60 ) {
+											if ( gamePoints < decks*80 ) {
 												this.attacking.goUp(1);
-											} else if ( gamePoints < 300 ) {
+											} else if ( gamePoints < decks*100 ) {
 												this.attacking.goUp(2);
 											} else {
 												this.attacking.goUp(3);

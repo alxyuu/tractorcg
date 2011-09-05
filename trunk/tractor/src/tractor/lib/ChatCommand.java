@@ -6,6 +6,7 @@ public enum ChatCommand {
 
 	C_JOIN,
 	C_PART,
+	C_LIST,
 	E_ERR,
 	G_CREATE,
 	G_HOOK,
@@ -17,6 +18,7 @@ public enum ChatCommand {
 		cset = new HashMap<String,ChatCommand>();
 		cset.put("JOIN",C_JOIN);
 		cset.put("PART",C_PART);
+		cset.put("LIST",C_LIST);
 		cset.put("ERR", E_ERR);
 		cset.put("GCREATE", G_CREATE);
 		cset.put("GHOOK", G_HOOK);

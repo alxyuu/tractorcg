@@ -53,8 +53,19 @@ public class Chatroom {
 	public boolean join(User user) {
 		if(this.users.contains(user))
 			return false;
+		
+		StringBuilder msg = new StringBuilder("LIST ");
+		msg.append(name);
+		for(User u : this.users) {
+			msg.append(" ");
+			msg.append(u.getName());
+		}
+		
 		this.users.add(user);
 		this.send(user, user.getName() + " has joined " + this.getName());
+		
+		user.getIO().write(msg.toString(),MessageFactory.CHATCMD);
+		
 		return true;
 	}
 

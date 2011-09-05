@@ -2,14 +2,8 @@ package tractor.client.game;
 
 import org.newdawn.slick.Graphics;
 import org.newdawn.slick.Image;
-import org.newdawn.slick.SlickException;
 import org.newdawn.slick.gui.GUIContext;
-import org.newdawn.slick.AppGameContainer;
 import tractor.thirdparty.MouseOverArea;
-
-import tractor.client.Client;
-import tractor.client.handlers.IOFactory;
-import tractor.lib.GameCommand;
 
 public class Button extends MouseOverArea {
 
@@ -17,7 +11,6 @@ public class Button extends MouseOverArea {
 	private Image normalImage;
 	private Image disabledImage;
 	private Image mouseoverImage;
-	private IOFactory io;
 	private ButtonPressedListener pressed;
 	private ButtonReleasedListener released;
 	private boolean isPressed;
@@ -37,9 +30,7 @@ public class Button extends MouseOverArea {
 		this.setNormalImage(normalImage);
 		this.setMouseOverImage(mouseoverImage);
 		this.isPressed = false;
-
-		this.io = Client.getInstance().getIO();
-
+		
 		this.hide();
 		//this.show();
 	}
@@ -57,7 +48,6 @@ public class Button extends MouseOverArea {
 		this.normalImage = normalImage;
 		this.disabledImage = disabledImage;
 		this.mouseoverImage = mouseoverImage;
-		this.io = Client.getInstance().getIO();
 
 		this.hide();
 	}

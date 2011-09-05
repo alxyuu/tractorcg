@@ -32,6 +32,7 @@ public class PlayerHand {
 		this.currentPlay = Collections.emptyList();
 	}
 	
+	@SuppressWarnings("unchecked")
 	public void init(TreeSet<Card> pairs, TreeSet<Card> triples, TreeSet<Tractor> tractors, TreeSet<Tractor> mixed) {
 		this.pairs = pairs;
 		this.triples = triples;

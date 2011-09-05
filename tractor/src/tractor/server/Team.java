@@ -3,8 +3,6 @@ package tractor.server;
 import java.util.ArrayList;
 import java.util.List;
 
-import tractor.lib.Card;
-
 public class Team {
 	
 	private List<User> users;

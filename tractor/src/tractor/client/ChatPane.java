@@ -2,13 +2,11 @@ package tractor.client;
 
 import java.awt.BorderLayout;
 import java.awt.Color;
-import java.awt.Point;
-import java.awt.event.AdjustmentEvent;
-import java.awt.event.AdjustmentListener;
 
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JTextArea;
+import javax.swing.SwingUtilities;
 import javax.swing.text.BadLocationException;
 
 /** Displays the chat window
@@ -17,13 +15,10 @@ import javax.swing.text.BadLocationException;
  */
 public class ChatPane extends JScrollPane {
 	private static final long serialVersionUID = 1L;
-	private static final int MAX_LINES = 50;
+	private static final int MAX_LINES = 100;
 	private JTextArea textarea;
 	private int lines;
-	private static AdjustmentListener scrollToBottom = new AdjustmentListener() {  
-			public void adjustmentValueChanged(AdjustmentEvent e) {  
-			e.getAdjustable().setValue(e.getAdjustable().getMaximum());  
-			}};
+
 	/** Constructor
 	 * @param name
 	 *
@@ -43,7 +38,6 @@ public class ChatPane extends JScrollPane {
 		this.setViewportView(panel);
 		//this.putClientProperty("isClosable",true);
 		this.lines = 0;
-		getVerticalScrollBar().addAdjustmentListener(ChatPane.scrollToBottom);  
 	}
 	/** Adds a string to the chat window
 	 * @param s
@@ -63,6 +57,15 @@ public class ChatPane extends JScrollPane {
 			this.textarea.replaceRange("",0,offset);
 			this.lines = this.textarea.getLineCount();
 		}
-		getVerticalScrollBar().setValue(getVerticalScrollBar().getMaximum()); // do I need to invoke later?
+		SwingUtilities.invokeLater(new Runnable() {
+			public void run() {
+				scrollToBottom();
+			}
+		});
+		
+	}
+	
+	public void scrollToBottom() {
+		getVerticalScrollBar().setValue(getVerticalScrollBar().getMaximum());
 	}
 }

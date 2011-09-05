@@ -18,18 +18,11 @@ import javax.swing.JMenu;
 import javax.swing.JMenuBar;
 import javax.swing.JMenuItem;
 import javax.swing.JPanel;
-import javax.swing.JScrollPane;
-import javax.swing.JTextArea;
 import javax.swing.JTextField;
 import javax.swing.SwingUtilities;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 
-import org.newdawn.slick.AppGameContainer;
-import org.newdawn.slick.CanvasGameContainer;
-import org.newdawn.slick.SlickException;
-
-import tractor.client.game.TractorGame;
 import tractor.client.handlers.IOFactory;
 import tractor.thirdparty.CloseableTabbedPane;
 import tractor.thirdparty.CloseableTabbedPaneListener;
@@ -42,7 +35,6 @@ public class ClientView extends JFrame {
 	private JLabel statusField;
 	private JTextField statusColor;
 	private JPanel statusBar;
-	private JTextArea chatText;
 	private JTextField chatLine;
 	private JTextField nameField;
 	private JButton connectButton;

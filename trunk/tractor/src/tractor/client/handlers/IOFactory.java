@@ -6,10 +6,6 @@ import java.io.InputStreamReader;
 import java.io.PrintWriter;
 import java.net.Socket;
 
-import tractor.client.ChatPane;
-import tractor.client.ClientView;
-import tractor.lib.ChatCommand;
-import tractor.lib.ErroneousMessageException;
 import tractor.lib.MessageFactory;
 
 //messagefactory with built in io handling, should only be used by client

@@ -6,7 +6,6 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.LinkedList;
-import java.util.Set;
 
 import java.util.Iterator;
 
@@ -16,14 +15,11 @@ import org.newdawn.slick.GameContainer;
 import org.newdawn.slick.Graphics;
 import org.newdawn.slick.Image;
 import org.newdawn.slick.SlickException;
-import org.newdawn.slick.AppGameContainer;
 
 import tractor.client.Client;
 import tractor.client.handlers.IOFactory;
 import tractor.lib.Card;
 import tractor.lib.GameCommand;
-import tractor.lib.MessageFactory;
-import tractor.server.User;
 
 public class TractorGame extends BasicGame {
 
@@ -35,7 +31,7 @@ public class TractorGame extends BasicGame {
 	private String name; //name of the gameroom i.e. @123456789
 	private PlayerHand hand;
 	private Button startButton;
-	private boolean isHost;
+	//private boolean isHost;
 	private boolean callingEnabled;
 	private Button spades, clubs, diamonds, hearts, notrump;
 	private Color background;
@@ -64,7 +60,7 @@ public class TractorGame extends BasicGame {
 		this.position = position;
 		this.name = name;
 		this.hands = new HashMap<String,OtherPlayerHand>();
-		this.isHost = false;
+		//this.isHost = false;
 		this.called_cards = 0;
 		this.selected = new ArrayList<CardButton>();
 		this.banker = null;
@@ -477,10 +473,10 @@ public class TractorGame extends BasicGame {
 			case GameCommand.SET_HOST:
 			{
 				if(message[1].equals(Client.getInstance().getUsername())) {
-					this.isHost = true;
+					//this.isHost = true;
 					this.startButton.show();
 				} else {
-					this.isHost = false;
+					//this.isHost = false;
 					this.startButton.hide();
 				}
 			}

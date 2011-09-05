@@ -14,7 +14,7 @@ See three deck variation
 
 = Commands =
 
-  * /gcreate [1/2/3] - create gameroom with 1, 2, or 3 decks
+  * /gcreate [1,2,3] - create gameroom with 1, 2, or 3 decks
   * /ghook username - join username's gameroom
   * /join #channel - join channel
   * /part - leave current channel

@@ -3,6 +3,8 @@ package tractor.client;
 import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Point;
+import java.awt.event.AdjustmentEvent;
+import java.awt.event.AdjustmentListener;
 
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
@@ -18,6 +20,10 @@ public class ChatPane extends JScrollPane {
 	private static final int MAX_LINES = 50;
 	private JTextArea textarea;
 	private int lines;
+	private static AdjustmentListener scrollToBottom = new AdjustmentListener() {  
+			public void adjustmentValueChanged(AdjustmentEvent e) {  
+			e.getAdjustable().setValue(e.getAdjustable().getMaximum());  
+			}};
 	/** Constructor
 	 * @param name
 	 *
@@ -37,6 +43,7 @@ public class ChatPane extends JScrollPane {
 		this.setViewportView(panel);
 		//this.putClientProperty("isClosable",true);
 		this.lines = 0;
+		getVerticalScrollBar().addAdjustmentListener(ChatPane.scrollToBottom);  
 	}
 	/** Adds a string to the chat window
 	 * @param s

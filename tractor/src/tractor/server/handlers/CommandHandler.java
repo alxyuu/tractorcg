@@ -80,7 +80,19 @@ public class CommandHandler extends ServerHandler {
 						case G_CREATE:
 						{
 							if(user.getCurrentGame() == null) {
-								Gameroom room = new Gameroom(4);
+								int decks = 3;
+								if(command != "") {
+									try {
+										decks = Integer.parseInt(command);
+										if(decks < 1 || decks > 3) {
+											//TODO: error handler
+											break;
+										}
+									} catch (NumberFormatException e) {
+										e.printStackTrace(System.out);
+									}
+								}
+								Gameroom room = new Gameroom(4,3);
 								chatrooms.put(room.getName(), room);
 								room.join(user);
 								room.setHost(user);

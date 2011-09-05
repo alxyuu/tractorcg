@@ -61,6 +61,7 @@ public class CommandHandler extends ServerHandler {
 								user.addChatroom(tojoin);
 								System.out.println(user.getName() + " has joined "+command);
 								io.write("JOIN "+command, MessageFactory.CHATCMD);
+								tojoin.sendList(user);
 							}
 						}
 						break;

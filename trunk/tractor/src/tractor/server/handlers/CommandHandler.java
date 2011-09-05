@@ -93,7 +93,7 @@ public class CommandHandler extends ServerHandler {
 										e.printStackTrace(System.out);
 									}
 								}
-								Gameroom room = new Gameroom(4,3);
+								Gameroom room = new Gameroom(4,decks);
 								chatrooms.put(room.getName(), room);
 								room.join(user);
 								room.setHost(user);

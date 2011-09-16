@@ -532,7 +532,7 @@ public class Gameroom extends Chatroom implements Runnable { // do I need a thre
 									this.called_cards = call_number;
 									this.TRUMP_SUIT = played.getSuit();
 									this.caller = user;
-									this.sendCommand(GameCommand.PLAY_CARD + " " + user.getName() + " " + played.getSuit() + " " + call_number);
+									this.sendCommand(GameCommand.PLAY_CARD + " " + user.getName() + " " + played.getSuit() + " " + played.getNumber() + " " + call_number);
 								} else {
 									System.out.println("illegal call");
 								}

@@ -597,7 +597,7 @@ public class Gameroom extends Chatroom implements Runnable { // do I need a thre
 										if(!tractors.contains(t) && !tractors.contains(t3)) {
 											//pairs.removeAll(tractorcards);
 											//don't need to remove, no duplicates in a set
-											pairs.addAll(tractorcards);
+											//pairs.addAll(tractorcards);
 											mixed.add(t);
 										}
 									}

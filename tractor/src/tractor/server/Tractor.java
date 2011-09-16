@@ -34,9 +34,12 @@ public class Tractor {
 		return (this.type==2 ? "double" : this.type==3 ? "triple" : "unknown") + "tractor: " + cards.toString();
 	}
 	
-	public boolean equals(Tractor t) {
-		if(t.type == this.type && this.cards.containsAll(t.cards) && t.cards.containsAll(this.cards))
-			return true;
+	public boolean equals(Object o) {
+		if(o instanceof Tractor) {
+			Tractor t = (Tractor)o;
+			if(t.type == this.type && this.cards.containsAll(t.cards) && t.cards.containsAll(this.cards))
+				return true;
+		}
 		return false;
 	}
 }

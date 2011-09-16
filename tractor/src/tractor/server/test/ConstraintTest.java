@@ -197,10 +197,46 @@ public class ConstraintTest {
 		User user = users.get(1);
 
 		ArrayList<Card> played = new ArrayList<Card>();
+		played.add(Card.getCard(Card.SPADES,Card.THREE));
+		played.add(Card.getCard(Card.SPADES,Card.SIX));
+		played.add(Card.getCard(Card.SPADES,Card.SIX));
+		played.add(Card.getCard(Card.SPADES,Card.SEVEN));
+		played.add(Card.getCard(Card.SPADES,Card.SEVEN));
+		played.add(Card.getCard(Card.SPADES,Card.SEVEN));
+		played.add(Card.getCard(Card.SPADES,Card.EIGHT));
+		played.add(Card.getCard(Card.SPADES,Card.EIGHT));
+		played.add(Card.getCard(Card.SPADES,Card.EIGHT));
+		played.add(Card.getCard(Card.SPADES,Card.NINE));
+		played.add(Card.getCard(Card.SPADES,Card.TEN));
+		played.add(Card.getCard(Card.SPADES,Card.QUEEN));
+		played.add(Card.getCard(Card.SPADES,Card.KING));
+		played.add(Card.getCard(Card.CLUBS,Card.FOUR));
+		played.add(Card.getCard(Card.CLUBS,Card.SIX));
+		played.add(Card.getCard(Card.CLUBS,Card.SEVEN));
+		played.add(Card.getCard(Card.CLUBS,Card.JACK));
+		played.add(Card.getCard(Card.CLUBS,Card.ACE));
+		played.add(Card.getCard(Card.DIAMONDS,Card.THREE));
+		played.add(Card.getCard(Card.DIAMONDS,Card.FOUR));
+		played.add(Card.getCard(Card.DIAMONDS,Card.EIGHT));
+		played.add(Card.getCard(Card.DIAMONDS,Card.TEN));
+		played.add(Card.getCard(Card.DIAMONDS,Card.JACK));
+		played.add(Card.getCard(Card.DIAMONDS,Card.QUEEN));
+		played.add(Card.getCard(Card.DIAMONDS,Card.KING));
+		played.add(Card.getCard(Card.DIAMONDS,Card.KING));
+		played.add(Card.getCard(Card.HEARTS,Card.SIX));
 		played.add(Card.getCard(Card.HEARTS,Card.SEVEN));
 		played.add(Card.getCard(Card.HEARTS,Card.SEVEN));
-		played.add(Card.getCard(Card.HEARTS,Card.EIGHT));
-		played.add(Card.getCard(Card.HEARTS,Card.EIGHT));
+		played.add(Card.getCard(Card.HEARTS,Card.NINE));
+		played.add(Card.getCard(Card.HEARTS,Card.NINE));
+		played.add(Card.getCard(Card.HEARTS,Card.ACE));
+		played.add(Card.getCard(Card.SPADES,Card.TWO));
+		played.add(Card.getCard(Card.SPADES,Card.TWO));
+		played.add(Card.getCard(Card.CLUBS,Card.TWO));
+		played.add(Card.getCard(Card.CLUBS,Card.TWO));
+		played.add(Card.getCard(Card.DIAMONDS,Card.TWO));
+		played.add(Card.getCard(Card.TRUMP,Card.SMALL_JOKER));
+		played.add(Card.getCard(Card.TRUMP,Card.SMALL_JOKER));
+
 
 		System.out.println(cardComparator.gameCompare(Card.getCard(Card.SPADES,Card.TWO), Card.getCard(Card.HEARTS,Card.QUEEN)));
 		

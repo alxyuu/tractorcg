@@ -116,8 +116,11 @@ public class TractorGame extends BasicGame {
 			this.notrump = new Button(container,new Image("images/suits/"+GraphicsCard.TRUMP+".png"), new Image("images/suits/"+GraphicsCard.TRUMP+"s.png"), container.getWidth()*2/3+124, 370);
 			this.notrump.addButtonReleasedListener(new ButtonReleasedListener() {
 				public void buttonReleased() {
-					//TODO: differentiate between big and small
-					sendCommand(GameCommand.PLAY_CARD+" "+GraphicsCard.TRUMP + " " + GraphicsCard.SMALL_JOKER + " " + (Math.max(called_cards,2)));
+					int toCall = Math.max(called_cards,2);
+					if(hand.frequency(GraphicsCard.getCard(GraphicsCard.TRUMP, GraphicsCard.SMALL_JOKER)) >= toCall)
+						sendCommand(GameCommand.PLAY_CARD+" "+GraphicsCard.TRUMP + " " + GraphicsCard.SMALL_JOKER + " " + (toCall));
+					else
+						sendCommand(GameCommand.PLAY_CARD+" "+GraphicsCard.TRUMP + " " + GraphicsCard.BIG_JOKER + " " + (toCall));
 				}
 			});
 			this.playButton = new Button(container,new Image("images/play.png"), new Image("images/play_over.png"), container.getWidth()/2-30, 370);

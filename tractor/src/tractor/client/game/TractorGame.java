@@ -382,10 +382,10 @@ public class TractorGame extends BasicGame {
 			{
 				if(this.state == GameCommand.DEALING) { // being called
 					this.caller = message[1];
-					this.called_cards = Integer.parseInt(message[3]);
+					this.called_cards = Integer.parseInt(message[4]);
 					List<GraphicsCard> list = new LinkedList<GraphicsCard>();
 					for(int i = 0; i < called_cards; i++) {
-						list.add(GraphicsCard.getCard(Integer.parseInt(message[2]),GraphicsCard.TRUMP_NUMBER));
+						list.add(GraphicsCard.getCard(Integer.parseInt(message[2]),Integer.parseInt(message[3])));
 					}
 
 					// I'm so cool

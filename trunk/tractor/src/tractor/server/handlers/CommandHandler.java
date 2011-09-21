@@ -78,7 +78,7 @@ public class CommandHandler extends ServerHandler {
 						{
 							if(user.getCurrentGame() == null) {
 								int decks = 3;
-								if(command != "") {
+								if(!command.equals("")) {
 									try {
 										decks = Integer.parseInt(command);
 										if(decks < 1 || decks > 3) {

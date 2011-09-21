@@ -14,7 +14,7 @@ public class Trick {
 	private TreeSet<Card> triples;
 	private TreeSet<Card> pc, tc;
 	private TreeSet<Tractor> tractors;
-	public Trick(CardComparator<Card> cc, Comparator<Tractor> tc) {
+	public Trick(CardComparator cc, Comparator<Tractor> tc) {
 		this.singles = new LinkedList<Card>();
 		this.pairs = new TreeSet<Card>(cc);
 		this.triples = new TreeSet<Card>(cc);

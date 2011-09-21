@@ -9,6 +9,7 @@ import org.newdawn.slick.SlickException;
 
 import tractor.client.handlers.IOFactory;
 import tractor.client.game.TractorGame;
+import tractor.client.game.TractorGameContainer;
 import tractor.lib.MessageFactory;
 
 public class Client {
@@ -38,6 +39,7 @@ public class Client {
 	private String username;
 
 	private TractorGame game;
+	private TractorGameContainer container;
 	private Thread gamethread;
 
 	public static void main(String ... bobby) {
@@ -143,15 +145,14 @@ public class Client {
 	public void startGame() {
 		this.gamethread = new Thread("game thread") {
 			public void run() {
-				AppGameContainer app;
 				try {
-					app = new AppGameContainer(game);
-					app.setDisplayMode(1024,600,false);
-					app.setTargetFrameRate(30);
-					app.setAlwaysRender(true);
+					container = new TractorGameContainer(game);
+					container.setDisplayMode(1024,600,false);
+					container.setTargetFrameRate(30);
+					container.setAlwaysRender(true);
 					//TODO: clean up game on close, don't exit whole program
-					//app.setForceExit(false);
-					app.start();
+					//container.setForceExit(false);
+					container.start();
 				} catch (SlickException e) {
 					// TODO Auto-generated catch block
 					e.printStackTrace();
@@ -165,7 +166,7 @@ public class Client {
 	 * 
 	 */
 	public void stopGame() {
-
+		this.container.exit();
 	}
 
 	/**It gets the username

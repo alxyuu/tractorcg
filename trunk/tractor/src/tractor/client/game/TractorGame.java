@@ -77,7 +77,7 @@ public class TractorGame extends BasicGame {
         	this.hand.addCard();
         }*/
 		this.gamecontainer = container;
-		this.gamecontainer.setShowFPS(false);
+		this.gamecontainer.setShowFPS(true);
 		this.gamecontainer.setUpdateOnlyWhenVisible(false);
 		this.io = Client.getInstance().getIO();
 		this.background = new Color(0,150,0);
@@ -212,6 +212,10 @@ public class TractorGame extends BasicGame {
 		return new Point2D.Double(gamecontainer.getWidth()/2+radius*Math.cos(theta), gamecontainer.getHeight()/2-radius*Math.sin(theta));
 	}
 
+	public String getName() {
+		return this.name;
+	}
+	
 	@Override
 	public void update(GameContainer container, int delta)
 	throws SlickException {

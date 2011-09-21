@@ -54,7 +54,7 @@ class CommandListener implements ActionListener {
 				} else if(cmd.equals("GCREATE")) {
 					io.write("GCREATE "+args, IOFactory.CHATCMD);
 				} else if(cmd.equals("GPART")) {
-					//io.write("GPART "+client.getGameID(), IOFactory.CHATCMD);
+					io.write("GPART "+client.getGame().getName(), IOFactory.CHATCMD);
 				} else if(cmd.equals("GHOOK")) {
 					io.write("GHOOK "+args, IOFactory.CHATCMD);
 				} else if(cmd.equals("QUIT")) {

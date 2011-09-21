@@ -62,6 +62,7 @@ public class CommandHandler extends ClientHandler {
 					break;
 				case G_PART:
 					ClientView.getInstance().part(command);
+					client.stopGame();
 					break;
 				default:
 					//TODO: some error handler

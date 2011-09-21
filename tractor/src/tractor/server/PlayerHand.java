@@ -19,7 +19,7 @@ public class PlayerHand {
 	private TreeSet<Tractor> tractors;
 	private TreeSet<Tractor> mixed;
 	private List<Card> currentPlay;
-	private CardComparator<Card> cc;
+	private CardComparator cc;
 	//private String name;
 
 	public PlayerHand() {
@@ -38,7 +38,7 @@ public class PlayerHand {
 		this.triples = triples;
 		this.tractors = tractors;
 		this.mixed = mixed;
-		this.cc = ((CardComparator<Card>)this.pairs.comparator());
+		this.cc = ((CardComparator)this.pairs.comparator());
 	}
 	
 	public TreeSet<Tractor> getTractors() {

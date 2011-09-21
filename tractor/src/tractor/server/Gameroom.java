@@ -35,19 +35,20 @@ public class Gameroom extends Chatroom implements Runnable { // do I need a thre
 	private int currentPoints;
 	private int gamePoints;
 	private boolean trumped;
-	private CardComparator<Card> cardComparator;
+	private CardComparator cardComparator;
 	private Comparator<Tractor> tractorComparator;
 	private Team team1;
 	private Team team2;
 	private Team defending;
 	private Team attacking;
 	private int decks;
+	
 	/** It constructs the game room.
 	 * @param players
 	 */
 	public Gameroom(int players, int decks) {
 		if(decks < 1 || decks > 3 || players < 1) {
-			throw new IllegalArgumentException("shit");
+			throw new IllegalArgumentException("unsuppored number of decks " + decks + " or players " + players);
 		}
 		
 		this.decks = decks;
@@ -60,100 +61,7 @@ public class Gameroom extends Chatroom implements Runnable { // do I need a thre
 		this.team1 = new Team();
 		this.team2 = new Team();
 		
-		this.cardComparator = new CardComparator<Card>() {
-			/**
-			 * gets the suit used for sorting
-			 * @return
-			 */
-			private int getSortingSuit(Card card) {
-				if (card.getSuit() == Card.TRUMP)
-					return Card.TRUMP+Card.TRUMP+2;
-				else if(card.getSuit() == TRUMP_SUIT && card.getNumber() == TRUMP_NUMBER)
-					return Card.TRUMP+Card.TRUMP+1;
-				else if(card.getNumber() == TRUMP_NUMBER)
-					return Card.TRUMP+card.getSuit()+1;
-				else if(card.getSuit() == TRUMP_SUIT)
-					return Card.TRUMP;
-				else
-					return card.getSuit();
-			}
-
-			/**
-			 * gets the value of the card in the current game
-			 * @param card
-			 * @return
-			 */
-			private int getGameValue(Card card) {
-				if (card.getSuit() == Card.TRUMP)
-					if(card.getNumber() == Card.BIG_JOKER)
-						return Card.TRUMP+4; // 8
-					else
-						return Card.TRUMP+3; // 7
-				else if(card.getSuit() == TRUMP_SUIT && card.getNumber() == TRUMP_NUMBER)
-					return Card.TRUMP+2; // 6
-				else if(card.getNumber() == TRUMP_NUMBER)
-					return Card.TRUMP+1; // 5
-				else if(card.getSuit() == TRUMP_SUIT)
-					return Card.TRUMP; // 4
-				else
-					return card.getSuit();
-			}
-
-			/** It gets the sorting value of the card.
-			 * @return
-			 */
-			private int getSortingValue(Card card) {
-				//return (card.getNumber() == TRUMP_NUMBER) ? ((card.getSuit() == TRUMP_SUIT) ? Card.SET_TRUMP_NUMBER : Card.SET_TRUMP) : card.getNumber();
-				//set trump sorting was taken care of in getSortingSuit, I think
-				return card.getNumber();
-			}
-
-			public int compare(Card c1, Card c2) {
-				if(getSortingSuit(c1) == getSortingSuit(c2)) {
-					return getSortingValue(c1) - getSortingValue(c2);
-				} else {
-					return getSortingSuit(c1) - getSortingSuit(c2);
-				}
-			}
-
-			public int gameCompare(Card c1, Card c2) {
-				try {
-					int value1 = getGameValue(c1);
-					int value2 = getGameValue(c2);
-					if(value1 == value2) {
-						int toreturn = c1.getNumber() - c2.getNumber();
-						if(toreturn > 0 && TRUMP_NUMBER < c1.getNumber() && TRUMP_NUMBER > c2.getNumber())
-							return toreturn -1;
-						else if(toreturn < 0 && TRUMP_NUMBER > c1.getNumber() && TRUMP_NUMBER < c2.getNumber())
-							return toreturn +1;
-						else
-							return toreturn;
-					} else {
-						if(value1 >= 4 && value2 >= 4) {
-							if(value1 == 4) {
-								int decrease = (Card.ACE-1) - c1.getNumber();
-								if(TRUMP_NUMBER < c1.getNumber()) {
-									decrease++;
-								}
-								return value1-decrease-value2;
-							} else if(value2 == 4) {
-								int decrease = (Card.ACE-1) - c2.getNumber();
-								if(TRUMP_NUMBER < c2.getNumber()) {
-									decrease++;
-								}
-								return value1+decrease-value2;
-							} else {
-								return value1-value2;
-							}
-						} else {
-							return 9999;
-						}
-					}
-				} catch (NullPointerException e) {
-					return 9999;
-				}
-			}
-		};
+		this.cardComparator = new CardComparator(Card.HEARTS, Card.TWO);
 	
 		this.tractorComparator = new Comparator<Tractor>() {
 			public int compare(Tractor t1, Tractor t2) {
@@ -269,6 +177,22 @@ public class Gameroom extends Chatroom implements Runnable { // do I need a thre
 		if(index > 0) { // -1 = not found ruh roh, 0 = number 1 don't do anyone
 			Collections.rotate(this.users, 0-index);
 		}
+	}
+	
+	private void setTrumpSuit(int suit) {
+		this.TRUMP_SUIT = suit;
+		this.cardComparator.setTrump(this.TRUMP_SUIT, this.TRUMP_NUMBER);
+	}
+	
+	private void setTrumpNumber(int number){ 
+		this.TRUMP_NUMBER = number;
+		this.cardComparator.setTrump(this.TRUMP_SUIT, this.TRUMP_NUMBER);
+	}
+	
+	private void setTrump(int suit, int number) {
+		this.TRUMP_SUIT = suit;
+		this.TRUMP_NUMBER = number;
+		this.cardComparator.setTrump(this.TRUMP_SUIT, this.TRUMP_NUMBER);
 	}
 
 	/** It updates the stats of the game room.
@@ -476,7 +400,6 @@ public class Gameroom extends Chatroom implements Runnable { // do I need a thre
 				MessageFactory io = user.getIO();
 				while(io.hasNextMessage(MessageFactory.GAMECMD)) {
 					String[] message = io.getNextMessage(MessageFactory.GAMECMD).split(" ");
-					//int primary = GameCommand.get(message[0]);
 					int primary = Integer.parseInt(message[0]);
 					CommandSwitch: switch(primary) {
 					/*case GameCommand.NULL:
@@ -506,8 +429,7 @@ public class Gameroom extends Chatroom implements Runnable { // do I need a thre
 						for(Iterator<User> i2 = users.iterator();i2.hasNext();) {
 							i2.next().setGameScore(Card.TWO);
 						}
-						this.TRUMP_NUMBER = Card.TWO;
-						this.TRUMP_SUIT  = -1;
+						this.setTrump(Card.TWO, -1);
 						this.setLead(host);
 						this.deal();
 					}
@@ -528,9 +450,8 @@ public class Gameroom extends Chatroom implements Runnable { // do I need a thre
 									(user != this.caller ||
 										played.getSuit() == this.TRUMP_SUIT)
 									) {
-									//TODO: differentiate between big and small jokers
 									this.called_cards = call_number;
-									this.TRUMP_SUIT = played.getSuit();
+									this.setTrumpSuit(played.getSuit());
 									this.caller = user;
 									this.sendCommand(GameCommand.PLAY_CARD + " " + user.getName() + " " + played.getSuit() + " " + played.getNumber() + " " + call_number);
 								} else {
@@ -1140,7 +1061,7 @@ public class Gameroom extends Chatroom implements Runnable { // do I need a thre
 										}
 									}
 									
-									this.TRUMP_NUMBER = this.lead.getGameScore();
+									this.setTrumpNumber(this.lead.getGameScore());
 									
 									if(this.TRUMP_NUMBER > Card.ACE) {
 										//TODO: this.lead.getTeam() wins

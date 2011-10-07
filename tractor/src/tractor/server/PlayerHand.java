@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Comparator;
+import java.util.ConcurrentModificationException;
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
@@ -175,7 +176,16 @@ public class PlayerHand {
 				this.pairs.remove(card);
 				
 				for(Iterator<Tractor> i = this.tractors.iterator(); i.hasNext();) {
-					Tractor tractor = i.next();
+					Tractor tractor;
+					while(true) {
+						try {
+							tractor = i.next();
+							break;
+						} catch (ConcurrentModificationException e) {
+							System.out.println("shit @PlayerHand.184");
+						}
+					}
+					
 					int index = tractor.getCards().indexOf(card);
 					if( index > -1) {
 						if(tractor.getType() == 2) {

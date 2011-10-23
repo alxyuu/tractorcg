@@ -200,6 +200,7 @@ public class Gameroom extends Chatroom implements Runnable { // do I need a thre
 	 */
 	private void updateStats() {
 		String stats = GameCommand.SET_STATS + " " + this.TRUMP_NUMBER + " " + 4;
+		System.out.println("Sending update stat: "+stats);
 		for(Iterator<User> i = users.iterator();i.hasNext();) {
 			User user = i.next();
 			stats += " " + user.getName() + " " + user.getGameScore();
@@ -429,7 +430,7 @@ public class Gameroom extends Chatroom implements Runnable { // do I need a thre
 						for(Iterator<User> i2 = users.iterator();i2.hasNext();) {
 							i2.next().setGameScore(Card.TWO);
 						}
-						this.setTrump(Card.TWO, -1);
+						this.setTrump(-1, Card.TWO);
 						this.setLead(host);
 						this.deal();
 					}

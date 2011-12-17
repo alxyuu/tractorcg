@@ -183,6 +183,8 @@ public class PlayerHand {
 							break;
 						} catch (ConcurrentModificationException e) {
 							System.out.println("shit @PlayerHand.184");
+							e.printStackTrace(System.out);
+							System.exit(1);
 						}
 					}
 					

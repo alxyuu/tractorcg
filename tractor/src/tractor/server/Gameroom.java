@@ -705,7 +705,7 @@ public class Gameroom extends Chatroom implements Runnable { // do I need a thre
 												User u = i2.next();
 												if(u != user)
 												{
-													for(Iterator<Tractor> it2 = u.getHand().getMixedTractors().iterator(); it.hasNext();) {
+													for(Iterator<Tractor> it2 = u.getHand().getMixedTractors().iterator(); it2.hasNext();) {
 															Tractor comp = it2.next();
 															if( comp.getStartingCard().getGameSuit(this.TRUMP_SUIT,this.TRUMP_NUMBER) == tractor.getStartingCard().getGameSuit(this.TRUMP_SUIT,this.TRUMP_NUMBER) && comp.getLength() >= tractor.getLength() && cardComparator.gameCompare(comp.getStartingCard(), tractor.getStartingCard()) >= 1 ) {
 																//sendCommand(GameCommand.PLAY_INVALID+" not high (normal tractor found)",user);

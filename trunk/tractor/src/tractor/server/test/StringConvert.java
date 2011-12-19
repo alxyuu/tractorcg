@@ -4,7 +4,7 @@ import tractor.lib.Card;
 
 public class StringConvert {
 	public static void main (String ... bobby) {
-		String[] in = "three of spades, three of spades, four of spades, four of spades, five of spades, five of spades, five of spades, eight of spades, nine of spades, jack of spades, ace of spades, three of clubs, four of clubs, five of clubs, seven of clubs, seven of clubs, jack of clubs, queen of clubs, two of hearts, two of hearts, three of hearts, five of hearts, five of hearts, seven of hearts, seven of hearts, seven of hearts, jack of hearts, king of hearts, two of diamonds, four of diamonds, five of diamonds, seven of diamonds, nine of diamonds, queen of diamonds, king of diamonds, six of hearts, small joker of trump, small joker of trump, big joker of trump".split(", ");
+		String[] in = "three of spades, six of spades, nine of spades, ten of spades, ten of spades, jack of spades, queen of spades, queen of spades, king of spades, king of spades, king of spades, five of diamonds, seven of diamonds, eight of diamonds, nine of diamonds, ten of diamonds, jack of diamonds, queen of diamonds, king of diamonds, four of hearts, five of hearts, eight of hearts, nine of hearts, nine of hearts, ten of hearts, jack of hearts, queen of hearts, ace of hearts, three of clubs, four of clubs, seven of clubs, seven of clubs, jack of clubs, queen of clubs, king of clubs, king of clubs, ace of clubs, two of spades, two of hearts".split(", ");
 		String out = "";
 		for(String semi : in) {
 			String[] card = semi.split(" ");

@@ -7,6 +7,7 @@ import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.ListIterator;
+import java.util.TreeSet;
 
 import tractor.lib.Card;
 import tractor.server.CardComparator;
@@ -107,45 +108,86 @@ public class ConstraintTest {
 		ArrayList<Card> played = new ArrayList<Card>();
 		played.add(Card.getCard(Card.SPADES,Card.THREE));
 		played.add(Card.getCard(Card.SPADES,Card.SIX));
-		played.add(Card.getCard(Card.SPADES,Card.SIX));
-		played.add(Card.getCard(Card.SPADES,Card.SEVEN));
-		played.add(Card.getCard(Card.SPADES,Card.SEVEN));
-		played.add(Card.getCard(Card.SPADES,Card.SEVEN));
-		played.add(Card.getCard(Card.SPADES,Card.EIGHT));
-		played.add(Card.getCard(Card.SPADES,Card.EIGHT));
-		played.add(Card.getCard(Card.SPADES,Card.EIGHT));
 		played.add(Card.getCard(Card.SPADES,Card.NINE));
 		played.add(Card.getCard(Card.SPADES,Card.TEN));
+		played.add(Card.getCard(Card.SPADES,Card.TEN));
+		played.add(Card.getCard(Card.SPADES,Card.JACK));
+		played.add(Card.getCard(Card.SPADES,Card.QUEEN));
 		played.add(Card.getCard(Card.SPADES,Card.QUEEN));
 		played.add(Card.getCard(Card.SPADES,Card.KING));
-		played.add(Card.getCard(Card.CLUBS,Card.FOUR));
-		played.add(Card.getCard(Card.CLUBS,Card.SIX));
-		played.add(Card.getCard(Card.CLUBS,Card.SEVEN));
-		played.add(Card.getCard(Card.CLUBS,Card.JACK));
-		played.add(Card.getCard(Card.CLUBS,Card.ACE));
-		played.add(Card.getCard(Card.DIAMONDS,Card.THREE));
-		played.add(Card.getCard(Card.DIAMONDS,Card.FOUR));
+		played.add(Card.getCard(Card.SPADES,Card.KING));
+		played.add(Card.getCard(Card.SPADES,Card.KING));
+		played.add(Card.getCard(Card.DIAMONDS,Card.FIVE));
+		played.add(Card.getCard(Card.DIAMONDS,Card.SEVEN));
 		played.add(Card.getCard(Card.DIAMONDS,Card.EIGHT));
+		played.add(Card.getCard(Card.DIAMONDS,Card.NINE));
 		played.add(Card.getCard(Card.DIAMONDS,Card.TEN));
 		played.add(Card.getCard(Card.DIAMONDS,Card.JACK));
 		played.add(Card.getCard(Card.DIAMONDS,Card.QUEEN));
 		played.add(Card.getCard(Card.DIAMONDS,Card.KING));
-		played.add(Card.getCard(Card.DIAMONDS,Card.KING));
-		played.add(Card.getCard(Card.HEARTS,Card.SIX));
-		played.add(Card.getCard(Card.HEARTS,Card.SEVEN));
-		played.add(Card.getCard(Card.HEARTS,Card.SEVEN));
+		played.add(Card.getCard(Card.HEARTS,Card.FOUR));
+		played.add(Card.getCard(Card.HEARTS,Card.FIVE));
+		played.add(Card.getCard(Card.HEARTS,Card.EIGHT));
 		played.add(Card.getCard(Card.HEARTS,Card.NINE));
 		played.add(Card.getCard(Card.HEARTS,Card.NINE));
+		played.add(Card.getCard(Card.HEARTS,Card.TEN));
+		played.add(Card.getCard(Card.HEARTS,Card.JACK));
+		played.add(Card.getCard(Card.HEARTS,Card.QUEEN));
 		played.add(Card.getCard(Card.HEARTS,Card.ACE));
+		played.add(Card.getCard(Card.CLUBS,Card.THREE));
+		played.add(Card.getCard(Card.CLUBS,Card.FOUR));
+		played.add(Card.getCard(Card.CLUBS,Card.SEVEN));
+		played.add(Card.getCard(Card.CLUBS,Card.SEVEN));
+		played.add(Card.getCard(Card.CLUBS,Card.JACK));
+		played.add(Card.getCard(Card.CLUBS,Card.QUEEN));
+		played.add(Card.getCard(Card.CLUBS,Card.KING));
+		played.add(Card.getCard(Card.CLUBS,Card.KING));
+		played.add(Card.getCard(Card.CLUBS,Card.ACE));
 		played.add(Card.getCard(Card.SPADES,Card.TWO));
-		played.add(Card.getCard(Card.SPADES,Card.TWO));
-		played.add(Card.getCard(Card.CLUBS,Card.TWO));
-		played.add(Card.getCard(Card.CLUBS,Card.TWO));
-		played.add(Card.getCard(Card.DIAMONDS,Card.TWO));
-		played.add(Card.getCard(Card.TRUMP,Card.SMALL_JOKER));
-		played.add(Card.getCard(Card.TRUMP,Card.SMALL_JOKER));
+		played.add(Card.getCard(Card.HEARTS,Card.TWO));
 
+		Trick trick = calculateTrick(played);
+		
+		TreeSet<Tractor> tractors = trick.getTractors();
+		TreeSet<Card> pairs = trick.getPairsPlusTractors();
+		TreeSet<Card> triples = trick.getTriplesPlusTractors();
+		TreeSet<Card> combined = new TreeSet<Card>(cardComparator);
+		TreeSet<Tractor> mixed = new TreeSet<Tractor>(tractorComparator);
+		combined.addAll(pairs);
+		combined.addAll(triples);
+		mixed.addAll(tractors);
+		
+		Iterator<Card> it = combined.iterator();
+		Card current = it.hasNext() ? it.next() : null;
+		
+		while(it.hasNext()) {
+			
+			//TODO: what if the person has 2 non trump suit trump numbers...?
+			Card previous;
+			List<Card> tractorcards = new LinkedList<Card>();
+			do {
+				tractorcards.add(current);
+				previous = current;
+				current = it.next();
+			} while ( it.hasNext() && cardComparator.gameCompare(current, previous) == 1 );
+			if(cardComparator.gameCompare(current, previous) == 1)
+				tractorcards.add(current);
+			
+			if(tractorcards.size() >= 2) {
+				Tractor t = new Tractor(2, tractorcards);
+				Tractor t3 = new Tractor(3, tractorcards);
+				if(!tractors.contains(t) && !tractors.contains(t3)) {
+					//pairs.removeAll(tractorcards);
+					//don't need to remove, no duplicates in a set
+					//pairs.addAll(tractorcards);
+					mixed.add(t);
+				}
+			}
+			tractorcards.clear();
+		}
 
+		System.out.println(mixed);
+		
 		System.out.println(cardComparator.gameCompare(Card.getCard(Card.SPADES,Card.TWO), Card.getCard(Card.HEARTS,Card.QUEEN)));
 		
 		//add cards

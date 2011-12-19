@@ -51,6 +51,8 @@ public class Gameroom extends Chatroom implements Runnable { // do I need a thre
 			throw new IllegalArgumentException("unsuppored number of decks " + decks + " or players " + players);
 		}
 		
+		System.out.println("Creating gameroom with " + decks + " deck(s)");
+		
 		this.decks = decks;
 		this.users = new CopyOnWriteArrayList<User>();
 		this.players = players;
@@ -498,7 +500,7 @@ public class Gameroom extends Chatroom implements Runnable { // do I need a thre
 								mixed.addAll(tractors);
 								
 								Iterator<Card> it = combined.iterator();
-								Card current = it.next();
+								Card current = it.hasNext() ? it.next() : null;
 								
 								while(it.hasNext()) {
 									

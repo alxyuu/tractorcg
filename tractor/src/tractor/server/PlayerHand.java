@@ -122,6 +122,8 @@ public class PlayerHand {
 	 */
 	public void removeCard(Card card) {
 		synchronized (this) {
+			LinkedList<Tractor> postadd = new LinkedList<Tractor>();
+			
 			if(this.triples.contains(card)) {
 				this.triples.remove(card);
 				this.pairs.add(card);
@@ -160,7 +162,7 @@ public class PlayerHand {
 										tractorcards.add(current);
 									
 									if(tractorcards.size() >= 2) {
-										tractors.add(new Tractor(3, tractorcards));
+										postadd.add(new Tractor(3, tractorcards));
 									}
 									tractorcards.clear();
 								}
@@ -170,22 +172,24 @@ public class PlayerHand {
 					}
 				}
 				
+				for(Iterator<Tractor> i = postadd.iterator(); i.hasNext();) {
+					tractors.add(i.next());
+					i.remove();
+				}
+				
 				//can't be any mixed tractors of type 3
 				
 			} else if (this.pairs.contains(card)) {
 				this.pairs.remove(card);
 				
 				for(Iterator<Tractor> i = this.tractors.iterator(); i.hasNext();) {
-					Tractor tractor;
-					while(true) {
-						try {
-							tractor = i.next();
-							break;
-						} catch (ConcurrentModificationException e) {
-							System.out.println("shit @PlayerHand.184");
-							e.printStackTrace(System.out);
-							System.exit(1);
-						}
+					Tractor tractor = null;
+					try {
+						tractor = i.next();
+					} catch (ConcurrentModificationException e) {
+						System.out.println("shit @PlayerHand.184");
+						e.printStackTrace(System.out);
+						break;
 					}
 					
 					int index = tractor.getCards().indexOf(card);
@@ -219,7 +223,7 @@ public class PlayerHand {
 										tractorcards.add(current);
 									
 									if(tractorcards.size() >= 2) {
-										tractors.add(new Tractor(2, tractorcards));
+										postadd.add(new Tractor(2, tractorcards));
 									}
 									tractorcards.clear();
 								}
@@ -227,6 +231,11 @@ public class PlayerHand {
 						}
 						//break;
 					}
+				}
+				
+				for(Iterator<Tractor> i = postadd.iterator(); i.hasNext();) {
+					tractors.add(i.next());
+					i.remove();
 				}
 				
 				

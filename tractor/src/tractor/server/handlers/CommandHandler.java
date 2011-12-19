@@ -83,10 +83,11 @@ public class CommandHandler extends ServerHandler {
 										decks = Integer.parseInt(command);
 										if(decks < 1 || decks > 3) {
 											//TODO: error handler
+											System.out.println("invalid gcreate argument: "+command);
 											break;
 										}
 									} catch (NumberFormatException e) {
-										e.printStackTrace(System.out);
+										System.out.println("invalid gcreate argument: "+command);
 									}
 								}
 								Gameroom room = new Gameroom(4,decks);

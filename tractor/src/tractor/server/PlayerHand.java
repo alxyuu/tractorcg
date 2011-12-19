@@ -187,7 +187,7 @@ public class PlayerHand {
 					try {
 						tractor = i.next();
 					} catch (ConcurrentModificationException e) {
-						System.out.println("shit @PlayerHand.184");
+						System.out.println("shit @PlayerHand.188");
 						e.printStackTrace(System.out);
 						break;
 					}

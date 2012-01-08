@@ -329,6 +329,7 @@ public class TractorGame extends BasicGame {
 				for(Iterator<CardButton> i = this.selected.iterator(); i.hasNext();) {
 					CardButton card = i.next();
 					//problem with multiple of the same card, but for the case of this game, if the play is successful all of a certain card should be played...
+					//TODO: I think the off center issue stems from here, need to update update once for every card repetition, fix later
 					if(list.contains(card.getCard()))
 						this.hand.removeCard(card);
 					else

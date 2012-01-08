@@ -712,7 +712,9 @@ public class Gameroom extends Chatroom implements Runnable { // do I need a thre
 																//break CommandSwitch;
 																played.clear();
 																for(Card c : tractor.getCards()) {
-																	played.add(c);
+																	for(int k = 0; k < tractor.getType(); k++) {
+																		played.add(c);
+																	}
 																}
 																trick = new Trick(this.cardComparator, this.tractorComparator);
 																trick.addTractor(tractor);

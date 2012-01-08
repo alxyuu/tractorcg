@@ -45,7 +45,7 @@ public class CardComparator implements Comparator<Card> {
 				return Card.TRUMP+4; // 8
 			else
 				return Card.TRUMP+3; // 7
-		else if(card.getSuit() == TRUMP_SUIT && card.getNumber() == TRUMP_NUMBER)
+		else if(card.getNumber() == TRUMP_NUMBER && ( card.getSuit() == TRUMP_SUIT || TRUMP_SUIT == Card.TRUMP ))
 			return Card.TRUMP+2; // 6
 		else if(card.getNumber() == TRUMP_NUMBER)
 			return Card.TRUMP+1; // 5

@@ -42,6 +42,7 @@ public class Gameroom extends Chatroom implements Runnable { // do I need a thre
 	private Team defending;
 	private Team attacking;
 	private int decks;
+	private int secondsSinceCalling;
 	
 	/** It constructs the game room.
 	 * @param players
@@ -256,7 +257,16 @@ public class Gameroom extends Chatroom implements Runnable { // do I need a thre
 						return;
 					}
 				}
-
+				
+				for(Gameroom.this.resetCallTimer(); Gameroom.this.secondsSinceCalling < 2; Gameroom.this.secondsSinceCalling++) {
+					try {
+						Thread.sleep(1000);	
+					} catch (InterruptedException e) {
+						e.printStackTrace();
+						return;
+					}
+				}
+				
 				if(firstgame) {
 					setLead(caller);
 					firstgame = false;
@@ -278,6 +288,10 @@ public class Gameroom extends Chatroom implements Runnable { // do I need a thre
 			}
 		};
 		dealing.start();
+	}
+	
+	public void resetCallTimer() {
+		this.secondsSinceCalling = 0;
 	}
 	
 	public void addPoints(List<Card> cards) {
@@ -457,6 +471,7 @@ public class Gameroom extends Chatroom implements Runnable { // do I need a thre
 									this.setTrumpSuit(played.getSuit());
 									this.caller = user;
 									this.sendCommand(GameCommand.PLAY_CARD + " " + user.getName() + " " + played.getSuit() + " " + played.getNumber() + " " + call_number);
+									this.resetCallTimer();
 								} else {
 									System.out.println("illegal call");
 								}

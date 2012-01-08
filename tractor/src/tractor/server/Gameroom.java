@@ -267,6 +267,9 @@ public class Gameroom extends Chatroom implements Runnable { // do I need a thre
 					}
 				}
 				
+				//possible race condition
+				sendUpdateState(GameCommand.DIPAI);
+				
 				if(firstgame) {
 					setLead(caller);
 					firstgame = false;
@@ -283,7 +286,8 @@ public class Gameroom extends Chatroom implements Runnable { // do I need a thre
 				
 				sendCommandExclude(GameCommand.DIPAI + " " + lead.getName(), lead);
 				
-				sendUpdateState(GameCommand.DIPAI);
+				//possible race condition
+				//sendUpdateState(GameCommand.DIPAI);
 				sendCommand(GameCommand.CLEAR_TABLE+" 0");
 			}
 		};

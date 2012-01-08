@@ -60,12 +60,8 @@ public class CommandHandler extends ServerHandler {
 								tojoin.sendList(user);
 								if(tojoin.getName().equals("#LOBBY")) {
 									user.getIO().write("#LOBBY|>MOTD: Thank you for beta testing tractorcg!", MessageFactory.CHAT);
-									user.getIO().write("#LOBBY|>I've noticed some of you have been having trouble with the commands, so here's a reminder:", MessageFactory.CHAT);
-									user.getIO().write("#LOBBY|>to join asdf's game, type \"/ghook asdf\"", MessageFactory.CHAT);
-									user.getIO().write("#LOBBY|>to create a game with 1 deck, type \"/gcreate 1\" and so on up to 3 decks", MessageFactory.CHAT);
-									user.getIO().write("#LOBBY|>typing just \"/gcreate\" will create a game with 3 decks by default", MessageFactory.CHAT);
-									user.getIO().write("#LOBBY|>Please let me know if there are any problems with the game!", MessageFactory.CHAT);
-									user.getIO().write("#LOBBY|>comments and suggestions: iu@utexas.edu", MessageFactory.CHAT);
+									user.getIO().write("#LOBBY|>Update: you now have 2 seconds after every call/overturn to overturn again.", MessageFactory.CHAT);
+									user.getIO().write("#LOBBY|>Please send any comments and suggestions to: iu@utexas.edu", MessageFactory.CHAT);
 								}
 							}
 						}

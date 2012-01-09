@@ -14,7 +14,7 @@ public class LoginHandler extends ServerHandler {
 					if(io.getMessageSize(MessageFactory.LOGIN) >= 2) {
 						String name = io.getNextMessage(MessageFactory.LOGIN);
 						if(io.getNextMessage(MessageFactory.LOGIN).equals(user.getMD5())) {
-							if(!users.containsKey(name.toUpperCase()) && name.length() > 0 && !name.contains(" ")) {
+							if(name.length() > 0 && name.length() < 32 && name.matches("[a-zA-Z0-9]+") && !users.containsKey(name.toUpperCase())) {
 								user.setName(name);
 								io.write("1",MessageFactory.LOGIN);
 								users.put(name.toUpperCase(),user);
@@ -44,7 +44,7 @@ public class LoginHandler extends ServerHandler {
 					Thread.sleep(500);
 				}
 			} catch (InterruptedException e) {
-				e.printStackTrace();
+				e.printStackTrace(System.out);
 				break;
 			}
 		}

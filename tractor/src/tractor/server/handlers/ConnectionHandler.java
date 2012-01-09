@@ -24,7 +24,7 @@ public class ConnectionHandler extends ServerHandler {
 				io.add(user);
 				waiting.add(user);
 			} catch (IOException e) {
-				e.printStackTrace();
+				e.printStackTrace(System.out);
 			}
 			/*} else {
 				try {

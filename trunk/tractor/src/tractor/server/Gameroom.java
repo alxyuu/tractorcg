@@ -247,8 +247,7 @@ public class Gameroom extends Chatroom implements Runnable { // do I need a thre
 					}
 				}
 				
-				//TODO: sleep for a few seconds after a card is called for chance to overturn
-				//while loop will be removed when dipai flipping is implemented
+				//TODO: while loop will be removed when dipai flipping is implemented
 				while( caller == null ) {
 					try {
 						Thread.sleep(1000);	
@@ -267,7 +266,7 @@ public class Gameroom extends Chatroom implements Runnable { // do I need a thre
 					}
 				}
 				
-				//possible race condition
+				//possible race condition?
 				sendUpdateState(GameCommand.DIPAI);
 				
 				if(firstgame) {

@@ -57,6 +57,7 @@ public class Card implements Comparable<Card> {
 			return null;
 		}
 	}*/
+	
 	/** It gets the card.
 	 * @param suit
 	 * @param value
@@ -150,8 +151,37 @@ public class Card implements Comparable<Card> {
 			return Card.TRUMP+this.suit+1;
 		else if(this.suit == Card.TRUMP_SUIT)
 			return Card.TRUMP;
-		else
-			return this.suit;
+		else {
+			//hard coding integers so I don't have to mess with the final suit ints
+			if(Card.TRUMP_SUIT == -1 || Card.TRUMP_SUIT == Card.TRUMP || Card.TRUMP_SUIT == Card.HEARTS) {
+				switch(this.suit) {
+					case Card.CLUBS: return 2;
+					case Card.SPADES: return 0;
+					case Card.DIAMONDS: return 1;
+					case Card.HEARTS: return 3;
+				}
+			} else if (Card.TRUMP_SUIT == Card.CLUBS) {
+				switch(this.suit) {
+					case Card.HEARTS: return 2;
+					case Card.SPADES: return 1;
+					case Card.DIAMONDS: return 0;
+				}
+			} else if (Card.TRUMP_SUIT == Card.DIAMONDS) {
+				switch(this.suit) {
+					case Card.HEARTS: return 1;
+					case Card.SPADES: return 0;
+					case Card.CLUBS: return 2;
+				}
+			} else if (Card.TRUMP_SUIT == Card.SPADES) {
+				switch(this.suit) {
+					case Card.HEARTS: return 2;
+					case Card.CLUBS: return 1;
+					case Card.DIAMONDS: return 0;
+				}
+			}
+			System.out.println("returning -1");
+			return -1;
+		}
 	}
 	
 	/** It gets the sorting value of the card.

@@ -62,6 +62,7 @@ public class CommandHandler extends ServerHandler {
 									user.getIO().write("#LOBBY|>MOTD: Thank you for beta testing tractorcg!", MessageFactory.CHAT);
 									user.getIO().write("#LOBBY|>New version: the latest version of tractorcg is 0.0.126.", MessageFactory.CHAT); 
 									user.getIO().write("#LOBBY|>Download the latest version from: http://code.google.com/p/tractorcg/downloads", MessageFactory.CHAT);
+									user.getIO().write("#LOBBY|>If possible, try to use the exe version, as it generates a log file, which can be emailed to me to aid in debugging.", MessageFactory.CHAT);
 									user.getIO().write("#LOBBY|>Please send any comments and suggestions to: iu@utexas.edu", MessageFactory.CHAT);
 								}
 							}

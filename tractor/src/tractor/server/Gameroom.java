@@ -1132,7 +1132,9 @@ public class Gameroom extends Chatroom implements Runnable { // do I need a thre
 				//dynamic sleeping?
 				Thread.sleep(100);
 			} catch (InterruptedException e) {
-				e.printStackTrace(System.out);
+				//e.printStackTrace(System.out);
+				System.out.println("Gameroom-"+this.getName()+" closed.");
+				return;
 			}
 		}
 	}

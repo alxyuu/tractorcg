@@ -77,7 +77,7 @@ public class TractorGame extends BasicGame {
         	this.hand.addCard();
         }*/
 		this.gamecontainer = container;
-		this.gamecontainer.setShowFPS(true);
+		this.gamecontainer.setShowFPS(false);
 		this.gamecontainer.setUpdateOnlyWhenVisible(false);
 		this.io = Client.getInstance().getIO();
 		this.background = new Color(0,150,0);

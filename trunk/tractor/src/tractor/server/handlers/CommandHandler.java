@@ -60,7 +60,8 @@ public class CommandHandler extends ServerHandler {
 								tojoin.sendList(user);
 								if(tojoin.getName().equals("#LOBBY")) {
 									user.getIO().write("#LOBBY|>MOTD: Thank you for beta testing tractorcg!", MessageFactory.CHAT);
-									user.getIO().write("#LOBBY|>Update: you now have 2 seconds after every call/overturn to overturn again.", MessageFactory.CHAT);
+									user.getIO().write("#LOBBY|>New version: the latest version of tractorcg is 0.0.126.", MessageFactory.CHAT); 
+									user.getIO().write("#LOBBY|>Download the latest version from: http://code.google.com/p/tractorcg/downloads", MessageFactory.CHAT);
 									user.getIO().write("#LOBBY|>Please send any comments and suggestions to: iu@utexas.edu", MessageFactory.CHAT);
 								}
 							}
@@ -156,7 +157,7 @@ public class CommandHandler extends ServerHandler {
 				//dynamic sleeping lalalaal
 				Thread.sleep(100);
 			} catch (InterruptedException e) {
-				e.printStackTrace();
+				e.printStackTrace(System.out);
 				break;
 			}
 		}

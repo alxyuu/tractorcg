@@ -379,7 +379,12 @@ public class TractorGame extends BasicGame {
 					this.hand.addCard(container,toadd);
 					checkCalling(toadd);
 				} else {
-					this.hands.get(message[1]).addCard();
+					try {
+						this.hands.get(message[1]).addCard();
+					} catch (NullPointerException e) {
+						e.printStackTrace(System.out);
+						break;
+					}
 				}
 			}
 			break;

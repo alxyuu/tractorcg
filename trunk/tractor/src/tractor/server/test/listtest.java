@@ -19,5 +19,6 @@ public class listtest {
 		}*/
 		System.out.println(Arrays.toString("hi,lol".split(",",2)));
 		System.out.println(Arrays.toString("hi,".split(",",2)));
+		System.out.println("AA".matches("[a-zA-Z0-9]+"));
 	}
 }

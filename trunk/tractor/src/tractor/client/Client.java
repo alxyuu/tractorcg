@@ -238,7 +238,7 @@ public class Client {
 						break;
 					case '2':
 						this.connectionStatus = DISCONNECTED;
-						this.setError(ClientError.LOGIN_USERNAME_UNAVAILABLE, "login failure: username unavaible");
+						this.setError(ClientError.LOGIN_USERNAME_UNAVAILABLE, "login failure: username unavailable");
 						this.clientview.updateStatusTS();
 						break;
 					case '3':

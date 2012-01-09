@@ -62,7 +62,7 @@ public class User {
 			this.io.write(this.md5,MessageFactory.LOGIN);
 
 		} catch (Exception e) {
-			e.printStackTrace();
+			e.printStackTrace(System.out);
 			this.kill();
 		}
 	}

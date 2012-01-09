@@ -62,7 +62,7 @@ public class Server {
 			this.waiting = new Vector<User>();	
 			this.handlers = new ThreadGroup("Server Handlers");
 		} catch (IOException e) {
-			e.printStackTrace();
+			e.printStackTrace(System.out);
 			System.out.println("FATAL ERROR: failed to initialize socket");
 			System.exit(0);
 		}

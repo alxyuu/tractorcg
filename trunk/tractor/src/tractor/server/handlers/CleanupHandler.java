@@ -1,5 +1,7 @@
 package tractor.server.handlers;
 
+import java.util.Iterator;
+
 import tractor.server.User;
 
 public class CleanupHandler extends ServerHandler {
@@ -15,21 +17,21 @@ public class CleanupHandler extends ServerHandler {
 						System.out.println(user.toString()+" - connection closed");
 					}
 				}
-				for(int i = 0; i < waiting.size(); i++) {
-					User user = waiting.get(i);
+				//for(int i = 0; i < waiting.size(); i++) {
+				for(Iterator<User> i = waiting.iterator(); i.hasNext();) {
+					User user = i.next();
 					if(user.checkError()) {
 						user.kill();
-						waiting.remove(i);
+						i.remove();
 						System.out.println(user.toString()+" - connection closed");
-						i--;
 					}
 				}
 				Thread.sleep(1000);
 			} catch (InterruptedException e) {
-				e.printStackTrace();
+				e.printStackTrace(System.out);
 				break;
 			} catch (ArrayIndexOutOfBoundsException e) {
-				e.printStackTrace();
+				e.printStackTrace(System.out);
 				//do nothing
 			}
 		}

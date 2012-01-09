@@ -77,7 +77,7 @@ class IOHandler extends ThreadGroup {
 				}	
 			}
 		} catch (IOException e) {
-			e.printStackTrace();
+			e.printStackTrace(System.out);
 			user.setError();
 			//return -1;
 		}

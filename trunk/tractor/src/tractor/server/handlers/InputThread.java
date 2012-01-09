@@ -49,10 +49,10 @@ public class InputThread extends Thread {
 						user.getIO().read(line);
 					} 
 				} catch (IOException e) {
-					e.printStackTrace();
+					e.printStackTrace(System.out);
 					user.setError();
 				} catch (ErroneousMessageException e) {
-					e.printStackTrace();
+					e.printStackTrace(System.out);
 				}
 			}
 
@@ -60,7 +60,7 @@ public class InputThread extends Thread {
 				//dynamic sleeping?
 				Thread.sleep(100);
 			} catch (InterruptedException e) {
-				e.printStackTrace();
+				e.printStackTrace(System.out);
 			}
 		}
 		System.out.println(this.getName()+" no longer serving users");

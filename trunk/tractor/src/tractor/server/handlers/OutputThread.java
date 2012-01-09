@@ -54,7 +54,7 @@ public class OutputThread extends Thread {
 				//dynamic sleeping?
 				Thread.sleep(100);
 			} catch (InterruptedException e) {
-				e.printStackTrace();
+				e.printStackTrace(System.out);
 			}
 		}
 		System.out.println(this.getName()+" no longer serving users");

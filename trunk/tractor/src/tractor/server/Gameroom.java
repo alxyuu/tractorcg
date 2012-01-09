@@ -241,7 +241,7 @@ public class Gameroom extends Chatroom implements Runnable { // do I need a thre
 						try {
 							Thread.sleep(100);
 						} catch (InterruptedException e) {
-							e.printStackTrace();
+							e.printStackTrace(System.out);
 							return;
 						}
 					}
@@ -252,7 +252,7 @@ public class Gameroom extends Chatroom implements Runnable { // do I need a thre
 					try {
 						Thread.sleep(1000);	
 					} catch (InterruptedException e) {
-						e.printStackTrace();
+						e.printStackTrace(System.out);
 						return;
 					}
 				}
@@ -261,7 +261,7 @@ public class Gameroom extends Chatroom implements Runnable { // do I need a thre
 					try {
 						Thread.sleep(1000);	
 					} catch (InterruptedException e) {
-						e.printStackTrace();
+						e.printStackTrace(System.out);
 						return;
 					}
 				}
@@ -1104,7 +1104,7 @@ public class Gameroom extends Chatroom implements Runnable { // do I need a thre
 									Thread.sleep(1000);
 								} catch (InterruptedException e) {
 									// TODO Auto-generated catch block
-									e.printStackTrace();
+									e.printStackTrace(System.out);
 								}
 								
 								
@@ -1132,7 +1132,7 @@ public class Gameroom extends Chatroom implements Runnable { // do I need a thre
 				//dynamic sleeping?
 				Thread.sleep(100);
 			} catch (InterruptedException e) {
-				e.printStackTrace();
+				e.printStackTrace(System.out);
 			}
 		}
 	}

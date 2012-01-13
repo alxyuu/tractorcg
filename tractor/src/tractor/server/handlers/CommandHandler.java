@@ -84,20 +84,20 @@ public class CommandHandler extends ServerHandler {
 						case G_CREATE:
 						{
 							if(user.getCurrentGame() == null) {
-								int decks = 3;
-								if(!command.equals("")) {
+								Gameroom room = null;
+								if(!command.trim().equals("")) {
 									try {
-										decks = Integer.parseInt(command);
-										if(decks < 1 || decks > 3) {
-											//TODO: error handler
-											System.out.println("invalid gcreate argument: "+command);
-											break;
-										}
+										room = new Gameroom(4,command);
 									} catch (NumberFormatException e) {
 										System.out.println("invalid gcreate argument: "+command);
+										break;
+									} catch (IllegalArgumentException e) {
+										System.out.println(e.getMessage());
+										break;
 									}
+								}  else {
+									room = new Gameroom(4,"3");
 								}
-								Gameroom room = new Gameroom(4,decks);
 								chatrooms.put(room.getName(), room);
 								room.join(user);
 								room.setHost(user);

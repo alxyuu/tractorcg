@@ -14,6 +14,7 @@ public class Trick {
 	private TreeSet<Card> triples;
 	private TreeSet<Card> pc, tc;
 	private TreeSet<Tractor> tractors;
+	private int convertedTriples;
 	public Trick(CardComparator cc, Comparator<Tractor> tc) {
 		this.singles = new LinkedList<Card>();
 		this.pairs = new TreeSet<Card>(cc);
@@ -21,6 +22,7 @@ public class Trick {
 		this.pc = new TreeSet<Card>(cc);
 		this.tc = new TreeSet<Card>(cc);
 		this.tractors = new TreeSet<Tractor>(tc);
+		this.convertedTriples = 0;
 	}
 
 	public void addSingle(Card card) {
@@ -107,6 +109,10 @@ public class Trick {
 		return false;
 	}*/
 	
+	public int countConvertedTriples() {
+		return this.convertedTriples;
+	}
+	
 	public int countTriples() {
 		return this.triples.size();
 	}
@@ -120,6 +126,7 @@ public class Trick {
 		this.tc.remove(card);
 		this.addPair(card);
 		this.addSingle(card);
+		this.convertedTriples++;
 	}
 	
 	/*public boolean tripleInTractor(Card card) {

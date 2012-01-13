@@ -1,5 +1,6 @@
 package tractor.server;
 
+import java.util.Arrays;
 import java.util.Comparator;
 import java.util.LinkedList;
 import java.util.List;
@@ -43,23 +44,18 @@ public class Gameroom extends Chatroom implements Runnable { // do I need a thre
 	private Team attacking;
 	private int decks;
 	private int secondsSinceCalling;
+	private int[] initialScores;
+	private int dipaiPosition;
 	
 	/** It constructs the game room.
 	 * @param players
 	 */
-	public Gameroom(int players, int decks) {
-		if(decks < 1 || decks > 3 || players < 1) {
-			throw new IllegalArgumentException("unsuppored number of decks " + decks + " or players " + players);
-		}
+	public Gameroom(int players, String argument) {
 		
-		System.out.println("Creating gameroom with " + decks + " deck(s)");
-		
-		this.decks = decks;
 		this.users = new CopyOnWriteArrayList<User>();
 		this.players = players;
 		this.setName("@"+this.hashCode());
 		this.state = GameCommand.WAITING;
-		this.firstgame = true;
 		this.dipai = Collections.emptyList();
 		this.team1 = new Team();
 		this.team2 = new Team();
@@ -77,6 +73,41 @@ public class Gameroom extends Chatroom implements Runnable { // do I need a thre
 				}
 			}
 		};
+		
+		try {
+			this.decks = Integer.parseInt(argument);
+			this.firstgame = true;
+		} catch (NumberFormatException e) {
+			//parse argument
+			//argument: [numdecks:score1:...:score_final:dipaiposition]
+			String[] codes;
+			if(	argument.charAt(0) == '[' && 
+				argument.charAt(argument.length()-1) == ']' && 
+				(codes = argument.substring(1, argument.length()-1).split(":")).length == players+2 &&
+				(this.dipaiPosition = Integer.parseInt(codes[codes.length-1])) >= 0 &&
+				this.dipaiPosition < players) {
+				
+				this.decks = Integer.parseInt(codes[0]);
+				this.initialScores = new int[players];
+				for(int i = 0; i < players; i++) {
+					this.initialScores[i] = Integer.parseInt(codes[i+1]);
+					if(!( this.initialScores[i] >= Card.TWO && this.initialScores[i] <= Card.ACE )) {
+						throw new IllegalArgumentException("invalid load code1");
+					}
+				}
+				this.firstgame = false;
+			} else { 
+				throw new IllegalArgumentException("invalid load code2");
+			}
+
+		}
+		
+		if(this.decks < 1 || this.decks > 3 || this.players < 1) {
+			throw new IllegalArgumentException("unsuppored number of decks " + decks + " or players " + players);
+		}
+		
+		System.out.println("Creating gameroom with " + decks + " deck(s)");
+
 	}
 	
 	public void start() {
@@ -203,11 +234,11 @@ public class Gameroom extends Chatroom implements Runnable { // do I need a thre
 	 */
 	private void updateStats() {
 		String stats = GameCommand.SET_STATS + " " + this.TRUMP_NUMBER + " " + 4;
-		System.out.println("Sending update stat: "+stats);
 		for(Iterator<User> i = users.iterator();i.hasNext();) {
 			User user = i.next();
 			stats += " " + user.getName() + " " + user.getGameScore();
 		}
+		System.out.println("Sending : "+stats);
 		sendCommand(stats);
 	}
 
@@ -446,11 +477,21 @@ public class Gameroom extends Chatroom implements Runnable { // do I need a thre
 						//gtfo if you're not the host
 						if(user != this.host)
 							break;
-						for(Iterator<User> i2 = users.iterator();i2.hasNext();) {
-							i2.next().setGameScore(Card.TWO);
+						if(firstgame) {
+							for(Iterator<User> i2 = users.iterator();i2.hasNext();) {
+								i2.next().setGameScore(Card.TWO);
+							}
+							this.setTrump(-1, Card.TWO);
+							this.setLead(host);
+						} else {
+							{
+								for(int k = 0; k < users.size(); k++) {
+									users.get(k).setGameScore(this.initialScores[k]);
+								}
+							}
+							this.setTrump(-1, users.get(this.dipaiPosition).getGameScore());
+							this.setLead(users.get(this.dipaiPosition));
 						}
-						this.setTrump(-1, Card.TWO);
-						this.setLead(host);
 						this.deal();
 					}
 					break;
@@ -900,7 +941,7 @@ public class Gameroom extends Chatroom implements Runnable { // do I need a thre
 													pairs++;
 												}
 											}
-											if(pairs > trick.countPairsPlusTractors()) {
+											if(pairs + trick.countConvertedTriples() > trick.countPairsPlusTractors()) {
 												sendCommand(GameCommand.PLAY_INVALID+" must play pairs",user);
 												break CommandSwitch;
 											}

@@ -18,12 +18,15 @@ public class CleanupHandler extends ServerHandler {
 					}
 				}
 				//for(int i = 0; i < waiting.size(); i++) {
-				for(Iterator<User> i = waiting.iterator(); i.hasNext();) {
-					User user = i.next();
-					if(user.checkError()) {
-						user.kill();
-						i.remove();
-						System.out.println(user.toString()+" - connection closed");
+				
+				synchronized(waiting) {
+					for(Iterator<User> i = waiting.iterator(); i.hasNext();) {
+						User user = i.next();
+						if(user.checkError()) {
+							user.kill();
+							i.remove();
+							System.out.println(user.toString()+" - connection closed");
+						}
 					}
 				}
 				Thread.sleep(1000);

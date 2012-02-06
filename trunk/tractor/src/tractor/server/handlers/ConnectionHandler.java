@@ -22,7 +22,9 @@ public class ConnectionHandler extends ServerHandler {
 				sock.setKeepAlive(true);
 				User user = new User(sock);
 				io.add(user);
-				waiting.add(user);
+				synchronized(waiting) {
+					waiting.add(user);
+				}
 			} catch (IOException e) {
 				e.printStackTrace(System.out);
 			}

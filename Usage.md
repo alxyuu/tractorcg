@@ -1,0 +1,17 @@
+# Requirements #
+  * Java Runtime Environment (downloadable from http://www.java.com/en/download/)
+  * Windows (executables for Linux and OS X can be compiled from source)
+  * 4 players
+
+# How To Play #
+http://www.pagat.com/kt5/tractor.html
+
+See three deck variation
+
+
+# Commands #
+
+  * /gcreate {1,2,3} - create gameroom with 1, 2, or 3 decks
+  * /ghook username - join username's gameroom
+  * /join #channel - join channel
+  * /part - leave current channel

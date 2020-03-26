@@ -57,6 +57,7 @@ public class Server {
 		try {
 			System.out.println("initing socket");
 			this.socket = new ServerSocket(this.PORT);
+			System.out.println("listening on port " + this.PORT.toString());
 			this.users = new ConcurrentHashMap<String,User>();
 			this.chatrooms = new ConcurrentHashMap<String,Chatroom>();
 			this.waiting = new Vector<User>();

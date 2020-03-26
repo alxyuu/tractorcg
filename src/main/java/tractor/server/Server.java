@@ -16,7 +16,7 @@ public class Server {
 
 	/**It returns the instance of the server
 	 * @return
-	 * 
+	 *
 	 */
 	public static Server getInstance() {
 		return Server.instance;
@@ -24,14 +24,14 @@ public class Server {
 
 	public static void main(String ... bobby) {
 		Thread.setDefaultUncaughtExceptionHandler( new Thread.UncaughtExceptionHandler() {
-			
+
 			@Override
 			public void uncaughtException(Thread t, Throwable e) {
 				// TODO Auto-generated method stub
 				e.printStackTrace(System.out);
 			}
 		});
-		
+
 		Server host = new Server();
 		host.addHandler(new ConnectionHandler(), "listener");
 		host.addHandler(new LoginHandler(), "login");
@@ -48,7 +48,7 @@ public class Server {
 	private Vector<User> waiting;
 
 	Server() {
-		this(9741);
+		this(Integer.parseInt(System.getenv("PORT")));
 	}
 
 	Server(int port) {
@@ -59,7 +59,7 @@ public class Server {
 			this.socket = new ServerSocket(this.PORT);
 			this.users = new ConcurrentHashMap<String,User>();
 			this.chatrooms = new ConcurrentHashMap<String,Chatroom>();
-			this.waiting = new Vector<User>();	
+			this.waiting = new Vector<User>();
 			this.handlers = new ThreadGroup("Server Handlers");
 		} catch (IOException e) {
 			e.printStackTrace(System.out);
@@ -71,7 +71,7 @@ public class Server {
 	/**It adds a server handler.
 	 * @param handler
 	 * @param name
-	 * 
+	 *
 	 */
 	public void addHandler(ServerHandler handler, String name) {
 		Thread t = new Thread(this.handlers, handler, name);
@@ -80,7 +80,7 @@ public class Server {
 
 	/**It closes a server socket.
 	 * @throws IOException
-	 * 
+	 *
 	 */
 	public void close() throws IOException {
 		this.socket.close();
@@ -88,7 +88,7 @@ public class Server {
 
 	/**It returns the socket of the server
 	 * @return
-	 * 
+	 *
 	 */
 	public ServerSocket getSocket() {
 		return this.socket;
@@ -96,7 +96,7 @@ public class Server {
 
 	/**It returns the various chatrooms on the server.
 	 * @return
-	 * 
+	 *
 	 */
 	public ConcurrentHashMap<String,Chatroom> getChatrooms() {
 		return this.chatrooms;
@@ -104,7 +104,7 @@ public class Server {
 
 	/**It gets the users on the server.
 	 * @return
-	 * 
+	 *
 	 */
 	public ConcurrentHashMap<String,User> getUsers() {
 		return this.users;
@@ -112,7 +112,7 @@ public class Server {
 
 	/**It returns the users waiting to login
 	 * @return
-	 * 
+	 *
 	 */
 	public Vector<User> getWaiting() {
 		return this.waiting;

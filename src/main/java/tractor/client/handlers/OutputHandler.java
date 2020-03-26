@@ -21,6 +21,7 @@ public class OutputHandler extends ClientHandler {
 			if(io.hasNextWrite()) {
 				do {
 					String line = io.getNextWrite();
+					System.out.println("OUT: " + line);
 					out.println(line);
 					out.flush();
 				} while(io.hasNextWrite());

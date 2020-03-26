@@ -21,6 +21,7 @@ public class InputHandler extends ClientHandler {
 			try {
 				if(in.ready()) {
 					String line = in.readLine();
+					System.out.println("IN: " + line);
 					io.read(line);
 				} else {
 					//dynamic sleeping?
@@ -35,7 +36,7 @@ public class InputHandler extends ClientHandler {
 				return;
 			}
 
-		}	
+		}
 	}
 
 }

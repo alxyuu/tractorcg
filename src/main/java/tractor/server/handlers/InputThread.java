@@ -46,8 +46,9 @@ public class InputThread extends Thread {
 					}
 					while(in.ready()) {
 						String line = in.readLine();
+						System.out.println("IN: " + line);
 						user.getIO().read(line);
-					} 
+					}
 				} catch (IOException e) {
 					e.printStackTrace(System.out);
 					user.setError();

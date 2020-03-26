@@ -42,6 +42,7 @@ public class OutputThread extends Thread {
 				if(user.getIO().hasNextWrite()) {
 					do {
 						String line = user.getIO().getNextWrite();
+						System.out.println("OUT: " + line);
 						out.println(line);
 						out.flush();
 					} while(user.getIO().hasNextWrite());

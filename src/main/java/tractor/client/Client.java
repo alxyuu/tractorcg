@@ -20,12 +20,7 @@ public class Client {
 	public final static int DISCONNECTED = 1;
 	public final static int DISCONNECTING = 2;
 	private static Client instance;
-	//do something with this...
-	//support hostnames?
-	public final static String ip = "127.0.0.1";
-//	public final static String ip = "208.53.131.251";
 	public final static int NULL = 0;
-	public final static int port = 9741;
 	public static Client getInstance() {
 		return Client.instance;
 	}
@@ -47,7 +42,7 @@ public class Client {
 	}
 
 	Client() {
-		
+
 		Thread.setDefaultUncaughtExceptionHandler( new Thread.UncaughtExceptionHandler() {
 			@Override
 			public void uncaughtException(Thread t, Throwable e) {
@@ -55,7 +50,7 @@ public class Client {
 				e.printStackTrace(System.out);
 			}
 		});
-		
+
 		Client.instance = this;
 		this.io = new IOFactory(15000);
 		this.clientview = new ClientView();
@@ -70,7 +65,7 @@ public class Client {
 
 	/**It connects to the network
 	 * @param fork
-	 * 
+	 *
 	 */
 	public void connect(boolean fork) {
 		this.connectionStatus = BEGIN_CONNECT;
@@ -85,13 +80,24 @@ public class Client {
 			System.out.println("connecting...");
 			if(this.isConnected()) {
 				return;
-			} 
+			}
 			io.reset();
 			try {
 				Socket s = new Socket();
 				s.setSoTimeout(1000);
 				System.out.println("Establishing Connection");
-				s.connect(new InetSocketAddress(Client.ip,Client.port), 2000);
+				String host = System.getenv("HOST");
+				String port = System.getenv("PORT");
+
+				if (host == null) {
+					host = "tractorcg.herokuapp.com";
+				}
+
+				if (port == null) {
+					port = "80";
+				}
+
+				s.connect(new InetSocketAddress(host, Integer.parseInt(port)), 2000);
 				System.out.println("Connection Established");
 				s.setSoTimeout(15000);
 				s.setKeepAlive(true);
@@ -119,7 +125,7 @@ public class Client {
 	}
 	/**It gets the message factory
 	 * @return
-	 * 
+	 *
 	 */
 	public IOFactory getIO() {
 		return this.io;
@@ -140,7 +146,7 @@ public class Client {
 	}
 
 	/** It starts the game
-	 * 
+	 *
 	 */
 	public void startGame() {
 		this.gamethread = new Thread("game thread") {
@@ -163,7 +169,7 @@ public class Client {
 	}
 
 	/** It stops the game.
-	 * 
+	 *
 	 */
 	public void stopGame() {
 		this.container.exit();
@@ -171,35 +177,35 @@ public class Client {
 
 	/**It gets the username
 	 * @return
-	 * 
+	 *
 	 */
 	public String getUsername() {
 		return username;
 	}
 	/**It gets the error code
 	 * @return
-	 * 
+	 *
 	 */
 	public ClientError getErrorCode() {
 		return this.errorCode;
 	}
 	/**It gets error message
 	 * @return
-	 * 
+	 *
 	 */
 	public String getErrorMessage() {
 		return this.errorMsg;
 	}
 	/**It gets the connection status
 	 * @return
-	 * 
+	 *
 	 */
 	public int getConnectionStatus() {
 		return this.connectionStatus;
 	}
 	/**It returns whether the client is connected
 	 * @return
-	 * 
+	 *
 	 */
 	public boolean isConnected() {
 		return this.io.isAlive();
@@ -207,7 +213,7 @@ public class Client {
 
 	/**It logs in to the network
 	 * @param fork
-	 * 
+	 *
 	 */
 	public void login(boolean fork) {
 		this.connectionStatus = BEGIN_CONNECT;
@@ -230,7 +236,7 @@ public class Client {
 					//TODO: catch erroneous message (i.e. not 1 char long, not a proper reply)
 					char s = this.io.getNextMessage(MessageFactory.LOGIN).charAt(0);
 					switch(s) {
-					case '1': 
+					case '1':
 						this.connectionStatus = CONNECTED;
 						this.clearError();
 						this.io.write("JOIN #lobby", MessageFactory.CHATCMD);
@@ -246,7 +252,7 @@ public class Client {
 						this.setError(ClientError.LOGIN_MD5_MISMATCH, "login failure: md5 mismatch");
 						this.clientview.updateStatusTS();
 						break;
-					default: 
+					default:
 						this.connectionStatus = DISCONNECTED;
 						this.setError(ClientError.LOGIN_ERRONEOUS_MESSAGE, "login failure: unknown server response");
 						this.clientview.updateStatusTS();
@@ -264,7 +270,7 @@ public class Client {
 		}
 	}
 	/**It clears errors
-	 * 
+	 *
 	 */
 	private void clearError() {
 		this.errorCode = ClientError.NO_ERROR;
@@ -273,7 +279,7 @@ public class Client {
 	/**It sets what the error is
 	 * @param error
 	 * @param message
-	 * 
+	 *
 	 */
 	private void setError(ClientError error, String message) {
 		this.errorCode = error;
@@ -282,7 +288,7 @@ public class Client {
 
 	/**It sets what the username is
 	 * @param username
-	 * 
+	 *
 	 */
 	public void setUsername(String username) {
 		this.username = username;

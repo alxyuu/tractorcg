@@ -1,3 +1,5 @@
+.DS_Store
 .idea
 target
-client_bin/**/*.class
+client_bin/tractor
+client_bin/*.jar

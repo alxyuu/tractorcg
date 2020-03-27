@@ -90,7 +90,7 @@ public class Client {
 				String port = System.getenv("PORT");
 
 				if (host == null) {
-					host = "tractorcg.herokuapp.com";
+					host = "34.71.46.83";
 				}
 
 				if (port == null) {

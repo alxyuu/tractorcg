@@ -94,7 +94,7 @@ public class Client {
 				}
 
 				if (port == null) {
-					port = "80";
+					port = "9741";
 				}
 
 				s.connect(new InetSocketAddress(host, Integer.parseInt(port)), 2000);

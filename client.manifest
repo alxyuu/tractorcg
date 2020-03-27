@@ -1,4 +1,3 @@
 Manifest-Version: 1.0
 Created-By: alxyuu
-Class-Path: ../lib/slick.jar ../lib/lwjgl.jar
 Main-Class: tractor.client.JarRunner

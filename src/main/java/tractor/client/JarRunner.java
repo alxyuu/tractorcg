@@ -24,6 +24,8 @@ public class JarRunner {
         copyNativeLibraries("windows");
       } else if (os.startsWith("Mac")) {
         copyNativeLibraries("macosx");
+      } else if (os.indexOf("nux") >= 0) {
+        copyNativeLibraries("linux");
       } else {
         System.out.println("This OS is not supported: " + os);
         System.exit(1);

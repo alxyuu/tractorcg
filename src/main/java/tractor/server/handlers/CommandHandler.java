@@ -51,7 +51,7 @@ public class CommandHandler extends ServerHandler {
 								}
 								if(tojoin.contains(user)) {
 									System.out.println(user.getName() + " already in "+command+", ignoring");
-									break; 
+									break;
 								}
 								tojoin.join(user);
 								user.addChatroom(tojoin);
@@ -84,7 +84,7 @@ public class CommandHandler extends ServerHandler {
 								Gameroom room = null;
 								if(!command.trim().equals("")) {
 									try {
-										room = new Gameroom(4,command);
+										room = new Gameroom(command);
 									} catch (NumberFormatException e) {
 										System.out.println("invalid gcreate argument: "+command);
 										break;
@@ -93,7 +93,7 @@ public class CommandHandler extends ServerHandler {
 										break;
 									}
 								}  else {
-									room = new Gameroom(4,"3");
+									room = new Gameroom("4");
 								}
 								chatrooms.put(room.getName(), room);
 								room.join(user);

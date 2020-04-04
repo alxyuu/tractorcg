@@ -138,7 +138,7 @@ public class TractorGame extends BasicGame {
 					playButton.hide();
 				}
 			});
-			
+
 			this.lastButton = new Button(container,new Image("images/suits/"+GraphicsCard.TRUMP+".png"), new Image("images/suits/"+GraphicsCard.TRUMP+"s.png"), container.getWidth()-130, 100);
 			this.lastButton.addButtonPressedListener(new ButtonPressedListener() {
 				public void buttonPressed() {
@@ -156,7 +156,7 @@ public class TractorGame extends BasicGame {
 					hand.setShowLastTrick(false);
 				}
 			});
-			
+
 		} catch (SlickException e) {
 			e.printStackTrace();
 		}
@@ -215,7 +215,7 @@ public class TractorGame extends BasicGame {
 	public String getName() {
 		return this.name;
 	}
-	
+
 	@Override
 	public void update(GameContainer container, int delta)
 	throws SlickException {
@@ -245,7 +245,7 @@ public class TractorGame extends BasicGame {
 				int secondary = Integer.parseInt(message[1]);
 				this.state = secondary;
 				switch(secondary) {
-				case GameCommand.WAITING: 
+				case GameCommand.WAITING:
 				{
 					//clear stuff and sit there?
 					this.startButton.disable();
@@ -400,7 +400,7 @@ public class TractorGame extends BasicGame {
 
 					// I'm so cool
 					hand.sort(Integer.parseInt(message[2]),GraphicsCard.TRUMP_NUMBER);
-					
+
 					if(message[1].equals(Client.getInstance().getUsername())) {
 						this.hand.playCards(list);
 					} else {
@@ -413,7 +413,7 @@ public class TractorGame extends BasicGame {
 					for(int i = 0; i < cards*2; i+=2) {
 						list.add(GraphicsCard.getCard(message[i+3],message[i+4]));
 					}
-					
+
 					if(message[1].equals(Client.getInstance().getUsername())) {
 						this.hand.playCards(list);
 					} else {
@@ -425,7 +425,7 @@ public class TractorGame extends BasicGame {
 				}
 			}
 			break;
-			case GameCommand.SET_STATS: 
+			case GameCommand.SET_STATS:
 			{
 				this.hand.sort(GraphicsCard.TRUMP_SUIT,Integer.parseInt(message[1]));
 				int players = Integer.parseInt(message[2]);
@@ -453,7 +453,7 @@ public class TractorGame extends BasicGame {
 				}
 			}
 			break;
-			case GameCommand.DIPAI: 
+			case GameCommand.DIPAI:
 			{
 				this.banker = message[1];
 				if(message[1].equals(Client.getInstance().getUsername())) {
@@ -499,7 +499,7 @@ public class TractorGame extends BasicGame {
 				this.errorMessage = message[1];
 				for(int i=2; i<message.length;i++)
 					errorMessage+=" "+message[i];
-				
+
 				//TODO: double check this...
 				if(this.state == GameCommand.WAITING) {
 					this.playButton.enable();
@@ -531,7 +531,7 @@ public class TractorGame extends BasicGame {
 		int count = 0;
 		for(Iterator<String> i = hands.keySet().iterator(); i.hasNext(); ) {
 			String un = i.next();
-			g.drawString(un+"'s Score: "+Card.getNameOfNumber(hands.get(un).getScore()) , 8, 148-count*20);
+			g.drawString(un+"'s Score: "+Card.getNameOfNumber(hands.get(un).getScore()) , 8, 108 + count*20);
 			count++;
 		}
 		g.setColor(Color.black);
@@ -589,12 +589,12 @@ public class TractorGame extends BasicGame {
 	 * @param card
 	 */
 	public void checkCalling(GraphicsCard card) {
-		if( ( card.getNumber() == GraphicsCard.TRUMP_NUMBER && 
-				card.getSuit() != GraphicsCard.TRUMP && 
-				this.hand.frequency(card) > called_cards ) || 
-			( card.getSuit() == GraphicsCard.TRUMP && 
-				this.hand.frequency(card) >= called_cards && 
-				this.hand.frequency(card) >= 2 ) 
+		if( ( card.getNumber() == GraphicsCard.TRUMP_NUMBER &&
+				card.getSuit() != GraphicsCard.TRUMP &&
+				this.hand.frequency(card) > called_cards ) ||
+			( card.getSuit() == GraphicsCard.TRUMP &&
+				this.hand.frequency(card) >= called_cards &&
+				this.hand.frequency(card) >= 2 )
 			) {
 			switch(card.getSuit()) {
 			case GraphicsCard.SPADES:
@@ -635,7 +635,7 @@ public class TractorGame extends BasicGame {
 	}
 
 	/** It checks whether anyone has called any suit.
-	 * 
+	 *
 	 */
 	public void checkAllCalling() {
 		this.spades.hide();

@@ -45,22 +45,21 @@ public class Gameroom extends Chatroom implements Runnable { // do I need a thre
 	private int secondsSinceCalling;
 	private int[] initialScores;
 	private int dipaiPosition;
-	
+
 	/** It constructs the game room.
 	 * @param players
 	 */
-	public Gameroom(int players, String argument) {
-		
+	public Gameroom(String argument) {
+
 		this.users = new CopyOnWriteArrayList<User>();
-		this.players = players;
 		this.setName("@"+this.hashCode());
 		this.state = GameCommand.WAITING;
 		this.dipai = Collections.emptyList();
 		this.team1 = new Team();
 		this.team2 = new Team();
-		
+
 		this.cardComparator = new CardComparator(Card.HEARTS, Card.TWO);
-	
+
 		this.tractorComparator = new Comparator<Tractor>() {
 			public int compare(Tractor t1, Tractor t2) {
 				if(t1.getType() > t2.getType() && t1.getLength() >= t2.getLength() || t1.getType() >= t2.getType() && t1.getLength() > t2.getLength()) {
@@ -72,43 +71,49 @@ public class Gameroom extends Chatroom implements Runnable { // do I need a thre
 				}
 			}
 		};
-		
+
 		try {
-			this.decks = Integer.parseInt(argument);
+			this.players = Integer.parseInt(argument);
+			this.decks = Math.min((players / 2) + 1, 3);
+			this.dipaiPosition = 0;
 			this.firstgame = true;
 		} catch (NumberFormatException e) {
 			//parse argument
-			//argument: [numdecks:score1:...:score_final:dipaiposition]
+			//argument: [numplayers:numdecks:score1:...:score_final:dipaiposition]
 			String[] codes;
-			if(	argument.charAt(0) == '[' && 
-				argument.charAt(argument.length()-1) == ']' && 
-				(codes = argument.substring(1, argument.length()-1).split(":")).length == players+2 &&
-				(this.dipaiPosition = Integer.parseInt(codes[codes.length-1])) >= 0 &&
-				this.dipaiPosition < players) {
-				
-				this.decks = Integer.parseInt(codes[0]);
-				this.initialScores = new int[players];
-				for(int i = 0; i < players; i++) {
+			if(	argument.charAt(0) == '[' &&
+				argument.charAt(argument.length()-1) == ']' &&
+				(codes = argument.substring(1, argument.length()-1).split(":")).length == players+3) {
+				this.players = Integer.parseInt(codes[0]);
+				this.decks = Integer.parseInt(codes[1]);
+				this.dipaiPosition = Integer.parseInt(codes[codes.length-1]);
+				this.initialScores = new int[this.players];
+				for(int i = 0; i < this.players; i++) {
 					this.initialScores[i] = Integer.parseInt(codes[i+1]);
 					if(!( this.initialScores[i] >= Card.TWO && this.initialScores[i] <= Card.ACE )) {
-						throw new IllegalArgumentException("invalid load code1");
+						throw new IllegalArgumentException("invalid initial positions in load code");
 					}
 				}
+
+				if (this.dipaiPosition < 0 || this.dipaiPosition >= players) {
+					throw new IllegalArgumentException("invalid dipai position");
+				}
+
 				this.firstgame = false;
-			} else { 
-				throw new IllegalArgumentException("invalid load code2");
+			} else {
+				throw new IllegalArgumentException("invalid load code");
 			}
 
 		}
-		
-		if(this.decks < 1 || this.decks > 3 || this.players < 1) {
+
+		if(this.decks < 1 || this.decks > 3 || this.players < 1 || this.players % 2 != 0) {
 			throw new IllegalArgumentException("unsuppored number of decks " + decks + " or players " + players);
 		}
-		
-		System.out.println("Creating gameroom with " + decks + " deck(s)");
+
+		System.out.println("Creating gameroom with " + decks + " deck(s) and " + players + " players(s)");
 
 	}
-	
+
 	public void start() {
 		this.gthread = new Thread(this,this.getName());
 		this.gthread.start();
@@ -127,7 +132,7 @@ public class Gameroom extends Chatroom implements Runnable { // do I need a thre
 	public int getGameSize() {
 		return this.players;
 	}
-	
+
 	public boolean join(User user) {
 		if(this.getSize() < this.players) {
 			return super.join(user);
@@ -135,14 +140,14 @@ public class Gameroom extends Chatroom implements Runnable { // do I need a thre
 		return false;
 		//error handler
 	}
-	
+
 	public void part(User user) {
 		super.part(user);
 		this.sendCommand(GameCommand.PART + " " + user.getName() + " " + user.getGamePosition());
 		this.sendUpdateState(GameCommand.WAITING);
 	}
 	/** It destroys the game room.
-	 * 
+	 *
 	 */
 	public void dispose() {
 		//cleanup
@@ -156,12 +161,12 @@ public class Gameroom extends Chatroom implements Runnable { // do I need a thre
 		this.sendCommand(GameCommand.UPDATE_STATE + " " + state);
 		this.state = state;
 	}
-	
+
 	private void sendUpdateState(int state, String message) {
 		this.sendCommand(GameCommand.UPDATE_STATE + " " + state + " " + message);
 		this.state = state;
 	}
-	
+
 	/** It sends the updated stated.
 	 * @param state
 	 * @param user
@@ -196,7 +201,7 @@ public class Gameroom extends Chatroom implements Runnable { // do I need a thre
 	private void sendCommandExclude(String message, User user) {
 		for(Iterator<User> i=this.users.iterator(); i.hasNext();) {
 			User u = i.next();
-			if(u != user) 
+			if(u != user)
 				this.sendCommand(message, u);
 		}
 	}
@@ -211,17 +216,17 @@ public class Gameroom extends Chatroom implements Runnable { // do I need a thre
 			Collections.rotate(this.users, 0-index);
 		}
 	}
-	
+
 	private void setTrumpSuit(int suit) {
 		this.TRUMP_SUIT = suit;
 		this.cardComparator.setTrump(this.TRUMP_SUIT, this.TRUMP_NUMBER);
 	}
-	
-	private void setTrumpNumber(int number){ 
+
+	private void setTrumpNumber(int number){
 		this.TRUMP_NUMBER = number;
 		this.cardComparator.setTrump(this.TRUMP_SUIT, this.TRUMP_NUMBER);
 	}
-	
+
 	private void setTrump(int suit, int number) {
 		this.TRUMP_SUIT = suit;
 		this.TRUMP_NUMBER = number;
@@ -229,7 +234,7 @@ public class Gameroom extends Chatroom implements Runnable { // do I need a thre
 	}
 
 	/** It updates the stats of the game room.
-	 * 
+	 *
 	 */
 	private void updateStats() {
 		String stats = GameCommand.SET_STATS + " " + this.TRUMP_NUMBER + " " + 4;
@@ -242,7 +247,7 @@ public class Gameroom extends Chatroom implements Runnable { // do I need a thre
 	}
 
 	/** It deals the cards in the game room.
-	 * 
+	 *
 	 */
 	private void deal() {
 		this.trumped = false;
@@ -276,29 +281,29 @@ public class Gameroom extends Chatroom implements Runnable { // do I need a thre
 						}
 					}
 				}
-				
+
 				//TODO: while loop will be removed when dipai flipping is implemented
 				while( caller == null ) {
 					try {
-						Thread.sleep(1000);	
+						Thread.sleep(1000);
 					} catch (InterruptedException e) {
 						e.printStackTrace(System.out);
 						return;
 					}
 				}
-				
+
 				for(Gameroom.this.resetCallTimer(); Gameroom.this.secondsSinceCalling < 2; Gameroom.this.secondsSinceCalling++) {
 					try {
-						Thread.sleep(1000);	
+						Thread.sleep(1000);
 					} catch (InterruptedException e) {
 						e.printStackTrace(System.out);
 						return;
 					}
 				}
-				
+
 				//possible race condition?
 				sendUpdateState(GameCommand.DIPAI);
-				
+
 				if(firstgame) {
 					setLead(caller);
 					firstgame = false;
@@ -312,9 +317,9 @@ public class Gameroom extends Chatroom implements Runnable { // do I need a thre
 					lead.getHand().addCard(card);
 				}
 				sendCommand(GameCommand.DIPAI + " " + lead.getName() + " " + dipai, lead);
-				
+
 				sendCommandExclude(GameCommand.DIPAI + " " + lead.getName(), lead);
-				
+
 				//possible race condition
 				//sendUpdateState(GameCommand.DIPAI);
 				sendCommand(GameCommand.CLEAR_TABLE+" 0");
@@ -322,11 +327,11 @@ public class Gameroom extends Chatroom implements Runnable { // do I need a thre
 		};
 		dealing.start();
 	}
-	
+
 	public void resetCallTimer() {
 		this.secondsSinceCalling = 0;
 	}
-	
+
 	public void addPoints(List<Card> cards) {
 		this.addPoints(cards,1);
 	}
@@ -338,7 +343,7 @@ public class Gameroom extends Chatroom implements Runnable { // do I need a thre
 				this.currentPoints += 5*multiplier;
 		}
 	}
-	
+
 	private void addCardsToTrick(List<Card> cardlist, Trick trick, int size) {
 		if(cardlist.size() >= 2) {
 			trick.addTractor(new Tractor(size, cardlist));
@@ -382,8 +387,8 @@ public class Gameroom extends Chatroom implements Runnable { // do I need a thre
 			{
 				if(maxsize == 1)
 					maxsize = currentsize;
-					
-				if(maxsize != currentsize) 
+
+				if(maxsize != currentsize)
 				{
 					Card temp = cardlist.remove(cardlist.size()-1);
 					this.addCardsToTrick(cardlist, trick, maxsize);
@@ -397,23 +402,23 @@ public class Gameroom extends Chatroom implements Runnable { // do I need a thre
 				}
 				else
 				{
-					
+
 					if( cardComparator.gameCompare(current, previous) == 1 )
 					{
-						if(currentsize == 1) 
+						if(currentsize == 1)
 						{
 							trick.addSingle(previous);
 							cardlist.clear();
 						}
-					} 
+					}
 					else //skipped a card, current card can't be part of tractor
-					{ 
+					{
 						if(  cardlist.size() < 2 || cardComparator.gameCompare(cardlist.get(cardlist.size()-1), cardlist.get(cardlist.size()-2)) == 1 ) {
 							this.addCardsToTrick(cardlist, trick, maxsize);
 							cardlist.clear();
 							maxsize = 1;
 						} else {
-							Card temp = cardlist.remove(cardlist.size()-1);							
+							Card temp = cardlist.remove(cardlist.size()-1);
 							this.addCardsToTrick(cardlist, trick, maxsize);
 							cardlist.clear();
 							maxsize = currentsize;
@@ -425,8 +430,8 @@ public class Gameroom extends Chatroom implements Runnable { // do I need a thre
 						}
 					}
 
-					
-					
+
+
 				}
 				if(current != null) {
 					cardlist.add(current);
@@ -438,11 +443,11 @@ public class Gameroom extends Chatroom implements Runnable { // do I need a thre
 			}
 			previous=current;
 		}
-		
+
 		played.remove(played.size()-1); //remove the null we put in
 		return trick;
 	}
-	
+
 	public void run() {
 		while(!users.isEmpty()) {
 			for(Iterator<User> i = users.iterator();i.hasNext();) {
@@ -455,7 +460,7 @@ public class Gameroom extends Chatroom implements Runnable { // do I need a thre
 					/*case GameCommand.NULL:
 						//TODO: command not found error
 						break;*/
-					case GameCommand.JOIN: 
+					case GameCommand.JOIN:
 					{
 						//System.out.println("join");
 						this.sendCommandExclude(GameCommand.JOIN + " " + user.getGamePosition() + " " + user.getName(), user);
@@ -471,7 +476,7 @@ public class Gameroom extends Chatroom implements Runnable { // do I need a thre
 						}
 					}
 					break;
-					case GameCommand.START: 
+					case GameCommand.START:
 					{
 						//gtfo if you're not the host
 						if(user != this.host)
@@ -500,12 +505,12 @@ public class Gameroom extends Chatroom implements Runnable { // do I need a thre
 						if(this.state == GameCommand.DEALING) { //card being called
 							Card played = Card.getCard(message[1],message[2]);
 							int call_number = Integer.parseInt(message[3]);
-							if(played.getNumber() == this.TRUMP_NUMBER || played.getSuit() == Card.TRUMP) { // make sure the call is valid 
+							if(played.getNumber() == this.TRUMP_NUMBER || played.getSuit() == Card.TRUMP) { // make sure the call is valid
 								//card number for jokers might cause first half to return true, shouldn't matter
-								if( user.getHand().frequency(played) >= call_number && 
-									(call_number > this.called_cards || 
-										call_number >= 2 && 
-										call_number >= this.called_cards && 
+								if( user.getHand().frequency(played) >= call_number &&
+									(call_number > this.called_cards ||
+										call_number >= 2 &&
+										call_number >= this.called_cards &&
 										played.getSuit() == Card.TRUMP) &&
 									(user != this.caller ||
 										played.getSuit() == this.TRUMP_SUIT)
@@ -536,7 +541,7 @@ public class Gameroom extends Chatroom implements Runnable { // do I need a thre
 								user.getHand().getCards().remove(dpcard);
 							}
 							//System.out.println(this.dipai);
-							
+
 							//sort dem cards
 							for(Iterator<User> i2 = users.iterator();i2.hasNext();)
 							{
@@ -544,7 +549,7 @@ public class Gameroom extends Chatroom implements Runnable { // do I need a thre
 								temp.getHand().sort(cardComparator);
 								//System.out.println(temp.getHand().getCards());
 							}
-							
+
 							//calculate sets in hand
 							for(User u : users) {
 								Trick trick = calculateTrick(u.getHand().getCards());
@@ -556,12 +561,12 @@ public class Gameroom extends Chatroom implements Runnable { // do I need a thre
 								combined.addAll(pairs);
 								combined.addAll(triples);
 								mixed.addAll(tractors);
-								
+
 								Iterator<Card> it = combined.iterator();
 								Card current = it.hasNext() ? it.next() : null;
-								
+
 								while(it.hasNext()) {
-									
+
 									//TODO: what if the person has 2 non trump suit trump numbers...?
 									Card previous;
 									List<Card> tractorcards = new LinkedList<Card>();
@@ -572,7 +577,7 @@ public class Gameroom extends Chatroom implements Runnable { // do I need a thre
 									} while ( it.hasNext() && cardComparator.gameCompare(current, previous) == 1 );
 									if(cardComparator.gameCompare(current, previous) == 1)
 										tractorcards.add(current);
-									
+
 									if(tractorcards.size() >= 2) {
 										Tractor t = new Tractor(2, tractorcards);
 										Tractor t3 = new Tractor(3, tractorcards);
@@ -585,27 +590,23 @@ public class Gameroom extends Chatroom implements Runnable { // do I need a thre
 									}
 									tractorcards.clear();
 								}
-								
+
 								//remove any triples from the pairs
-								
-								
-								//TODO: 
+
+
+								//TODO:
 								u.getHand().init(pairs, triples, tractors, mixed);
 								System.out.println(u.getName() + "'s Hand: \n " + u.getHand());
 							}
-							
+
 							//manually set teams for now, modify for find a friend later
 							this.team1.clear();
 							this.team2.clear();
-							this.team1.add(users.get(0));
-							this.team1.add(users.get(2));
-							this.team2.add(users.get(1));
-							this.team2.add(users.get(3));
-							users.get(0).setTeam(team1);
-							users.get(2).setTeam(team1);
-							users.get(1).setTeam(team2);
-							users.get(3).setTeam(team2);
-							
+							for(int k=0; k<users.size(); k+=2) {
+								this.team1.add(users.get(k));
+								this.team2.add(users.get(k+1));
+							}
+
 							int index = users.indexOf(lead)-1;
 							if(index < 0) //can't possibly be not found...
 								index += users.size();
@@ -620,10 +621,10 @@ public class Gameroom extends Chatroom implements Runnable { // do I need a thre
 								this.defending = team2;
 								this.attacking = team1;
 							}
-							
+
 							this.currentPoints = 0;
 							this.gamePoints = 0;
-							
+
 							this.sendUpdateState(GameCommand.PLAYING);
 							this.setLead(lead);
 							this.sendCommand(GameCommand.YOUR_TURN+"",lead);
@@ -649,7 +650,7 @@ public class Gameroom extends Chatroom implements Runnable { // do I need a thre
 								break CommandSwitch;
 							}
 							Collections.sort(played,cardComparator);
-								
+
 
 
 
@@ -661,14 +662,14 @@ public class Gameroom extends Chatroom implements Runnable { // do I need a thre
 								Card card = it.next();
 								int suit = (card.getNumber() == this.TRUMP_NUMBER || card.getSuit() == this.TRUMP_SUIT) ? Card.TRUMP : card.getSuit();
 								this.trumped = false;
-								
+
 								while(it.hasNext()) {
 									card = it.next();
 									//if it's not the same suit and both this and the previous suit aren't trump
-									if( !( 
+									if( !(
 											( suit == card.getSuit()  && (suit != Card.TRUMP && card.getNumber() != TRUMP_NUMBER) ) ||
 											(card.getSuit() == this.TRUMP_SUIT || card.getSuit() == Card.TRUMP || card.getNumber() == this.TRUMP_NUMBER) && suit == Card.TRUMP
-									) ) 
+									) )
 									{
 										sendCommand(GameCommand.PLAY_INVALID+" must play same suit",user);
 										break CommandSwitch;
@@ -681,13 +682,13 @@ public class Gameroom extends Chatroom implements Runnable { // do I need a thre
 
 								//check if high only if there's more than one play
 								CheckPlay: while(trick.countPlays() > 1) {
-									
+
 									//can't just throw trump
 									if( suit == Card.TRUMP ) {
 										sendCommand(GameCommand.PLAY_INVALID+" can not throw trump",user);
 										break CommandSwitch;
 									}
-									
+
 									//just check the first in each play, since they're all sorted
 									if(trick.countSingles() > 0) {
 										Card single = trick.getSingles().get(0);
@@ -785,7 +786,7 @@ public class Gameroom extends Chatroom implements Runnable { // do I need a thre
 									}
 									break CheckPlay;
 								}
-								
+
 								if (trick.countPlays() == 0) { // this should never happen...
 									System.out.println("some bad shit happened");
 									return;
@@ -807,7 +808,7 @@ public class Gameroom extends Chatroom implements Runnable { // do I need a thre
 									sendCommand(GameCommand.PLAY_INVALID+" wrong number of cards",user);
 									break CommandSwitch;
 								}
-								
+
 								//make sure following suit
 								int cards_following_suit = 0;
 								for(Card card : played) {
@@ -817,7 +818,7 @@ public class Gameroom extends Chatroom implements Runnable { // do I need a thre
 								}
 								boolean following_suit = cards_following_suit == this.currentTrick.countCards();
 								System.out.println("following suit: "+following_suit);
-								
+
 								//check if void
 								boolean void_in_suit = false;
 								if(!following_suit) {
@@ -829,7 +830,7 @@ public class Gameroom extends Chatroom implements Runnable { // do I need a thre
 									}
 								}
 								System.out.println("void in suit: "+void_in_suit);
-								
+
 								//check if all trump but only if void and current play is not trump
 								boolean all_trump = false;
 								if(void_in_suit && this.currentSuit != Card.TRUMP) {
@@ -842,21 +843,21 @@ public class Gameroom extends Chatroom implements Runnable { // do I need a thre
 									}
 								}
 								System.out.println("all trump: "+all_trump);
-								
+
 								Trick trick = calculateTrick(played);
 								System.out.println(trick);
-								
+
 								CheckPlay: while ( following_suit || all_trump ) { //dirty...dirty hack
-									
+
 									boolean skipTractorCheck = false;
 									boolean following_play = true;
-									
+
 									//convert extra tractors to triples and pairs
 									if(trick.countTractors() > this.currentTrick.countTractors()) {
-										
+
 										TreeSet<Tractor> tricktractors = trick.getTractors();
 										List<Tractor> temp = new LinkedList<Tractor>();
-										
+
 										for(Tractor tractor : this.currentTrick.getTractors()) {
 											skipTractorCheck = false;
 											for(Iterator<Tractor> it = tricktractors.iterator(); it.hasNext();) {
@@ -873,7 +874,7 @@ public class Gameroom extends Chatroom implements Runnable { // do I need a thre
 												break;
 											}
 										}
-										
+
 										for(Iterator<Tractor> it = tricktractors.iterator(); it.hasNext();) {
 											Tractor temp1 = it.next();
 											if(temp1.getType() == 3) {
@@ -887,13 +888,13 @@ public class Gameroom extends Chatroom implements Runnable { // do I need a thre
 											}
 											it.remove();
 										}
-										
+
 										tricktractors.addAll(temp);
-										
+
 									}
-									
-									
-									
+
+
+
 									//System.out.println("played triples: " + trick.countTriplesPlusTractors());
 									if(trick.countTriplesPlusTractors() < this.currentTrick.countTriplesPlusTractors()) {
 										if( following_suit ) {
@@ -930,7 +931,7 @@ public class Gameroom extends Chatroom implements Runnable { // do I need a thre
 											trick.tripleToPair(trick.getTriples().first());
 										} while(trick.countTriples() > this.currentTrick.countTriples());
 									}
-									
+
 									if(trick.countPairsPlusTractors() < this.currentTrick.countPairsPlusTractors()) {
 										if( following_suit ) {
 											int pairs = 0;
@@ -953,7 +954,7 @@ public class Gameroom extends Chatroom implements Runnable { // do I need a thre
 										} while(trick.countPairs() > this.currentTrick.countPairs());
 										Collections.sort(trick.getSingles(),cardComparator);
 									}
-									
+
 									//check tractors
 									if (!skipTractorCheck) {
 										TreeSet<Tractor> ctrick = this.currentTrick.getTractors();
@@ -999,7 +1000,7 @@ public class Gameroom extends Chatroom implements Runnable { // do I need a thre
 												if (tt.getLength() > ct.getLength()) {
 													if(tt.getType() == 3) {
 														do {
-															Card card = tt.getCards().remove(0); 
+															Card card = tt.getCards().remove(0);
 															trick.getTriplesPlusTractors().remove(card);
 															trick.addTriple(card);
 														} while (tt.getLength() > ct.getLength());
@@ -1018,7 +1019,7 @@ public class Gameroom extends Chatroom implements Runnable { // do I need a thre
 														}
 													} else if(tt.getType() == 2) {
 														do {
-															Card card = tt.getCards().remove(0); 
+															Card card = tt.getCards().remove(0);
 															trick.getPairsPlusTractors().remove(card);
 															trick.addPair(card);
 														} while (tt.getLength() > ct.getLength());
@@ -1034,15 +1035,15 @@ public class Gameroom extends Chatroom implements Runnable { // do I need a thre
 											}
 										}
 									}
-									
-									
+
+
 									if(following_play) {
 										if(all_trump && !this.trumped) {
-											this.trumped = true; 
+											this.trumped = true;
 										} else {
 											if(this.trumped && !all_trump)
 												break CheckPlay;
-											
+
 											//check to see who's high now
 											//shouldn't have an issue with comparator returning 9999 since anything that's not the same suit will have been eliminated
 											if(this.currentTrick.countTractors() > 0) {
@@ -1062,7 +1063,7 @@ public class Gameroom extends Chatroom implements Runnable { // do I need a thre
 												}
 											}
 										}
-										
+
 										this.highest = user;
 										this.currentTrick = trick;
 									}
@@ -1071,7 +1072,7 @@ public class Gameroom extends Chatroom implements Runnable { // do I need a thre
 
 
 							}
-							
+
 							//should only be here if the play was valid
 							this.addPoints(played);
 							user.getHand().removeAllCards(played);
@@ -1087,21 +1088,21 @@ public class Gameroom extends Chatroom implements Runnable { // do I need a thre
 							}
 							sendCommandExclude(tosend,user);
 
-							if(!userIterator.hasNext()) { 
+							if(!userIterator.hasNext()) {
 
 								if(highest.getTeam() != this.defending) //if team is not the one with dipai
 									this.gamePoints += this.currentPoints;
 								this.currentPoints = 0;
-								
+
 								if(currentUser.getHand().getCards().size() == 0) {
 									System.out.println("GAME ENDING");
-									
+
 									//TODO: show dipai
 									if(highest.getTeam() != this.defending) {
 										this.addPoints(dipai,played.size()*2);
 										this.gamePoints += this.currentPoints;
 									}
-									
+
 									if(gamePoints == 0) {
 										this.defending.goUp(3);
 										this.setLead(this.defending.next());
@@ -1123,13 +1124,13 @@ public class Gameroom extends Chatroom implements Runnable { // do I need a thre
 											}
 										}
 									}
-									
+
 									this.setTrumpNumber(this.lead.getGameScore());
-									
+
 									if(this.TRUMP_NUMBER > Card.ACE) {
 										//TODO: this.lead.getTeam() wins
 									}
-									
+
 									this.sendCommand(GameCommand.CLEAR_TABLE+" "+gamePoints);
 									String dps = "" + this.dipai.size();
 									for(Card card : this.dipai) {
@@ -1137,7 +1138,7 @@ public class Gameroom extends Chatroom implements Runnable { // do I need a thre
 									}
 									this.sendUpdateState(GameCommand.FINISHED, dps);
 									this.deal();
-									
+
 									break CommandSwitch;
 								}
 								try {
@@ -1146,14 +1147,14 @@ public class Gameroom extends Chatroom implements Runnable { // do I need a thre
 									// TODO Auto-generated catch block
 									e.printStackTrace(System.out);
 								}
-								
-								
+
+
 								for(Iterator<User> i2 = users.iterator(); i.hasNext();) //what does this do?
 									i2.next().getHand().setCurrentPlay(null);
 								this.sendCommand(GameCommand.CLEAR_TABLE+" "+gamePoints);
 								this.setLead(highest);
 								this.userIterator = this.users.iterator();
-								
+
 							}
 							this.currentUser = userIterator.next();
 							this.sendCommand(GameCommand.YOUR_TURN+"",currentUser);
